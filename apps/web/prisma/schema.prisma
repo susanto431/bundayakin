@@ -1,0 +1,855 @@
+// ============================================================
+// BUNDAYAKIN — PRISMA SCHEMA
+// Human Care Consulting · v1.0 · Mei 2026
+// Stack: Next.js 14 + Prisma + Neon (PostgreSQL)
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum UserRole {
+  PARENT
+  NANNY
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  INACTIVE    // belum bayar
+  ACTIVE      // langganan aktif
+  EXPIRED     // kadaluarsa
+  CANCELLED
+}
+
+enum MatchingStatus {
+  PENDING         // survey belum lengkap dari salah satu pihak
+  PROCESSING      // AI sedang scoring
+  COMPLETED       // hasil matching sudah ada
+  NEGOTIATING     // ada dealbreaker, sedang dinegosiasi
+}
+
+enum NannyType {
+  LIVE_IN         // tinggal di rumah
+  LIVE_OUT        // tidak menginap
+  INFAL           // infal / pengganti
+  TEMPORARY       // sementara / kontrak singkat
+}
+
+enum WorkScope {
+  CHILD_ONLY
+  ELDERLY_ONLY
+  CHILD_AND_ELDERLY
+  HOUSEHOLD_INCLUDED
+}
+
+enum ChildAgeGroup {
+  INFANT_0_6M     // 0–6 bulan
+  INFANT_6_12M    // 6–12 bulan
+  TODDLER_1_3Y    // 1–3 tahun
+  PRESCHOOL_3_6Y  // 3–6 tahun
+  MIXED           // lebih dari satu rentang usia
+}
+
+enum EvaluationTiming {
+  WEEK_1
+  WEEK_2
+  MONTH_1
+  MONTH_3
+  QUARTERLY
+}
+
+enum EvaluationStatus {
+  PENDING
+  PARENT_DONE
+  NANNY_DONE
+  COMPLETED
+}
+
+enum TransactionType {
+  SUBSCRIPTION          // Rp 500rb/tahun
+  ADDON_PSIKOTES        // Layer 2 — Rp 300rb
+  ADDON_PSIKOLOG        // Layer 3 — Rp 1.2–1.5 juta
+  ADDON_TRACK_RECORD    // akses rekam jejak — Rp 50rb
+  PLACEMENT_FEE         // fee penyaluran nanny
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
+enum AssessmentLayer {
+  LAYER_1   // survey kecocokan — gratis dalam langganan
+  LAYER_2   // + psikotes AI
+  LAYER_3   // + psikolog
+}
+
+enum CheckinStatus {
+  PENDING
+  COMPLETED
+}
+
+enum SocialMediaFlag {
+  NONE
+  FLAGGED
+  REVIEWED
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+// ============================================================
+// AUTH — NextAuth v5
+// ============================================================
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================================
+// USER — core identity (parent & nanny)
+// ============================================================
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  DateTime?
+  phone          String?   @unique
+  image          String?
+  hashedPassword String?   // untuk credentials login
+  role           UserRole  @default(PARENT)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Role-specific profiles (1-to-1)
+  parentProfile ParentProfile?
+  nannyProfile  NannyProfile?
+
+  // Notifications & activity
+  notifications Notification[]
+  activityLogs  ActivityLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+// ============================================================
+// PARENT PROFILE
+// ============================================================
+
+model ParentProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  fullName        String
+  phone           String?
+  city            String?
+  district        String?  // kecamatan
+  address         String?  @db.Text
+  profilePhotoUrl String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Children & elderly under care
+  children  ChildProfile[]
+  elderlies ElderlyProfile[]
+
+  // Subscription
+  subscription Subscription?
+
+  // Matching
+  matchingRequests MatchingRequest[]
+
+  // Evaluations (as employer)
+  evaluations Evaluation[]
+
+  // Nanny assignments (active)
+  nannyAssignments NannyAssignment[]
+
+  // Track record access purchased
+  trackRecordAccess TrackRecordAccess[]
+
+  @@index([userId])
+}
+
+// ============================================================
+// CHILD PROFILE
+// ============================================================
+
+model ChildProfile {
+  id              String         @id @default(cuid())
+  parentProfileId String
+  name            String
+  dateOfBirth     DateTime
+  ageGroup        ChildAgeGroup
+  gender          String?
+  allergies       String?        @db.Text  // narasi bebas
+  medicalNotes    String?        @db.Text  // kondisi kesehatan khusus
+  pantangan       String?        @db.Text  // pantangan makanan / aktivitas
+  schedule        String?        @db.Text  // jadwal harian (narasi)
+  schoolName      String?
+  schoolSchedule  String?
+  additionalNotes String?        @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  parentProfile ParentProfile @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([parentProfileId])
+}
+
+// ============================================================
+// ELDERLY PROFILE (lansia — Phase 2, schema disiapkan sekarang)
+// ============================================================
+
+model ElderlyProfile {
+  id              String   @id @default(cuid())
+  parentProfileId String
+  name            String
+  dateOfBirth     DateTime?
+  gender          String?
+  medicalNotes    String?  @db.Text
+  mobilityNotes   String?  @db.Text  // kemampuan mobilitas
+  dietaryNotes    String?  @db.Text
+  medicationNotes String?  @db.Text
+  additionalNotes String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  parentProfile ParentProfile @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([parentProfileId])
+}
+
+// ============================================================
+// NANNY PROFILE
+// ============================================================
+
+model NannyProfile {
+  id                  String             @id @default(cuid())
+  userId              String             @unique
+  fullName            String
+  dateOfBirth         DateTime?
+  gender              String?            @default("Perempuan")
+  phone               String?
+  city                String?
+  district            String?
+  address             String?            @db.Text
+  profilePhotoUrl     String?
+  idCardNumber        String?            // NIK
+  idCardPhotoUrl      String?
+  idVerification      VerificationStatus @default(UNVERIFIED)
+
+  // Work preferences
+  nannyType           NannyType[]        // bisa multi: live-in + infal
+  workScope           WorkScope?
+  preferredAgeGroup   ChildAgeGroup[]
+  availableFrom       DateTime?
+  expectedSalaryMin   Int?               // IDR
+  expectedSalaryMax   Int?               // IDR
+
+  // Background
+  educationLevel      String?
+  yearsOfExperience   Int?               @default(0)
+  previousFamilies    Int?               @default(0)  // jumlah keluarga sebelumnya
+  bio                 String?            @db.Text
+  skills              String[]           // ["MPASI", "bayi kolik", "toilet training", ...]
+  languages           String[]           // ["Indonesia", "Sunda", "Jawa"]
+  religion            String?
+  dressCode           String?            // preferensi pakaian kerja
+
+  // References
+  referenceCount      Int?               @default(0)
+  references          NannyReference[]
+
+  // Social media screening
+  socialMediaFlag     SocialMediaFlag    @default(NONE)
+  socialMediaNotes    String?            @db.Text
+
+  // Badges & reputation
+  badges              String[]           // ["Terpercaya", "Terverifikasi", ...]
+  reputationScore     Float?             @default(0)
+
+  // Availability
+  isAvailable         Boolean            @default(true)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Matching
+  matchingRequests MatchingRequest[]
+  matchingResults  MatchingResult[]
+
+  // Evaluations (as employee)
+  evaluations Evaluation[]
+
+  // Assignments
+  nannyAssignments NannyAssignment[]
+
+  // Psikotes & assessment results
+  assessmentResults AssessmentResult[]
+
+  // Track record
+  trackRecordEntries TrackRecordEntry[]
+
+  // Referral
+  referralsGiven    Referral[] @relation("ReferrerNanny")
+
+  @@index([userId])
+  @@index([isAvailable])
+  @@index([city])
+}
+
+// ============================================================
+// NANNY REFERENCE (rekam jejak dari keluarga sebelumnya)
+// ============================================================
+
+model NannyReference {
+  id             String   @id @default(cuid())
+  nannyProfileId String
+  employerName   String?  // anonim jika tidak opt-in
+  employerPhone  String?
+  durationMonths Int?
+  workPeriod     String?  // "Jan 2023 – Mar 2024"
+  notes          String?  @db.Text
+  isPublic       Boolean  @default(false) // opt-in dari pemberi kerja
+  createdAt      DateTime @default(now())
+
+  nannyProfile NannyProfile @relation(fields: [nannyProfileId], references: [id], onDelete: Cascade)
+
+  @@index([nannyProfileId])
+}
+
+// ============================================================
+// SUBSCRIPTION — Rp 500rb/tahun untuk parent
+// ============================================================
+
+model Subscription {
+  id              String             @id @default(cuid())
+  parentProfileId String             @unique
+  status          SubscriptionStatus @default(INACTIVE)
+  planName        String             @default("BundaYakin Annual")
+  priceIDR        Int                @default(500000)
+  startDate       DateTime?
+  endDate         DateTime?
+  autoRenew       Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  parentProfile ParentProfile  @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+
+  @@index([parentProfileId])
+  @@index([status])
+}
+
+// ============================================================
+// TRANSACTION — semua pembayaran
+// ============================================================
+
+model Transaction {
+  id                 String            @id @default(cuid())
+  subscriptionId     String?
+  parentProfileId    String?           // siapa yang bayar
+  nannyProfileId     String?           // nanny terkait (jika ada)
+  type               TransactionType
+  status             TransactionStatus @default(PENDING)
+  amountIDR          Int
+  midtransOrderId    String?           @unique
+  midtransToken      String?           @db.Text
+  midtransStatus     String?
+  paymentMethod      String?           // "gopay", "bca_va", dll
+  paidAt             DateTime?
+  expiredAt          DateTime?
+  notes              String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  @@index([midtransOrderId])
+  @@index([status])
+  @@index([parentProfileId])
+}
+
+// ============================================================
+// MATCHING REQUEST — satu sesi matching parent ↔ nanny
+// ============================================================
+
+model MatchingRequest {
+  id              String         @id @default(cuid())
+  parentProfileId String
+  nannyProfileId  String?        // null jika nanny belum dipilih (pool matching)
+  layer           AssessmentLayer @default(LAYER_1)
+  status          MatchingStatus  @default(PENDING)
+
+  // Survey completion flags
+  parentSurveyDone  Boolean @default(false)
+  nannySurveyDone   Boolean @default(false)
+
+  // Metadata
+  nannyTypeRequested NannyType?
+  workScopeRequested WorkScope?
+  startDateRequested DateTime?
+  notes              String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parentProfile ParentProfile @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+  nannyProfile  NannyProfile? @relation(fields: [nannyProfileId], references: [id])
+
+  // Survey responses
+  parentSurveyResponses SurveyResponse[] @relation("ParentResponses")
+  nannySurveyResponses  SurveyResponse[] @relation("NannyResponses")
+
+  // Custom questions
+  customQuestions CustomQuestion[]
+
+  // Dealbreakers
+  dealbreakers Dealbreaker[]
+
+  // Result
+  matchingResult MatchingResult?
+
+  @@index([parentProfileId])
+  @@index([nannyProfileId])
+  @@index([status])
+}
+
+// ============================================================
+// SURVEY QUESTIONS — master bank soal
+// ============================================================
+
+model SurveyQuestion {
+  id           String   @id @default(cuid())
+  code         String   @unique  // "A1-01", "B3-07", dll
+  domain       String            // "A", "B", "C"
+  aspect       String            // "A1", "B2", "C3"
+  layer        AssessmentLayer   @default(LAYER_1)
+  questionText String   @db.Text
+  questionFor  String            // "PARENT", "NANNY", "BOTH"
+  answerType   String            // "MULTIPLE_CHOICE", "SCALE", "FREE_TEXT"
+  options      Json?             // [{label, value, score}]
+  weight       Float    @default(1.0)  // bobot aspek
+  isActive     Boolean  @default(true)
+  ageGroupTrigger ChildAgeGroup?       // null = tampil semua, atau trigger usia anak
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  responses SurveyResponse[]
+
+  @@index([domain])
+  @@index([aspect])
+  @@index([layer])
+}
+
+// ============================================================
+// SURVEY RESPONSE — jawaban per pertanyaan
+// ============================================================
+
+model SurveyResponse {
+  id                String   @id @default(cuid())
+  matchingRequestId String
+  questionId        String
+  respondentRole    String   // "PARENT" atau "NANNY"
+  answerValue       String?  // kode pilihan atau nilai skala
+  answerText        String?  @db.Text  // jika free text
+  score             Float?   // skor per jawaban (0–100)
+  isDealbreaker     Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  matchingRequest MatchingRequest  @relation("ParentResponses", fields: [matchingRequestId], references: [id], onDelete: Cascade, map: "SurveyResponse_parent_matchingRequestId_fkey")
+  nannyResponses  MatchingRequest? @relation("NannyResponses", fields: [matchingRequestId], references: [id], onDelete: Cascade, map: "SurveyResponse_nanny_matchingRequestId_fkey")
+  question        SurveyQuestion   @relation(fields: [questionId], references: [id])
+
+  @@unique([matchingRequestId, questionId, respondentRole])
+  @@index([matchingRequestId])
+  @@index([questionId])
+}
+
+// ============================================================
+// CUSTOM QUESTION — pertanyaan tambahan dari parent/nanny
+// ============================================================
+
+model CustomQuestion {
+  id                String   @id @default(cuid())
+  matchingRequestId String
+  askedByRole       String   // "PARENT" atau "NANNY"
+  questionText      String   @db.Text
+  isDealbreaker     Boolean  @default(false)
+  answerFromParent  String?  @db.Text
+  answerFromNanny   String?  @db.Text
+  isAnswered        Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  matchingRequest MatchingRequest @relation(fields: [matchingRequestId], references: [id], onDelete: Cascade)
+
+  @@index([matchingRequestId])
+}
+
+// ============================================================
+// DEALBREAKER — tracking per aspek
+// ============================================================
+
+model Dealbreaker {
+  id                String   @id @default(cuid())
+  matchingRequestId String
+  questionCode      String   // kode pertanyaan (A1-01, custom, dll)
+  flaggedByRole     String   // "PARENT" atau "NANNY"
+  isMatched         Boolean? // null = belum dicek, true/false = hasil
+  notificationSent  Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  matchingRequest MatchingRequest @relation(fields: [matchingRequestId], references: [id], onDelete: Cascade)
+
+  @@index([matchingRequestId])
+}
+
+// ============================================================
+// MATCHING RESULT — output AI scoring
+// ============================================================
+
+model MatchingResult {
+  id                String   @id @default(cuid())
+  matchingRequestId String   @unique
+  nannyProfileId    String
+
+  // Scores per domain
+  scoreOverall      Float    // 0–100
+  scoreDomainA      Float?   // Kondisi Kerja
+  scoreDomainB      Float?   // Nilai & Gaya Hidup
+  scoreDomainC      Float?   // Pengalaman & Kemampuan
+
+  // Detail breakdown (JSON untuk fleksibilitas)
+  aspectBreakdown   Json?    // {A1: 85, A2: 70, B1: 90, ...}
+  matchHighlights   String[] // area cocok
+  mismatchAreas     String[] // area tidak cocok
+  negotiationPoints String[] // pertanyaan untuk negosiasi
+  tipsForParent     String[] // saran untuk orang tua
+  tipsForNanny      String[] // saran untuk nanny
+
+  // AI raw output
+  aiRawOutput       Json?    // full response dari Claude API
+  aiModel           String?  // model yang dipakai
+  generatedAt       DateTime @default(now())
+
+  // Report PDF
+  reportPdfUrl      String?  // URL ke file PDF
+  reportGeneratedAt DateTime?
+
+  matchingRequest MatchingRequest @relation(fields: [matchingRequestId], references: [id], onDelete: Cascade)
+  nannyProfile    NannyProfile   @relation(fields: [nannyProfileId], references: [id])
+
+  @@index([nannyProfileId])
+}
+
+// ============================================================
+// NANNY ASSIGNMENT — saat nanny mulai kerja
+// ============================================================
+
+model NannyAssignment {
+  id              String    @id @default(cuid())
+  parentProfileId String
+  nannyProfileId  String
+  startDate       DateTime
+  endDate         DateTime?
+  isActive        Boolean   @default(true)
+  nannyType       NannyType
+  salaryAgreed    Int?      // IDR/bulan
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  parentProfile ParentProfile @relation(fields: [parentProfileId], references: [id])
+  nannyProfile  NannyProfile  @relation(fields: [nannyProfileId], references: [id])
+
+  // Evaluations linked to this assignment
+  evaluations Evaluation[]
+
+  // Check-ins
+  checkins Checkin[]
+
+  @@index([parentProfileId])
+  @@index([nannyProfileId])
+  @@index([isActive])
+}
+
+// ============================================================
+// CHECKIN — check-in singkat minggu ke-1 & ke-2
+// ============================================================
+
+model Checkin {
+  id               String          @id @default(cuid())
+  assignmentId     String
+  timing           EvaluationTiming
+  status           CheckinStatus   @default(PENDING)
+
+  // Parent responses
+  parentConditionRating  String?   // "Sangat baik" / "Baik" / "Cukup" / "Ada kendala"
+  parentConcernFlag      String?   // "Tidak ada" / "Ada, masih bisa kutangani" / "Ada, perlu bantuan"
+  parentAdaptRating      String?
+  parentCommsRating      String?
+  parentFreeText         String?   @db.Text
+
+  // Nanny responses
+  nannyConditionRating   String?
+  nannyConcernFlag       String?
+  nannyComfortRating     String?
+  nannyCommsRating       String?
+  nannyFreeText          String?   @db.Text
+
+  parentDoneAt  DateTime?
+  nannyDoneAt   DateTime?
+  scheduledAt   DateTime
+  createdAt     DateTime  @default(now())
+
+  assignment NannyAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@index([assignmentId])
+}
+
+// ============================================================
+// EVALUATION — evaluasi bulanan / berkala
+// ============================================================
+
+model Evaluation {
+  id              String           @id @default(cuid())
+  assignmentId    String
+  parentProfileId String
+  nannyProfileId  String
+  timing          EvaluationTiming
+  status          EvaluationStatus @default(PENDING)
+
+  // Parent fills
+  parentScores       Json?          // {ketepatan_waktu: 4, kebersihan: 5, ...}
+  parentNarrative    String?        @db.Text
+  parentRecommend    Boolean?
+  parentContinue     Boolean?       // lanjut atau ganti nanny?
+
+  // Nanny fills
+  nannyScores        Json?          // {kondisi_kerja: 4, komunikasi: 5, ...}
+  nannyNarrative     String?        @db.Text
+  nannyContinue      Boolean?       // mau lanjut atau tidak?
+
+  // AI summary
+  aiSummary          String?        @db.Text
+  aiRecommendation   String?        @db.Text
+
+  // Report
+  reportPdfUrl       String?
+  reportGeneratedAt  DateTime?
+
+  parentDoneAt  DateTime?
+  nannyDoneAt   DateTime?
+  scheduledAt   DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  assignment    NannyAssignment @relation(fields: [assignmentId], references: [id])
+  parentProfile ParentProfile   @relation(fields: [parentProfileId], references: [id])
+  nannyProfile  NannyProfile    @relation(fields: [nannyProfileId], references: [id])
+
+  @@index([assignmentId])
+  @@index([parentProfileId])
+  @@index([nannyProfileId])
+}
+
+// ============================================================
+// ASSESSMENT RESULT — psikotes (Layer 2) & laporan psikolog (Layer 3)
+// ============================================================
+
+model AssessmentResult {
+  id             String          @id @default(cuid())
+  nannyProfileId String
+  layer          AssessmentLayer
+  transactionId  String?
+
+  // Layer 2 — AI psikotes
+  testType       String?         // "IQ", "KEPRIBADIAN", "SIKAP_KERJA"
+  rawScores      Json?
+  interpretedBy  String?         @default("AI")
+
+  // Layer 3 — Psikolog
+  psychologistId String?         // user ID psikolog HCC
+  clinicalNotes  String?         @db.Text
+  verdict        String?         // "Direkomendasikan" / "Perlu Catatan" / dll
+  parentMessage  String?         @db.Text  // pesan untuk orang tua
+  grafisNotes    Json?           // {relasi_anak: "Tinggi", relasi_sekitar: "Cukup", ...}
+
+  // NannyCare Profile PDF (output dari ReportLab Python service)
+  reportPdfUrl   String?
+  reportGeneratedAt DateTime?
+
+  issuedAt       DateTime        @default(now())
+  createdAt      DateTime        @default(now())
+
+  nannyProfile NannyProfile @relation(fields: [nannyProfileId], references: [id], onDelete: Cascade)
+
+  @@index([nannyProfileId])
+  @@index([layer])
+}
+
+// ============================================================
+// TRACK RECORD — rekam jejak anonim antar keluarga
+// ============================================================
+
+model TrackRecordEntry {
+  id             String   @id @default(cuid())
+  nannyProfileId String
+  reviewerName   String?  // anonim kecuali opt-in
+  isPublic       Boolean  @default(false)
+  rating         Int      // 1–5
+  workPeriod     String?
+  durationMonths Int?
+  reviewText     String?  @db.Text
+  isVerified     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  nannyProfile NannyProfile @relation(fields: [nannyProfileId], references: [id], onDelete: Cascade)
+
+  @@index([nannyProfileId])
+}
+
+model TrackRecordAccess {
+  id              String   @id @default(cuid())
+  parentProfileId String
+  nannyProfileId  String   // nanny yang rekam jejaknya dibeli
+  transactionId   String?
+  accessGrantedAt DateTime @default(now())
+  expiresAt       DateTime // akses berlaku berapa lama
+
+  parentProfile ParentProfile @relation(fields: [parentProfileId], references: [id])
+
+  @@index([parentProfileId])
+  @@index([nannyProfileId])
+}
+
+// ============================================================
+// REFERRAL — sistem referral nanny
+// ============================================================
+
+model Referral {
+  id              String    @id @default(cuid())
+  referrerNannyId String    // nanny yang mereferral
+  referredNannyId String?   // nanny yang direferral (jika sudah daftar)
+  parentProfileId String?   // keluarga yang menerima nanny
+  status          String    @default("PENDING") // "PENDING", "HIRED", "MONTH_1", "MONTH_3"
+
+  // Bonus tracking
+  bonusReferrerIDR Int?
+  bonusNannyIDR    Int?
+  bonusPaidAt      DateTime?
+
+  // Milestone dates
+  hiredAt          DateTime?
+  month1At         DateTime?
+  month3At         DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  referrerNanny NannyProfile @relation("ReferrerNanny", fields: [referrerNannyId], references: [id])
+
+  @@index([referrerNannyId])
+  @@index([referredNannyId])
+}
+
+// ============================================================
+// NOTIFICATION
+// ============================================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String   @db.Text
+  type      String   // "MATCHING_READY", "EVALUATION_DUE", "DEALBREAKER", "PAYMENT", dll
+  isRead    Boolean  @default(false)
+  link      String?  // deep link ke halaman terkait
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+// ============================================================
+// ACTIVITY LOG — audit trail
+// ============================================================
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String   // "LOGIN", "SURVEY_SUBMITTED", "REPORT_DOWNLOADED", dll
+  entity    String?  // "MatchingRequest", "Evaluation", dll
+  entityId  String?
+  metadata  Json?    // data tambahan (IP, browser, dll)
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
