@@ -27,7 +27,12 @@ export default async function ParentDashboardPage() {
             },
           },
           evaluations: {
-            select: { timing: true, status: true },
+            select: { timing: true, status: true, parentDoneAt: true },
+          },
+          nannyAssignments: {
+            where: { isActive: true },
+            take: 1,
+            select: { id: true },
           },
         },
       })
@@ -43,11 +48,13 @@ export default async function ParentDashboardPage() {
   const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "4829"}`
 
   const evals = profile?.evaluations ?? []
+  const hasActiveAssignment = (profile?.nannyAssignments?.length ?? 0) > 0
+
   const isDone = (timing: string) =>
-    evals.some(e => e.timing === timing && e.status === "COMPLETED")
+    evals.some(e => e.timing === timing && !!e.parentDoneAt)
 
   const TIMINGS = ["WEEK_1", "WEEK_2", "MONTH_1", "MONTH_3"] as const
-  const nextPending = activeMatch ? TIMINGS.find(t => !isDone(t)) ?? null : null
+  const nextPending = hasActiveAssignment ? TIMINGS.find(t => !isDone(t)) ?? null : null
 
   const timelineItems = [
     {
@@ -175,11 +182,27 @@ export default async function ParentDashboardPage() {
         {timelineItems.map((item) => {
           const done = isDone(item.timing)
           const active = nextPending === item.timing
-          return (
-            <div key={item.timing} className="relative mb-3.5">
+          const href = done
+            ? `/dashboard/parent/monitoring/summary?timing=${item.timing}`
+            : active
+            ? `/dashboard/parent/monitoring?timing=${item.timing}`
+            : null
+
+          const inner = (
+            <>
               <div className={`absolute -left-[17px] top-[3px] w-[10px] h-[10px] rounded-full border-2 border-[#FDFBFF] ${done ? "bg-[#5BBFB0]" : active ? "bg-[#E07B39]" : "bg-[#C8B8DC]"}`} />
-              <p className={`text-[13px] font-semibold ${active ? "text-[#E07B39]" : "text-[#5A3A7A]"}`}>{item.label}</p>
+              <p className={`text-[13px] font-semibold ${active ? "text-[#E07B39]" : done ? "text-[#5A3A7A]" : "text-[#999AAA]"}`}>{item.label}</p>
               <p className="text-[11px] text-[#999AAA] mt-0.5">{item.sub}</p>
+            </>
+          )
+
+          return href ? (
+            <Link key={item.timing} href={href} className="relative mb-3.5 block hover:opacity-80 transition-opacity">
+              {inner}
+            </Link>
+          ) : (
+            <div key={item.timing} className="relative mb-3.5">
+              {inner}
             </div>
           )
         })}
