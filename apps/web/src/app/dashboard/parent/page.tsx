@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import { CopyButton } from "@/components/settings/CopyButton"
 
 export const metadata = { title: "Beranda — BundaYakin" }
 
@@ -25,6 +26,9 @@ export default async function ParentDashboardPage() {
               matchingResult: { select: { scoreOverall: true } },
             },
           },
+          evaluations: {
+            select: { timing: true, status: true },
+          },
         },
       })
     : null
@@ -37,6 +41,36 @@ export default async function ParentDashboardPage() {
   const hasPendingMonitoring = !!activeMatch && activeMatch.status === "COMPLETED"
 
   const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "4829"}`
+
+  const evals = profile?.evaluations ?? []
+  const isDone = (timing: string) =>
+    evals.some(e => e.timing === timing && e.status === "COMPLETED")
+
+  const TIMINGS = ["WEEK_1", "WEEK_2", "MONTH_1", "MONTH_3"] as const
+  const nextPending = activeMatch ? TIMINGS.find(t => !isDone(t)) ?? null : null
+
+  const timelineItems = [
+    {
+      timing: "WEEK_1",
+      label: isDone("WEEK_1") ? "Kabar minggu ke-1 ✓" : "Kabar minggu ke-1",
+      sub: isDone("WEEK_1") ? "Sudah diisi kedua pihak" : "5 pertanyaan singkat",
+    },
+    {
+      timing: "WEEK_2",
+      label: isDone("WEEK_2") ? "Kabar minggu ke-2 ✓" : "Kabar minggu ke-2",
+      sub: isDone("WEEK_2") ? "Sudah diisi kedua pihak" : "5 pertanyaan singkat",
+    },
+    {
+      timing: "MONTH_1",
+      label: nextPending === "MONTH_1" ? "Pemantauan bulan ke-1 → isi sekarang" : isDone("MONTH_1") ? "Pemantauan bulan ke-1 ✓" : "Pemantauan bulan ke-1",
+      sub: isDone("MONTH_1") ? "Sudah diisi kedua pihak" : "10 pertanyaan · hasil untuk kedua pihak",
+    },
+    {
+      timing: "MONTH_3",
+      label: nextPending === "MONTH_3" ? "Pemantauan bulan ke-3 → isi sekarang" : isDone("MONTH_3") ? "Pemantauan bulan ke-3 ✓" : "Pemantauan bulan ke-3",
+      sub: isDone("MONTH_3") ? "Sudah diisi kedua pihak" : "Momen keputusan: lanjut atau ganti nanny",
+    },
+  ]
 
 
   return (
@@ -138,18 +172,17 @@ export default async function ParentDashboardPage() {
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-3">Pemantauan berkala</p>
       <div className="relative pl-5 mb-4">
         <div className="absolute left-[7px] top-1 bottom-1 w-[2px] bg-[#E0D0F0]" />
-        {[
-          { label: "Kabar minggu ke-1 ✓", sub: "Sudah diisi kedua pihak", done: true },
-          { label: "Kabar minggu ke-2 ✓", sub: "Sudah diisi kedua pihak", done: true },
-          { label: "Pemantauan bulan ke-1 → isi sekarang", sub: "10 pertanyaan · hasil untuk kedua pihak", active: true },
-          { label: "Pemantauan bulan ke-3", sub: "Momen keputusan: lanjut atau ganti nanny" },
-        ].map((item, i) => (
-          <div key={i} className="relative mb-3.5">
-            <div className={`absolute -left-[17px] top-[3px] w-[10px] h-[10px] rounded-full border-2 border-[#FDFBFF] ${item.done ? "bg-[#5BBFB0]" : item.active ? "bg-[#E07B39]" : "bg-[#C8B8DC]"}`} />
-            <p className={`text-[13px] font-semibold ${item.active ? "text-[#E07B39]" : "text-[#5A3A7A]"}`}>{item.label}</p>
-            <p className="text-[11px] text-[#999AAA] mt-0.5">{item.sub}</p>
-          </div>
-        ))}
+        {timelineItems.map((item) => {
+          const done = isDone(item.timing)
+          const active = nextPending === item.timing
+          return (
+            <div key={item.timing} className="relative mb-3.5">
+              <div className={`absolute -left-[17px] top-[3px] w-[10px] h-[10px] rounded-full border-2 border-[#FDFBFF] ${done ? "bg-[#5BBFB0]" : active ? "bg-[#E07B39]" : "bg-[#C8B8DC]"}`} />
+              <p className={`text-[13px] font-semibold ${active ? "text-[#E07B39]" : "text-[#5A3A7A]"}`}>{item.label}</p>
+              <p className="text-[11px] text-[#999AAA] mt-0.5">{item.sub}</p>
+            </div>
+          )
+        })}
       </div>
 
       {/* Referral code */}
@@ -160,15 +193,13 @@ export default async function ParentDashboardPage() {
         <p className="text-[11px] text-[#999AAA] mb-3 leading-relaxed">Dapat Rp 100rb saat terjadi penempatan nanny via kode ini</p>
         <div className="flex gap-2 justify-center">
           <a
-            href={`https://wa.me/?text=Gunakan%20kode%20${referralCode}%20di%20BundaYakin`}
+            href={`https://api.whatsapp.com/send?text=Gunakan%20kode%20${referralCode}%20di%20BundaYakin%20untuk%20menemukan%20nanny%20terpercaya%20%F0%9F%91%B6`}
             target="_blank" rel="noreferrer"
             className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] transition-all"
           >
             Kirim via WA
           </a>
-          <button className="inline-flex items-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] hover:bg-[#F3EEF8] transition-all">
-            Salin kode
-          </button>
+          <CopyButton text={referralCode} />
         </div>
       </div>
 
