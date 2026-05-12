@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import NannyInviteForm from "@/components/matching/NannyInviteForm"
 
 export const metadata = { title: "Cari Nanny — BundaYakin" }
 
@@ -93,52 +94,7 @@ export default async function ParentMatchingPage() {
         </div>
       )}
 
-      {/* Invite form */}
-      <div className="mb-4">
-        <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">Nama nanny</label>
-        <input
-          type="text"
-          placeholder="Siti Rahayu"
-          className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[48px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#999AAA] outline-none transition-all mb-3"
-        />
-        <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">Nomor HP nanny</label>
-        <input
-          type="tel"
-          placeholder="0812..."
-          className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[48px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#999AAA] outline-none transition-all mb-3"
-        />
-        <button className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all">
-          Kirim link via WhatsApp
-        </button>
-      </div>
-
-      {/* Divider */}
-      <div className="border-t border-[#E0D0F0] my-4" />
-
-      {/* Invite code */}
-      <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Atau bagikan kode undangan keluarga</p>
-      <div className="bg-[#F3EEF8] border-2 border-dashed border-[#C8B8DC] rounded-[16px] p-4 mb-4 text-center">
-        <p className="text-[11px] text-[#999AAA] mb-1">Kode undangan (untuk matching)</p>
-        <p className="font-[var(--font-dm-serif)] text-[24px] tracking-[4px] text-[#5A3A7A] my-1.5">{inviteCode}</p>
-        <p className="text-[11px] text-[#999AAA] mb-1 leading-relaxed">
-          Nanny / penyalur input kode ini saat daftar — langsung terhubung ke profil Bunda.
-        </p>
-        <p className="text-[11px] text-[#999AAA] italic mb-3">
-          Berbeda dari kode rekomendasi BY-REF-XXXX untuk fee referral.
-        </p>
-        <div className="flex gap-2 justify-center">
-          <a
-            href={`https://wa.me/?text=Gunakan%20kode%20${inviteCode}%20saat%20daftar%20di%20BundaYakin`}
-            target="_blank" rel="noreferrer"
-            className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] transition-all"
-          >
-            Kirim via WA
-          </a>
-          <button className="inline-flex items-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] hover:bg-[#F3EEF8] transition-all">
-            Salin kode
-          </button>
-        </div>
-      </div>
+      <NannyInviteForm inviteCode={inviteCode} />
 
       {/* Invited nannies */}
       {invitedNannies.length > 0 && (
