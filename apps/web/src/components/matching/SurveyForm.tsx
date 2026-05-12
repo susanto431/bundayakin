@@ -45,6 +45,7 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
   const [currentAspectIdx, setCurrentAspectIdx] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
@@ -197,6 +198,7 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
 
   async function handleSubmit() {
     setIsSubmitting(true)
+    setSubmitError(null)
     try {
       if (onSubmit) await onSubmit(answers)
       setIsSubmitted(true)
@@ -206,6 +208,7 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
       )
     } catch (err) {
       console.error("[SurveyForm] submit error", err)
+      setSubmitError("Gagal menyimpan preferensi. Coba lagi.")
     } finally {
       setIsSubmitting(false)
     }
@@ -470,6 +473,11 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
 
       {/* Navigation buttons */}
       <div className="space-y-2">
+        {submitError && (
+          <div className="bg-[#FAEAEA] border border-[#C75D5D] rounded-[10px] px-3.5 py-2.5">
+            <p className="text-[13px] text-[#C75D5D] font-medium">{submitError}</p>
+          </div>
+        )}
         {isLastAspect ? (
           <button
             type="button"

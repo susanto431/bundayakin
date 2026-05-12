@@ -42,10 +42,20 @@ export async function saveSurveyToDB(params: SaveSurveyParams): Promise<SaveSurv
       },
     })
   } else {
-    const profile = await prisma.parentProfile.findUniqueOrThrow({
+    let profile = await prisma.parentProfile.findUnique({
       where: { userId },
       select: { id: true },
     })
+    if (!profile) {
+      const user = await prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { name: true },
+      })
+      profile = await prisma.parentProfile.create({
+        data: { userId, fullName: user.name ?? "Pengguna" },
+        select: { id: true },
+      })
+    }
     profileId = profile.id
     await prisma.parentProfile.update({
       where: { id: profileId },
