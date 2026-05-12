@@ -18,11 +18,12 @@ export async function GET() {
         phone: true,
         city: true,
         district: true,
+        address: true,
         subscription: {
           select: { status: true, startDate: true, endDate: true },
         },
         children: {
-          select: { name: true, ageGroup: true, gender: true, allergies: true, medicalNotes: true, additionalNotes: true },
+          select: { name: true, ageGroup: true, gender: true, allergies: true, medicalNotes: true, pantangan: true, additionalNotes: true },
         },
       },
     })

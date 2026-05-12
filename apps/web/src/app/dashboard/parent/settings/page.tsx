@@ -44,6 +44,28 @@ export default async function ParentSettingsPage() {
         <p className="text-[12px] text-[#999AAA] mt-0.5">{userName}</p>
       </div>
 
+      {/* Profile shortcut */}
+      <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Profil saya</p>
+      <Link
+        href="/dashboard/parent/profile"
+        className="flex items-center justify-between bg-white border border-[#E0D0F0] rounded-[14px] p-3.5 mb-4 hover:border-[#A97CC4] transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#F3EEF8] rounded-full flex items-center justify-center flex-shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A97CC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-[13px] font-semibold text-[#5A3A7A]">{userName}</p>
+            <p className="text-[11px] text-[#999AAA]">Edit nama, no HP, kota, alamat</p>
+          </div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8B8DC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </Link>
+
       {/* Subscription */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Langganan</p>
       {isActive ? (
@@ -90,7 +112,7 @@ export default async function ParentSettingsPage() {
         </p>
         <div className="flex gap-2 justify-center">
           <a
-            href={`https://wa.me/?text=Gunakan%20kode%20${referralCode}%20di%20BundaYakin`}
+            href={`https://api.whatsapp.com/send?text=Gunakan%20kode%20${referralCode}%20di%20BundaYakin%20untuk%20menemukan%20nanny%20terpercaya%20%F0%9F%91%B6`}
             target="_blank" rel="noreferrer"
             className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] transition-all"
           >
