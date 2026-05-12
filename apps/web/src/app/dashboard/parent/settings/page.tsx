@@ -1,8 +1,12 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import { CopyButton } from "@/components/settings/CopyButton"
+import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton"
 
 export const metadata = { title: "Akun & Pengaturan — BundaYakin" }
+
+const WA_CONTACT = "https://wa.me/6281234567890?text=Halo%20tim%20BundaYakin%2C%20saya%20butuh%20bantuan"
 
 export default async function ParentSettingsPage() {
   const session = await auth()
@@ -53,9 +57,12 @@ export default async function ParentSettingsPage() {
               {daysLeft} hari tersisa
             </span>
           </div>
-          <button className="mt-2.5 inline-flex items-center bg-[#E5F6F4] hover:bg-[#A8DDD8] text-[#1E4A45] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] border border-[#A8DDD8] transition-all">
+          <Link
+            href="/dashboard/parent/subscription"
+            className="mt-2.5 inline-flex items-center bg-[#E5F6F4] hover:bg-[#A8DDD8] text-[#1E4A45] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] border border-[#A8DDD8] transition-all"
+          >
             Perpanjang
-          </button>
+          </Link>
         </div>
       ) : (
         <div className="bg-[#5A3A7A] rounded-[20px] p-4 mb-4 relative overflow-hidden">
@@ -89,9 +96,7 @@ export default async function ParentSettingsPage() {
           >
             Bagikan via WA
           </a>
-          <button className="inline-flex items-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] hover:bg-[#F3EEF8] transition-all">
-            Salin
-          </button>
+          <CopyButton text={referralCode} />
         </div>
       </div>
 
@@ -123,30 +128,52 @@ export default async function ParentSettingsPage() {
             <span className="text-[13px] text-[#5A3A7A]">
               {c.name} · {c.ageGroup} · {c.gender === "FEMALE" ? "Perempuan" : "Laki-laki"}
             </span>
-            <button className="inline-flex items-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[12px] px-3.5 py-1 rounded-[8px] min-h-[36px] hover:bg-[#F3EEF8] transition-all">
+            <Link
+              href="/onboarding/parent"
+              className="inline-flex items-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[12px] px-3.5 py-1 rounded-[8px] min-h-[36px] hover:bg-[#F3EEF8] transition-all"
+            >
               Edit
-            </button>
+            </Link>
           </div>
         ))}
       </div>
-      <button className="inline-flex items-center bg-[#E5F6F4] hover:bg-[#A8DDD8] text-[#1E4A45] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] border border-[#A8DDD8] transition-all mb-4">
+      <Link
+        href="/onboarding/parent"
+        className="inline-flex items-center bg-[#E5F6F4] hover:bg-[#A8DDD8] text-[#1E4A45] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] border border-[#A8DDD8] transition-all mb-4"
+      >
         + Tambah profil anak
-      </button>
+      </Link>
 
       {/* Privacy & security */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Privasi &amp; keamanan</p>
       <div className="space-y-2 mb-4 text-[13px]">
-        <button className="block text-[#5BBFB0] font-semibold min-h-[40px]">Ganti kata sandi</button>
-        <button className="block text-[#5BBFB0] font-semibold min-h-[40px]">Unduh data saya</button>
-        <button className="block text-[#C75D5D] font-semibold min-h-[40px]">Hapus akun</button>
+        <Link href="/dashboard/parent/settings/password" className="block text-[#5BBFB0] font-semibold min-h-[40px] flex items-center">
+          Ganti kata sandi
+        </Link>
+        <a
+          href="/api/parent/export"
+          download="data-bundayakin.json"
+          className="block text-[#5BBFB0] font-semibold min-h-[40px] flex items-center"
+        >
+          Unduh data saya
+        </a>
+        <DeleteAccountButton />
       </div>
 
       {/* About */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Tentang</p>
       <div className="space-y-0 text-[13px] text-[#999AAA]">
-        <div className="py-2.5 border-b border-[#F3EEF8]">Syarat &amp; Ketentuan</div>
+        <Link href="/dashboard/parent/terms" className="py-2.5 border-b border-[#F3EEF8] flex items-center hover:text-[#5A3A7A] transition-colors">
+          Syarat &amp; Ketentuan
+        </Link>
         <div className="py-2.5 border-b border-[#F3EEF8]">Kebijakan Privasi (PDP)</div>
-        <button className="py-2.5 block text-[#5BBFB0] font-semibold min-h-[40px]">Hubungi tim BundaYakin</button>
+        <a
+          href={WA_CONTACT}
+          target="_blank" rel="noreferrer"
+          className="py-2.5 flex items-center text-[#5BBFB0] font-semibold min-h-[40px] hover:underline"
+        >
+          Hubungi tim BundaYakin
+        </a>
         <div className="py-2.5">Versi 1.0.0</div>
       </div>
 

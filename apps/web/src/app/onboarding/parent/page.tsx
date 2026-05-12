@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
+import ParentBottomNav from "@/components/layout/ParentBottomNav"
 
 type SeekType = "longterm" | "temporary" | "daily"
 type ChildGender = "female" | "male"
@@ -54,10 +56,16 @@ export default function OnboardingParentPage() {
 
   return (
     <main className="min-h-screen bg-[#FDFBFF] font-[var(--font-jakarta)]">
-      <div className="max-w-[480px] mx-auto px-4 py-6">
+      <div className="max-w-[480px] mx-auto px-4 py-6 pb-28">
 
         {/* Header */}
         <div className="border-b border-[#E0D0F0] pb-3 mb-4">
+          <Link
+            href="/dashboard/parent/children"
+            className="inline-flex items-center text-[12px] text-[#999AAA] hover:text-[#5A3A7A] mb-2 transition-colors"
+          >
+            ← Kembali ke catatan anak
+          </Link>
           <h2 className="text-[16px] font-bold text-[#5A3A7A]">Ceritakan tentang si Kecil</h2>
           <p className="text-[12px] text-[#999AAA] mt-0.5">Membantu kami menemukan nanny yang paling cocok</p>
         </div>
@@ -173,6 +181,7 @@ export default function OnboardingParentPage() {
           </button>
         </form>
       </div>
+      <ParentBottomNav />
     </main>
   )
 }
