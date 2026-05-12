@@ -20,7 +20,7 @@ export async function GET() {
           select: { status: true, startDate: true, endDate: true },
         },
         children: {
-          select: { name: true, ageGroup: true, gender: true, conditions: true },
+          select: { name: true, ageGroup: true, gender: true, allergies: true, medicalNotes: true, additionalNotes: true },
         },
       },
     })
