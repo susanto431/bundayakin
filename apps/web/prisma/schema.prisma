@@ -163,7 +163,7 @@ model VerificationToken {
 model User {
   id             String    @id @default(cuid())
   name           String?
-  email          String    @unique
+  email          String?   @unique
   emailVerified  DateTime?
   phone          String?   @unique
   image          String?
@@ -211,11 +211,18 @@ model ParentProfile {
   children  ChildProfile[]
   elderlies ElderlyProfile[]
 
+  // Survey
+  surveyAnswers       Json?              // snapshot SurveyAnswers dari SurveyForm
+  surveyCompletedAt   DateTime?
+
   // Subscription
   subscription Subscription?
 
   // Matching
   matchingRequests MatchingRequest[]
+
+  // Survey responses
+  surveyResponses SurveyResponse[]
 
   // Evaluations (as employer)
   evaluations Evaluation[]
@@ -327,6 +334,10 @@ model NannyProfile {
   badges              String[]           // ["Terpercaya", "Terverifikasi", ...]
   reputationScore     Float?             @default(0)
 
+  // Survey
+  surveyAnswers       Json?              // snapshot SurveyAnswers dari SurveyForm
+  surveyCompletedAt   DateTime?
+
   // Availability
   isAvailable         Boolean            @default(true)
   createdAt           DateTime           @default(now())
@@ -343,6 +354,9 @@ model NannyProfile {
 
   // Assignments
   nannyAssignments NannyAssignment[]
+
+  // Survey responses
+  surveyResponses SurveyResponse[]
 
   // Psikotes & assessment results
   assessmentResults AssessmentResult[]
@@ -458,8 +472,7 @@ model MatchingRequest {
   nannyProfile  NannyProfile? @relation(fields: [nannyProfileId], references: [id])
 
   // Survey responses
-  parentSurveyResponses SurveyResponse[] @relation("ParentResponses")
-  nannySurveyResponses  SurveyResponse[] @relation("NannyResponses")
+  surveyResponses SurveyResponse[]
 
   // Custom questions
   customQuestions CustomQuestion[]
@@ -480,21 +493,34 @@ model MatchingRequest {
 // ============================================================
 
 model SurveyQuestion {
-  id           String   @id @default(cuid())
-  code         String   @unique  // "A1-01", "B3-07", dll
-  domain       String            // "A", "B", "C"
-  aspect       String            // "A1", "B2", "C3"
-  layer        AssessmentLayer   @default(LAYER_1)
-  questionText String   @db.Text
-  questionFor  String            // "PARENT", "NANNY", "BOTH"
-  answerType   String            // "MULTIPLE_CHOICE", "SCALE", "FREE_TEXT"
-  options      Json?             // [{label, value, score}]
-  weight       Float    @default(1.0)  // bobot aspek
-  isActive     Boolean  @default(true)
-  ageGroupTrigger ChildAgeGroup?       // null = tampil semua, atau trigger usia anak
-  order        Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(cuid())
+  code        String   @unique  // "A1.1", "A1.2", matches constants id
+  domain      String            // "A", "B", "C"
+  aspect      String            // "A1", "A2", "B1", dll
+  aspectLabel String?           // "Gaji, Libur & Fasilitas"
+  layer       String   @default("L1")   // "L1" | "L2" | "L2/L3"
+  weight      String   @default("Menengah") // "Tinggi" | "Menengah" | "Rendah"
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  canBeDealbreaker Boolean @default(false)
+
+  // Nanny side (always present)
+  questionTextNanny      String   @db.Text
+  optionsNanny           Json?    // [{value, label}]
+  hasFreeTextNanny       Boolean  @default(false)
+  freeTextTriggersNanny  String[]
+
+  // Parent side (null = nanny-only question)
+  questionTextParent      String?  @db.Text
+  optionsParent           Json?    // [{value, label}]
+  hasFreeTextParent       Boolean  @default(false)
+  freeTextTriggersParent  String[]
+
+  // Popup follow-up questions (JSON array of PopupFollowUp)
+  popupFollowUp Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   responses SurveyResponse[]
 
@@ -508,23 +534,38 @@ model SurveyQuestion {
 // ============================================================
 
 model SurveyResponse {
-  id                String   @id @default(cuid())
-  matchingRequestId String
-  questionId        String
-  respondentRole    String   // "PARENT" atau "NANNY"
-  answerValue       String?  // kode pilihan atau nilai skala
-  answerText        String?  @db.Text  // jika free text
-  score             Float?   // skor per jawaban (0–100)
-  isDealbreaker     Boolean  @default(false)
-  createdAt         DateTime @default(now())
+  id             String  @id @default(cuid())
+  questionId     String
+  questionCode   String  // denormalized for easy querying, e.g. "A1.1"
+  respondentRole String  // "PARENT" | "NANNY"
 
-  matchingRequest MatchingRequest  @relation("ParentResponses", fields: [matchingRequestId], references: [id], onDelete: Cascade, map: "SurveyResponse_parent_matchingRequestId_fkey")
-  nannyResponses  MatchingRequest? @relation("NannyResponses", fields: [matchingRequestId], references: [id], onDelete: Cascade, map: "SurveyResponse_nanny_matchingRequestId_fkey")
+  // Linked to a profile (standalone survey fill — the primary use)
+  parentProfileId String?
+  nannyProfileId  String?
+
+  // Optionally linked to a matching request (in-context scoring)
+  matchingRequestId String?
+
+  answerValue   String?  // kode pilihan, e.g. "a", "b"
+  answerText    String?  @db.Text  // free-text answer
+  popupAnswers  Json?    // {trigger_idx: "a", ...}
+  isDealbreaker Boolean  @default(false)
+  score         Float?   // computed score per answer (0–100)
+
+  createdAt DateTime @default(now())
+
   question        SurveyQuestion   @relation(fields: [questionId], references: [id])
+  parentProfile   ParentProfile?   @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+  nannyProfile    NannyProfile?    @relation(fields: [nannyProfileId], references: [id], onDelete: Cascade)
+  matchingRequest MatchingRequest? @relation(fields: [matchingRequestId], references: [id], onDelete: Cascade)
 
-  @@unique([matchingRequestId, questionId, respondentRole])
+  // One answer per question per respondent per profile
+  @@unique([questionId, respondentRole, parentProfileId])
+  @@unique([questionId, respondentRole, nannyProfileId])
+  @@index([parentProfileId])
+  @@index([nannyProfileId])
   @@index([matchingRequestId])
-  @@index([questionId])
+  @@index([questionCode])
 }
 
 // ============================================================

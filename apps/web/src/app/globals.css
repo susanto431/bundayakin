@@ -3,25 +3,51 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Teal */
+  --green:        #5BBFB0;
+  --green-dark:   #2C5F5A;
+  --green-deeper: #1E4A45;
+  --green-mid:    #A8DDD8;
+  --green-light:  #E5F6F4;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Purple */
+  --purple:       #A97CC4;
+  --purple-dark:  #5A3A7A;
+  --purple-mid:   #E0D0F0;
+  --purple-light: #F3EEF8;
+
+  /* Accent */
+  --yellow:       #F9C74F;
+  --orange:       #E07B39;
+  --orange-light: #FEF0E7;
+  --red:          #C75D5D;
+  --red-light:    #FAEAEA;
+  --blue:         #5B7EC9;
+  --blue-light:   #EEF2FC;
+
+  /* Neutral */
+  --ink:          #5A3A7A;
+  --ink2:         #666666;
+  --ink3:         #999AAA;
+  --bg:           #FDFBFF;
+  --bg2:          #F3EEF8;
+  --surface:      #FFFFFF;
+  --border:       #E0D0F0;
+  --border2:      #C8B8DC;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--ink2);
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  .font-serif {
+    font-family: var(--font-dm-serif), "DM Serif Display", serif;
   }
 }

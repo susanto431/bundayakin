@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BundaYakin Wireframe v6 — Branded</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:       #5BBFB0;
+  --green-dark:  #2C5F5A;
+  --green-deeper:#1E4A45;
+  --green-mid:   #A8DDD8;
+  --green-light: #E5F6F4;
+  --purple:      #A97CC4;
+  --purple-dark: #5A3A7A;
+  --purple-mid:  #E0D0F0;
+  --purple-light:#F3EEF8;
+  --orange:      #E07B39;
+  --orange-light:#FEF0E7;
+  --red:         #C75D5D;
+  --red-light:   #FAEAEA;
+  --blue:        #5B7EC9;
+  --blue-light:  #EEF2FC;
+  --ink:         #5A3A7A;
+  --ink2:        #666666;
+  --ink3:        #999AAA;
+  --bg:          #FDFBFF;
+  --bg2:         #F3EEF8;
+  --surface:     #FFFFFF;
+  --border:      #E0D0F0;
+  --border2:     #C8B8DC;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  background: #F0EBF8;
+  color: var(--ink);
+  min-height: 100vh;
+}
+.serif { font-family: 'DM Serif Display', serif; }
+
+/* NAV */
+.nav {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--border);
+  padding: 10px 16px;
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(169,124,196,.10);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 8px; margin-right: 8px;
+}
+.nav-logo-text {
+  font-family: 'DM Serif Display', serif;
+  font-size: 16px; color: var(--ink); letter-spacing: -0.3px;
+}
+.nb {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px; font-weight: 600;
+  padding: 5px 10px; border-radius: 9999px;
+  border: 1.5px solid var(--border2);
+  background: var(--bg2); color: var(--ink2);
+  cursor: pointer; white-space: nowrap; transition: all .15s;
+}
+.nb:hover { border-color: var(--green); color: var(--green-dark); background: var(--green-light); }
+.nb.on { background: var(--green); color: #fff; border-color: var(--green); }
+.nb.ny.on { background: var(--purple); border-color: var(--purple); }
+.sep { width: 1px; height: 18px; background: var(--border); margin: 0 3px; flex-shrink: 0; }
+
+/* STAGE */
+.stage { display: none; padding: 24px 16px; justify-content: center; min-height: calc(100vh - 54px); gap: 20px; }
+.stage.on { display: flex; }
+
+/* PHONE SHELL */
+.phone {
+  width: 360px; flex-shrink: 0;
+  background: var(--bg);
+  border-radius: 32px;
+  border: 2.5px solid #2C2C2A;
+  overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 12px 40px rgba(90,58,122,.20);
+}
+.notch {
+  height: 28px; background: #1a1a1a;
+  border-radius: 32px 32px 0 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.notch-pill { width: 72px; height: 7px; background: #111; border-radius: 4px; }
+.screen { flex: 1; overflow-y: auto; background: var(--bg); }
+.home-bar {
+  height: 22px; background: #1a1a1a;
+  border-radius: 0 0 32px 32px;
+  display: flex; align-items: center; justify-content: center;
+}
+.home-line { width: 90px; height: 4px; background: #555; border-radius: 2px; }
+
+/* STATUS BAR */
+.sbar {
+  display: flex; justify-content: space-between;
+  padding: 8px 16px 4px; font-size: 11px; font-weight: 600;
+  color: var(--ink3);
+}
+
+/* HEADER */
+.shd { padding: 8px 16px 12px; border-bottom: 1.5px solid var(--border); }
+.shd h2 {
+  font-size: 16px; font-weight: 700; color: var(--ink);
+  font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.3;
+}
+.shd p { font-size: 12px; color: var(--ink3); margin-top: 3px; }
+
+/* BODY */
+.bod { padding: 16px; }
+
+/* LOGO SVG INLINE */
+.by-logo {
+  display: flex; align-items: center; gap: 9px; padding: 14px 16px 4px;
+}
+.by-logo-text-wrap { display: flex; flex-direction: column; }
+.by-logo-brand {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; color: var(--ink); letter-spacing: -0.5px; line-height: 1;
+}
+.by-logo-tagline {
+  font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+  color: var(--ink3); text-transform: uppercase; margin-top: 2px;
+}
+
+/* TYPOGRAPHY */
+.display { font-family: 'DM Serif Display', serif; }
+.h1 { font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1.25; }
+.h2 { font-size: 18px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.h3 { font-size: 15px; font-weight: 700; color: var(--ink); }
+.body { font-size: 14px; color: var(--ink2); line-height: 1.6; }
+.caption { font-size: 11px; color: var(--ink3); line-height: 1.5; }
+.eyebrow {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--ink3); margin-bottom: 8px; margin-top: 14px;
+}
+.eyebrow:first-child { margin-top: 0; }
+
+/* BUTTONS */
+.btn {
+  display: block; width: 100%;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  padding: 0 20px; min-height: 48px;
+  border-radius: 10px; border: none; cursor: pointer;
+  text-align: center; transition: all .15s; margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-primary { background: var(--green); color: #fff; }
+.btn-primary:hover { background: var(--green-dark); }
+.btn-cta { background: var(--orange); color: #fff; }
+.btn-cta:hover { background: #CC6B2A; }
+.btn-secondary { background: var(--green-light); color: var(--green-deeper); }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border2); color: var(--ink2); }
+.btn-ghost:hover { background: var(--bg2); }
+.btn-danger { background: var(--red-light); color: var(--red); border: 1.5px solid var(--red); }
+.btn-purple { background: var(--purple); color: #fff; }
+.btn-sm {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: auto; min-height: 36px; padding: 0 14px;
+  font-size: 12px; margin-bottom: 0;
+}
+
+/* FORMS */
+.ig { margin-bottom: 14px; }
+.ig label { display: block; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.ig input, .ig select, .ig textarea {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--border2); border-radius: 10px;
+  font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--ink); background: var(--surface); min-height: 48px;
+  outline: none; transition: border-color .15s;
+}
+.ig input:focus, .ig select:focus, .ig textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(91,191,176,.15);
+}
+.ig input::placeholder, .ig textarea::placeholder { color: var(--ink3); }
+.ig .hint { font-size: 11px; color: var(--ink3); margin-top: 4px; }
+.ig textarea { resize: none; height: 72px; min-height: auto; line-height: 1.5; }
+
+/* RADIO PILLS */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.pill {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  padding: 8px 16px; min-height: 44px;
+  display: inline-flex; align-items: center;
+  border: 1.5px solid var(--border2); border-radius: 9999px;
+  color: var(--ink2); background: var(--surface); transition: all .15s;
+}
+.pill.on { background: var(--green-light); color: var(--green-deeper); border-color: var(--green); font-weight: 600; }
+.pill.pu.on { background: var(--purple-light); color: var(--purple-dark); border-color: var(--purple); }
+
+/* PROGRESS BAR */
+.prog-wrap { background: var(--bg2); border-radius: 9999px; height: 7px; overflow: hidden; margin: 6px 0; }
+.prog-bar { height: 100%; border-radius: 9999px; background: var(--green); transition: width .4s ease; }
+/* Steps */
+.steps-row { display: flex; gap: 6px; margin-bottom: 16px; }
+.step-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); }
+.step-dot.dn { background: var(--green); }
+.step-dot.ac { background: var(--green-mid); }
+
+/* CARDS */
+.card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 14px;
+  margin-bottom: 10px;
+}
+.card-green { background: var(--green-light); border-color: var(--green-mid); }
+.card-purple { background: var(--purple-light); border-color: var(--purple-mid); }
+.card-orange { background: var(--orange-light); border-color: #F5C4A0; }
+.card-red { background: var(--red-light); border-color: #EFB5B5; }
+.card-blue { background: var(--blue-light); border-color: #B5C8EF; }
+.card-stat {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 14px; flex: 1;
+}
+.card-stat .stat-label { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink3); margin-bottom: 5px; }
+.card-stat .stat-value { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+.card-stat .stat-desc { font-size: 11px; color: var(--ink3); }
+.card-stat .stat-trend { color: var(--green); font-weight: 600; }
+
+/* TAGS & BADGES */
+.tag {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 9px; border-radius: 9999px;
+}
+.tag-green { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-mid); }
+.tag-orange { background: var(--orange-light); color: #A35320; border: 1px solid #F5C4A0; }
+.tag-red { background: var(--red-light); color: var(--red); border: 1px solid #EFB5B5; }
+.tag-purple { background: var(--purple-light); color: var(--purple-dark); border: 1px solid var(--purple-mid); }
+.tag-blue { background: var(--blue-light); color: var(--blue); border: 1px solid #B5C8EF; }
+
+/* ALERTS */
+.alert { border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+.alert-red { background: var(--red-light); border-left: 4px solid var(--red); border-radius: 0 12px 12px 0; }
+.alert-red .alert-title { font-size: 13px; font-weight: 700; color: var(--red); }
+.alert-red .alert-body { font-size: 12px; color: #A04040; margin-top: 3px; line-height: 1.5; }
+.alert-orange { background: var(--orange-light); border-left: 4px solid var(--orange); border-radius: 0 12px 12px 0; }
+.alert-blue { background: var(--blue-light); border-left: 4px solid var(--blue); border-radius: 0 12px 12px 0; }
+.alert-blue .alert-title { font-size: 12px; font-weight: 700; color: var(--blue); }
+.alert-blue .alert-body { font-size: 11px; color: #3A5A9A; margin-top: 3px; line-height: 1.5; }
+
+/* NANNY CARD */
+.nanny-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 14px; margin-bottom: 10px;
+  transition: all .2s;
+}
+.nanny-card:hover { box-shadow: 0 6px 20px rgba(91,191,176,.18); transform: translateY(-2px); }
+.nanny-avatar {
+  width: 44px; height: 44px; border-radius: 9999px;
+  background: var(--purple-light); border: 2px solid var(--purple-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: var(--purple-dark); flex-shrink: 0;
+}
+
+/* VERDICT BOX */
+.verdict-box {
+  background: var(--purple-dark); border-radius: 20px;
+  padding: 20px; position: relative; overflow: hidden;
+  margin-bottom: 12px;
+}
+.verdict-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 6px; }
+.verdict-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: #fff; margin-bottom: 4px; }
+.verdict-meta { font-size: 12px; color: rgba(255,255,255,.65); margin-bottom: 10px; }
+.verdict-msg { font-size: 12px; color: rgba(255,255,255,.82); line-height: 1.6; margin-bottom: 14px; }
+.verdict-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.verdict-pill {
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+  border-radius: 10px; padding: 8px 12px;
+}
+.verdict-pill-val { font-size: 14px; font-weight: 700; color: #fff; }
+.verdict-pill-label { font-size: 10px; color: rgba(255,255,255,.5); margin-top: 1px; }
+
+/* SCORE BAR */
+.score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.score-label { font-size: 12px; color: var(--ink2); width: 110px; flex-shrink: 0; line-height: 1.3; }
+.score-bar-wrap { flex: 1; }
+.score-bar-bg { background: var(--bg2); border-radius: 9999px; height: 7px; }
+.score-bar-fill { height: 7px; border-radius: 9999px; }
+.score-val { font-size: 12px; font-weight: 700; color: var(--ink); width: 36px; text-align: right; flex-shrink: 0; }
+
+/* CHECKBOX */
+.chk-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px; color: var(--ink2); line-height: 1.5; }
+.chk-box {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 1.5px solid var(--border2); flex-shrink: 0; margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+.chk-box.on { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* TIMELINE */
+.tl { position: relative; padding-left: 20px; }
+.tl::before { content: ''; position: absolute; left: 7px; top: 4px; bottom: 4px; width: 2px; background: var(--border); }
+.tl-item { position: relative; margin-bottom: 14px; }
+.tl-item::before { content: ''; position: absolute; left: -17px; top: 3px; width: 10px; height: 10px; border-radius: 50%; background: var(--border2); border: 2px solid var(--bg); }
+.tl-item.done::before { background: var(--green); }
+.tl-item.active::before { background: var(--orange); }
+.tl-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+.tl-sub { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+
+/* GAMIFICATION */
+.gami-card { background: var(--orange-light); border: 1.5px solid #F5C4A0; border-radius: 14px; padding: 14px; margin-bottom: 14px; text-align: center; }
+.gami-title { font-family: 'DM Serif Display', serif; font-size: 15px; color: #A35320; margin-bottom: 4px; }
+.gami-sub { font-size: 12px; color: var(--ink3); margin-bottom: 10px; }
+.gami-bar-row { display: flex; gap: 5px; margin-bottom: 10px; }
+.gami-seg { flex: 1; height: 6px; border-radius: 9999px; background: var(--border); }
+.gami-seg.on { background: var(--orange); }
+.badge-strip { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.badge-item { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 9999px; border: 1.5px solid #F5C4A0; color: #A35320; }
+.badge-item.earned { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+/* REF BOX */
+.ref-box {
+  background: var(--bg2); border: 2px dashed var(--border2);
+  border-radius: 16px; padding: 16px; margin-bottom: 12px; text-align: center;
+}
+.ref-code {
+  font-family: 'DM Serif Display', serif; font-size: 24px;
+  letter-spacing: 4px; color: var(--ink); margin: 6px 0;
+}
+.ref-hint { font-size: 11px; color: var(--ink3); line-height: 1.5; }
+
+/* MODAL SHEET */
+.modal-bg { background: rgba(90,58,122,.35); min-height: 560px; display: flex; align-items: flex-end; }
+.modal-sheet { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; padding: 18px 16px; max-height: 420px; overflow-y: auto; }
+.modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 14px; }
+.modal-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--ink); margin-bottom: 12px; }
+.modal-body { font-size: 12px; color: var(--ink2); line-height: 1.7; }
+.modal-body h4 { font-size: 12px; font-weight: 700; color: var(--ink); margin: 10px 0 4px; }
+.modal-body ul { padding-left: 16px; margin-bottom: 8px; }
+.modal-body li { margin-bottom: 3px; }
+.modal-footer { font-size: 10px; color: var(--ink3); font-style: italic; margin-top: 12px; padding-top: 10px; border-top: 1.5px solid var(--border); line-height: 1.5; }
+
+/* NAV BOTTOM */
+.nav-bottom { display: flex; border-top: 1.5px solid var(--border); padding: 8px 0 4px; background: var(--surface); }
+.nbi { flex: 1; text-align: center; font-size: 10px; font-weight: 500; color: var(--ink3); cursor: pointer; padding: 3px 0; line-height: 1.3; }
+.nbi.on { color: var(--green); font-weight: 700; }
+.nbi-ic { font-size: 18px; display: block; margin-bottom: 2px; }
+
+/* ROW */
+.rw { display: flex; justify-content: space-between; align-items: center; }
+.div { border: none; border-top: 1.5px solid var(--border); margin: 12px 0; }
+
+/* MODULES */
+.mod { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1.5px solid var(--border); }
+.mod:last-child { border-bottom: none; }
+.mod-ic { width: 36px; height: 36px; border-radius: 10px; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.mod-t { font-size: 13px; font-weight: 600; color: var(--ink); }
+.mod-s { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+
+/* PSIKO NUDGE */
+.psiko { background: var(--purple-light); border: 1.5px solid var(--purple-mid); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+.psiko-title { font-size: 13px; font-weight: 700; color: var(--purple-dark); margin-bottom: 6px; }
+.psiko-list { font-size: 12px; color: var(--ink2); padding-left: 16px; line-height: 1.7; }
+
+/* DISCLAIMER */
+.disclaimer { background: var(--blue-light); border-left: 3px solid var(--blue); border-radius: 0 12px 12px 0; padding: 10px 12px; margin-bottom: 12px; }
+.disclaimer-title { font-size: 12px; font-weight: 700; color: var(--blue); }
+.disclaimer-body { font-size: 11px; color: #3A5A9A; margin-top: 3px; line-height: 1.5; }
+
+/* ANN PANEL */
+.ann { background: var(--purple-dark); color: rgba(255,255,255,.8); border-radius: 16px; padding: 16px; font-size: 11px; line-height: 1.6; max-width: 210px; flex-shrink: 0; align-self: flex-start; margin-top: 40px; }
+.ann h3 { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.ai { display: flex; gap: 7px; margin-bottom: 7px; }
+.ad { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.at { background: var(--green); } .aa { background: var(--orange); } .ap { background: var(--purple); } .ag { background: var(--border2); } .ar { background: var(--red); }
+
+/* WA BUBBLE */
+.wa { background: #DCF8C6; border-radius: 12px 12px 0 12px; padding: 10px 12px; font-size: 12px; color: #111; line-height: 1.5; margin-bottom: 8px; }
+.wa-head { font-size: 12px; font-weight: 700; color: var(--green-dark); margin-bottom: 5px; }
+
+/* STEP TUTORIAL */
+.stept { display: flex; flex-direction: column; }
+.stepr { display: flex; gap: 10px; padding-bottom: 12px; position: relative; }
+.stepr:not(:last-child)::before { content: ''; position: absolute; left: 12px; top: 25px; bottom: 0; width: 2px; background: var(--border); }
+.stepn { width: 25px; height: 25px; border-radius: 50%; background: var(--green); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.step-t { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.step-s { font-size: 11px; color: var(--ink3); line-height: 1.4; }
+.step-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; display: inline-block; margin-top: 4px; }
+.st-green { background: var(--green-light); color: var(--green-dark); }
+.st-orange { background: var(--orange-light); color: #A35320; }
+</style>
+</head>
+<body>
+
+<!-- LOGO SVG HELPER (inline reusable) -->
+<svg width="0" height="0" style="display:none">
+  <defs>
+    <symbol id="by-logo-icon" viewBox="0 0 60 60">
+      <circle cx="22" cy="28" r="20" fill="#A97CC4"/>
+      <circle cx="38" cy="28" r="20" fill="#5BBFB0"/>
+      <circle cx="30" cy="20" r="9" fill="#fff"/>
+      <ellipse cx="30" cy="36" rx="12" ry="8" fill="#fff" opacity=".9"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-logo">
+    <svg width="28" height="28" viewBox="0 0 60 60"><use href="#by-logo-icon"/></svg>
+    <span class="nav-logo-text">BundaYakin</span>
+  </div>
+  <div class="sep"></div>
+  <button class="nb on" onclick="go('s01')">S01 Landing</button>
+  <button class="nb" onclick="go('s02')">S02 Register OT</button>
+  <button class="nb" onclick="go('s04')">S04 Login</button>
+  <button class="nb" onclick="go('s06')">S06 Onboarding</button>
+  <button class="nb" onclick="go('s08')">S08 Dashboard OT</button>
+  <button class="nb" onclick="go('s09')">S09 Undang Nanny</button>
+  <button class="nb" onclick="go('s10')">S10 Isi Preferensi</button>
+  <button class="nb" onclick="go('s12')">S12 Laporan</button>
+  <button class="nb" onclick="go('s14')">S14 Placement Fee</button>
+  <button class="nb" onclick="go('s16')">S16 Kabar Mingguan</button>
+  <button class="nb" onclick="go('s17')">S17 Pemantauan</button>
+  <button class="nb" onclick="go('s19')">S19 Data Anak</button>
+  <button class="nb" onclick="go('s21ref')">S21 Referral</button>
+  <button class="nb" onclick="go('s22')">S22 Settings OT</button>
+  <button class="nb" onclick="go('s23tc')">S23 T&C</button>
+  <div class="sep"></div>
+  <button class="nb ny" onclick="go('s03')">S03 Register Nanny</button>
+  <button class="nb ny" onclick="go('s15')">S15 Dashboard Nanny</button>
+  <button class="nb ny" onclick="go('s21n')">S21 Psikotes</button>
+  <button class="nb ny" onclick="go('s24')">S24 Settings Nanny</button>
+</div>
+
+<!-- S01 LANDING -->
+<div class="stage on" id="s01">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="by-logo">
+      <svg width="44" height="44" viewBox="0 0 60 60"><use href="#by-logo-icon"/></svg>
+      <div class="by-logo-text-wrap">
+        <span class="by-logo-brand">BundaYakin</span>
+        <span class="by-logo-tagline">Online Nanny Assessment</span>
+      </div>
+    </div>
+    <div class="bod">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:600;padding:4px 10px;border-radius:9999px;margin-bottom:12px;border:1px solid var(--green-mid)">
+        <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#5BBFB0"/></svg>
+        Kecocokan berbasis psikologi
+      </div>
+      <p class="display" style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--ink);line-height:1.25;margin-bottom:8px">
+        Nanny yang cocok bukan kebetulan — bisa diukur.
+      </p>
+      <p class="body caption" style="font-size:13px;margin-bottom:18px;color:var(--ink2)">
+        BundaYakin mencocokkan nanny dan keluarga berdasarkan nilai, kebiasaan, dan kebutuhan nyata — bukan sekadar pengalaman di atas kertas.
+      </p>
+
+      <p class="eyebrow">Pilih cara pakai</p>
+
+      <!-- Paket gratis -->
+      <div class="card" style="margin-bottom:8px">
+        <div class="rw" style="margin-bottom:6px">
+          <div style="font-size:14px;font-weight:700;color:var(--ink)">Coba dulu — gratis</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--ink3)">Rp 0</div>
+        </div>
+        <ul style="font-size:12px;color:var(--ink3);padding-left:16px;line-height:1.8">
+          <li>3 jatah pencocokan gratis per bulan</li>
+          <li>Profil anak tersimpan</li>
+          <li>Lihat skor kecocokan (identitas nanny belum terlihat)</li>
+        </ul>
+      </div>
+
+      <!-- Paket langganan -->
+      <div class="card card-green" style="margin-bottom:8px">
+        <div class="rw" style="margin-bottom:4px">
+          <div style="font-size:14px;font-weight:700;color:var(--green-deeper)">Berlangganan</div>
+          <div class="tag tag-green">Paling worth it</div>
+        </div>
+        <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--green-dark);margin-bottom:3px">
+          Rp 500.000<span style="font-size:13px;font-weight:400;color:var(--ink3);font-family:'Plus Jakarta Sans',sans-serif"> / tahun</span>
+        </div>
+        <div style="font-size:11px;color:var(--green-dark);margin-bottom:8px">≈ Rp 42.000/bulan · all-in</div>
+        <ul style="font-size:12px;color:var(--green-deeper);padding-left:16px;line-height:1.8">
+          <li>Pencocokan nanny sepuasnya</li>
+          <li>Pantau nanny lewat pemantauan otomatis tiap bulan</li>
+          <li>Catatan anak tersimpan — tidak mulai dari nol saat ganti nanny</li>
+          <li>Notifikasi langsung via WA</li>
+        </ul>
+      </div>
+
+      <!-- Bayar saat perlu -->
+      <div class="card card-orange" style="margin-bottom:14px">
+        <div class="rw" style="margin-bottom:6px">
+          <div style="font-size:14px;font-weight:700;color:#A35320">Bayar saat perlu</div>
+          <div class="tag tag-orange">Pilih yang dibutuhkan</div>
+        </div>
+        <ul style="font-size:12px;color:#7A4018;padding-left:16px;line-height:1.8">
+          <li>Lihat identitas nanny yang cocok → <strong>Rp 100.000</strong>/nanny</li>
+          <li>Tes kepribadian &amp; sikap kerja → <strong>Rp 300.000</strong>/nanny</li>
+          <li>Penilaian langsung psikolog → <strong>Rp 1.000.000</strong>/sesi</li>
+        </ul>
+      </div>
+
+      <div class="alert alert-blue" style="margin-bottom:14px">
+        <div class="alert-title">Biaya penempatan nanny</div>
+        <div class="alert-body">Jika nanny deal lewat BY: Rp 1.200.000 (jangka panjang) atau Rp 600.000 (temporer). Termasuk bonus untuk nanny yang bertahan dan fee untuk referrer. <span style="color:var(--blue);font-weight:600;cursor:pointer">Selengkapnya →</span></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="go('s02')">Mulai gratis — daftar sebagai orang tua</button>
+      <button class="btn btn-ghost" onclick="go('s03')">Saya nanny — daftar gratis</button>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+<div class="ann"><h3>S01 Landing</h3>
+  <div class="ai"><div class="ad at"></div><div>Logo SVG inline sesuai brand: lingkaran purple + teal + figur putih</div></div>
+  <div class="ai"><div class="ad at"></div><div>DM Serif Display untuk hero title — hangat dan premium</div></div>
+  <div class="ai"><div class="ad aa"></div><div>3 paket dengan visual card berbeda: netral / teal / oranye</div></div>
+  <div class="ai"><div class="ad ag"></div><div>Plus Jakarta Sans 14px untuk body — wajib ≥16px nanti di produksi nanny</div></div>
+</div>
+</div>
+
+<!-- S02 REGISTER OT -->
+<div class="stage" id="s02">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div style="padding:16px 16px 0;display:flex;align-items:center;gap:8px">
+      <svg width="28" height="28" viewBox="0 0 60 60"><use href="#by-logo-icon"/></svg>
+      <span style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--ink)">BundaYakin</span>
+    </div>
+    <div class="shd" style="margin-top:12px"><h2>Daftar sebagai orang tua</h2><p>Akun gratis · tidak perlu bayar dulu</p></div>
+    <div class="bod">
+      <div class="steps-row"><div class="step-dot ac"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+      <div class="ig"><label>Nama lengkap</label><input type="text" placeholder="Cth: Ria Putri"></div>
+      <div class="ig"><label>Nomor HP</label><input type="text" placeholder="0812..."></div>
+      <div class="ig"><label>Email (opsional)</label><input type="text" placeholder="email@..."></div>
+      <div class="ig"><label>Kata sandi</label><input type="password" placeholder="Min. 8 karakter"><div class="hint">Kombinasi huruf, angka, dan simbol</div></div>
+      <div class="ig"><label>Kota domisili</label><input type="text" placeholder="Jakarta Selatan"></div>
+      <div class="ig"><label>Tahu BundaYakin dari mana?</label><select><option>Instagram / TikTok</option><option>Teman / keluarga</option><option>Google</option><option>Komunitas ibu-ibu</option><option>Lainnya</option></select></div>
+      <div class="ig"><label>Kode rekomendasi (opsional)</label><input type="text" placeholder="BY-REF-XXXX dari teman / penyalur"></div>
+      <div class="card card-green" style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--green-deeper);margin-bottom:6px">Syarat &amp; Ketentuan Data (PDP)</div>
+        <div style="font-size:12px;color:var(--green-dark);line-height:1.5">Data hanya untuk pencocokan dan pemantauan nanny. Tidak dijual ke pihak ketiga.</div>
+        <div class="chk-row" style="margin-top:10px"><div class="chk-box on">✓</div><span>Saya menyetujui syarat &amp; ketentuan</span></div>
+      </div>
+      <button class="btn btn-primary" onclick="go('s06')">Buat akun &amp; lanjut →</button>
+      <div style="text-align:center;font-size:12px;color:var(--ink3);margin-top:8px">Sudah punya akun? <span style="color:var(--green);font-weight:600;cursor:pointer">Masuk di sini</span></div>
+      <div style="text-align:center;font-size:11px;color:var(--ink3);margin-top:4px">Lupa password? <span style="color:var(--green);cursor:pointer">Reset via SMS/WA</span></div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+<div class="ann"><h3>S02 Register OT</h3>
+  <div class="ai"><div class="ad at"></div><div>Input border #C8B8DC, focus state ring teal — sesuai design system</div></div>
+  <div class="ai"><div class="ad aa"></div><div>Card T&C warna teal/green — lebih ramah dari kotak abu-abu biasa</div></div>
+  <div class="ai"><div class="ad ag"></div><div>Min-height 48px semua input dan button — touch target wajib</div></div>
+</div>
+</div>
+
+<!-- S03 REGISTER NANNY -->
+<div class="stage" id="s03">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div style="padding:16px 16px 0;display:flex;align-items:center;gap:8px">
+      <svg width="28" height="28" viewBox="0 0 60 60"><use href="#by-logo-icon"/></svg>
+      <span style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--ink)">BundaYakin</span>
+    </div>
+    <div class="shd" style="margin-top:12px"><h2>Daftar sebagai nanny</h2><p>Gratis · profil terverifikasi · rekam jejak terbentuk</p></div>
+    <div class="bod">
+      <div class="card card-purple" style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--purple-dark);margin-bottom:6px">Manfaat bergabung di BundaYakin</div>
+        <ul style="font-size:12px;color:var(--purple-dark);padding-left:16px;line-height:1.8">
+          <li>Profil nanny terverifikasi platform</li>
+          <li>Rekam jejak kerja terbentuk otomatis</li>
+          <li>Bonus Rp 150.000 kalau bertahan 3 bulan</li>
+          <li>Badge Terpercaya untuk nanny andalan</li>
+        </ul>
+      </div>
+      <div class="ig"><label>Nama lengkap</label><input type="text" placeholder="Cth: Dewi Rahayu"></div>
+      <div class="ig"><label>Nomor HP</label><input type="text" placeholder="0812..."></div>
+      <div class="ig"><label>Kata sandi</label><input type="password" placeholder="Min. 8 karakter"></div>
+      <div class="ig"><label>Tahu BundaYakin dari mana?</label><select><option>Teman / nanny lain</option><option>Penyalur nanny</option><option>Instagram / TikTok</option><option>Lainnya</option></select></div>
+      <div class="ig"><label>Kode undangan keluarga (opsional)</label><input type="text" placeholder="BY-XXXX — dari keluarga yang mengundang"></div>
+      <p class="eyebrow" style="margin-top:14px">Rekening / e-wallet untuk bonus</p>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:10px">Untuk transfer bonus bertahan dan fee rekomendasi. Bisa diisi nanti.</div>
+      <div class="ig"><label>Bank atau e-wallet</label><select><option>GoPay</option><option>BCA</option><option>BRI</option><option>Mandiri</option><option>OVO</option><option>DANA</option></select></div>
+      <div class="ig"><label>Nomor rekening / HP e-wallet</label><input type="text" placeholder="1234567890"></div>
+      <p class="eyebrow">Saya bersedia bekerja sebagai</p>
+      <div class="chk-row"><div class="chk-box on">✓</div><span>Jangka panjang (tinggal / harian rutin)</span></div>
+      <div class="chk-row"><div class="chk-box on">✓</div><span>Temporer / infal</span></div>
+      <div class="chk-row"><div class="chk-box"></div><span style="color:var(--ink3)">Harian / per jam (tersedia nanti)</span></div>
+      <div class="card card-purple" style="margin:12px 0">
+        <div style="font-size:12px;font-weight:700;color:var(--purple-dark);margin-bottom:5px">Syarat &amp; Ketentuan Data Nanny</div>
+        <div style="font-size:12px;color:var(--purple-dark);line-height:1.5">Dengan daftar, data boleh dipakai untuk pencocokan. Manfaat balik: profil terverifikasi + rekam jejak + bonus bertahan.</div>
+        <div class="chk-row" style="margin-top:8px"><div class="chk-box on">✓</div><span>Saya setuju</span></div>
+      </div>
+      <button class="btn btn-purple" onclick="go('s15')">Buat akun nanny gratis</button>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+<!-- S04 LOGIN -->
+<div class="stage" id="s04">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div style="padding:32px 16px 0;text-align:center">
+      <svg width="56" height="56" viewBox="0 0 60 60"><use href="#by-logo-icon"/></svg>
+      <p class="display" style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--ink);margin-top:8px">BundaYakin</p>
+      <p style="font-size:11px;color:var(--ink3);letter-spacing:1.5px;font-weight:700;text-transform:uppercase;margin-top:2px;margin-bottom:24px">Online Nanny Assessment</p>
+    </div>
+    <div class="bod">
+      <div class="ig"><label>Nomor HP atau email</label><input type="text" placeholder="0812... atau email@..."></div>
+      <div class="ig"><label>Kata sandi</label><input type="password" placeholder="••••••••"></div>
+      <div style="text-align:right;font-size:12px;color:var(--green);margin-bottom:16px;cursor:pointer;font-weight:600">Lupa password? Reset via SMS/WA →</div>
+      <button class="btn btn-primary">Masuk</button>
+      <div class="card" style="margin-top:12px;background:var(--bg2);border-color:var(--border)">
+        <div style="font-size:12px;color:var(--ink3);text-align:center;line-height:1.6">Sistem mendeteksi otomatis akun Orang Tua atau Nanny → diarahkan ke dashboard masing-masing.</div>
+      </div>
+      <div class="div"></div>
+      <div style="text-align:center;font-size:12px;color:var(--ink3);margin-bottom:10px">Belum punya akun?</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" style="flex:1;display:flex" onclick="go('s02')">Daftar OT</button>
+        <button class="btn btn-purple btn-sm" style="flex:1;display:flex" onclick="go('s03')">Daftar Nanny</button>
+      </div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+
+<!-- S06 ONBOARDING OT -->
+<div class="stage" id="s06">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Ceritakan tentang si Kecil</h2><p>Membantu kami menemukan nanny yang paling cocok</p></div>
+    <div class="bod">
+      <div class="steps-row"><div class="step-dot dn"></div><div class="step-dot ac"></div><div class="step-dot"></div></div>
+      <p class="eyebrow">Saya mencari nanny untuk</p>
+      <div class="pills" style="margin-bottom:14px">
+        <div class="pill on">Jangka panjang</div>
+        <div class="pill">Temporer / infal</div>
+        <div class="pill">Per hari / per jam</div>
+      </div>
+      <div class="ig"><label>Nama anak</label><input type="text" placeholder="Kira"></div>
+      <div class="ig"><label>Usia anak</label><select><option>0–6 bulan</option><option>6–12 bulan</option><option selected>1–3 tahun</option><option>3–6 tahun</option><option>6 tahun ke atas</option></select></div>
+      <div class="ig"><label>Jenis kelamin</label>
+        <div class="pills"><div class="pill on">Perempuan</div><div class="pill">Laki-laki</div></div>
+      </div>
+      <div class="card card-orange" style="margin:12px 0">
+        <div style="font-size:12px;font-weight:700;color:#A35320;margin-bottom:8px">Pertanyaan tambahan — usia 1–3 tahun</div>
+        <div style="font-size:13px;color:var(--ink2);margin-bottom:6px">Nanny perlu bantu latih toilet training?</div>
+        <div class="pills"><div class="pill on">Ya, perlu</div><div class="pill">Tidak perlu</div></div>
+        <div style="font-size:13px;color:var(--ink2);margin:10px 0 6px">Nanny perlu antar jemput ke sekolah / les?</div>
+        <div class="pills"><div class="pill">Ya</div><div class="pill on">Tidak</div></div>
+      </div>
+      <div class="ig"><label>Kondisi khusus / alergi (opsional)</label><textarea placeholder="Mis: alergi susu sapi, asma ringan..."></textarea></div>
+      <div class="ig"><label>Kota / area (opsional)</label><input type="text" placeholder="Jakarta Selatan"></div>
+      <button class="btn btn-primary" onclick="go('s08')">Simpan &amp; ke dashboard</button>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+<!-- S08 DASHBOARD OT -->
+<div class="stage" id="s08">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div style="padding:14px 16px 0;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11px;color:var(--ink3)">Selamat datang,</div>
+        <div class="display" style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink)"><em>Bunda</em> Ria Putri</div>
+      </div>
+      <div class="tag tag-green">Aktif · 287 hr</div>
+    </div>
+    <div class="bod">
+      <!-- Flag -->
+      <div class="alert alert-red">
+        <div class="alert-title">Perlu perhatian segera</div>
+        <div class="alert-body">Pemantauan bulan ke-1 belum diisi. Nanny Siti sudah mengisi dari sisinya.</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:8px;display:inline-flex" onclick="go('s17')">Isi sekarang</button>
+      </div>
+
+      <!-- Stat cards -->
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div class="card-stat">
+          <div class="stat-label">Kecocokan</div>
+          <div class="stat-value">78%</div>
+          <div class="stat-desc"><span class="stat-trend">Cocok</span> berdasarkan preferensi</div>
+        </div>
+        <div class="card-stat">
+          <div class="stat-label">Jatah bulan ini</div>
+          <div class="stat-value" style="font-size:20px">2×</div>
+          <div class="stat-desc">Pencocokan gratis</div>
+        </div>
+      </div>
+
+      <!-- Nanny aktif -->
+      <div class="nanny-card">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div class="nanny-avatar">SR</div>
+          <div style="flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--ink)">Siti Rahayu</div>
+                <div style="font-size:12px;color:var(--ink3);margin-top:1px">28 thn · SMA · Jakarta · Menginap</div>
+              </div>
+              <div class="tag tag-green">Cocok 78%</div>
+            </div>
+            <div class="prog-wrap" style="margin-top:8px"><div class="prog-bar" style="width:78%"></div></div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:3px">Kecocokan berdasarkan preferensi kedua pihak</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline pemantauan -->
+      <p class="eyebrow">Pemantauan berkala</p>
+      <div class="tl">
+        <div class="tl-item done"><div class="tl-label">Kabar minggu ke-1 ✓</div><div class="tl-sub">Sudah diisi kedua pihak</div></div>
+        <div class="tl-item done"><div class="tl-label">Kabar minggu ke-2 ✓</div><div class="tl-sub">Sudah diisi kedua pihak</div></div>
+        <div class="tl-item active"><div class="tl-label">Pemantauan bulan ke-1 → isi sekarang</div><div class="tl-sub">10 pertanyaan · hasil untuk kedua pihak</div></div>
+        <div class="tl-item"><div class="tl-label">Pemantauan bulan ke-3</div><div class="tl-sub">Momen keputusan: lanjut atau ganti nanny</div></div>
+      </div>
+
+      <!-- Referral -->
+      <p class="eyebrow" style="margin-top:14px">Kode rekomendasimu</p>
+      <div class="ref-box">
+        <div style="font-size:11px;color:var(--ink3)">Bagikan ke teman atau penyalur nanny</div>
+        <div class="ref-code">BY-REF-4829</div>
+        <div class="ref-hint">Dapat Rp 100rb saat terjadi penempatan nanny via kode ini</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+          <button class="btn btn-primary btn-sm">Kirim via WA</button>
+          <button class="btn btn-ghost btn-sm">Salin kode</button>
+        </div>
+      </div>
+
+      <!-- Add-on -->
+      <p class="eyebrow">Ingin tahu lebih dalam?</p>
+      <div class="card card-orange">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#A35320">Tes kepribadian &amp; sikap kerja Siti</div>
+            <div style="font-size:12px;color:#7A4018;margin-top:3px">Gambaran lebih lengkap tentang nanny</div>
+          </div>
+          <button class="btn btn-cta btn-sm">Rp 300rb</button>
+        </div>
+      </div>
+    </div>
+    <div class="nav-bottom">
+      <div class="nbi on"><span class="nbi-ic">⊙</span>Beranda</div>
+      <div class="nbi" onclick="go('s09')"><span class="nbi-ic">⊕</span>Cari Nanny</div>
+      <div class="nbi" onclick="go('s19')"><span class="nbi-ic">⊞</span>Catatan Anak</div>
+      <div class="nbi" onclick="go('s22')"><span class="nbi-ic">⊛</span>Akun</div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+<div class="ann"><h3>S08 Dashboard OT</h3>
+  <div class="ai"><div class="ad at"></div><div>DM Serif Display italic untuk sapaan "Bunda" — personal dan hangat</div></div>
+  <div class="ai"><div class="ad ar"></div><div>Alert merah pakai border-left 4px — konsisten dengan design system alert</div></div>
+  <div class="ai"><div class="ad at"></div><div>Stat card DM Serif Display untuk nilai utama (78%, 2×)</div></div>
+  <div class="ai"><div class="ad ag"></div><div>Nanny card dengan avatar inisial, hover shadow teal per spec</div></div>
+</div>
+</div>
+
+<!-- S09 UNDANG NANNY -->
+<div class="stage" id="s09">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Cocokkan dengan nanny</h2><p>Sudah punya kandidat? Ajak isi dari sini</p></div>
+    <div class="bod">
+      <div class="disclaimer">
+        <div class="disclaimer-title">Dapat nanny dari penyalur / kenalan? Tetap bisa pakai BY gratis</div>
+        <div class="disclaimer-body">Gunakan fitur pencocokan dan pemantauan secara gratis tanpa kewajiban bayar ke BY. Biaya penempatan BY hanya berlaku jika deal terjadi lewat platform kami. <span style="color:var(--blue);font-weight:600;cursor:pointer">Selengkapnya →</span></div>
+      </div>
+      <div class="card card-green" style="margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--green-deeper);margin-bottom:4px">Cara kerja</div>
+        <div style="font-size:12px;color:var(--green-dark);line-height:1.5">Nanny terima link → isi preferensi → sistem cocokkan dua jawaban → laporan untuk keduanya.</div>
+      </div>
+      <div class="ig"><label>Nama nanny</label><input type="text" placeholder="Siti Rahayu"></div>
+      <div class="ig"><label>Nomor HP nanny</label><input type="text" placeholder="0812..."></div>
+      <button class="btn btn-primary">Kirim link via WhatsApp</button>
+      <div class="div"></div>
+      <p class="eyebrow">Atau bagikan kode undangan keluarga</p>
+      <div class="ref-box">
+        <div style="font-size:11px;color:var(--ink3)">Kode undangan (untuk matching)</div>
+        <div class="ref-code">BY-4829</div>
+        <div class="ref-hint">Nanny / penyalur input kode ini saat daftar — langsung terhubung ke profil Bunda.<br><span style="color:var(--ink3);font-style:italic">Berbeda dari kode rekomendasi BY-REF-XXXX untuk fee referral.</span></div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+          <button class="btn btn-primary btn-sm">Kirim via WA</button>
+          <button class="btn btn-ghost btn-sm">Salin kode</button>
+        </div>
+      </div>
+      <p class="eyebrow">Nanny yang sudah diundang</p>
+      <div class="nanny-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="nanny-avatar" style="width:36px;height:36px;font-size:13px">SR</div>
+            <div><div style="font-size:13px;font-weight:600;color:var(--ink)">Siti Rahayu</div><div style="font-size:11px;color:var(--ink3)">Dikirim 10 Mei</div></div>
+          </div>
+          <div class="tag tag-green">Sudah isi</div>
+        </div>
+      </div>
+      <div class="nanny-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="nanny-avatar" style="width:36px;height:36px;font-size:13px">DK</div>
+            <div><div style="font-size:13px;font-weight:600;color:var(--ink)">Dewi Kartini</div><div style="font-size:11px;color:var(--ink3)">Dikirim 11 Mei</div></div>
+          </div>
+          <div class="tag tag-orange">Menunggu</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+
+<!-- S10 ISI PREFERENSI -->
+<div class="stage" id="s10">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Isi preferensi — Bagian 2 dari 4</h2><p>Nilai &amp; gaya hidup keluarga</p></div>
+    <div class="bod">
+      <div class="gami-card">
+        <div class="gami-title">Bagian 1 selesai, tinggal 3 lagi!</div>
+        <div class="gami-sub">Semakin lengkap diisi, semakin akurat hasilnya</div>
+        <div class="gami-bar-row">
+          <div class="gami-seg on"></div><div class="gami-seg" style="background:#F5C4A0"></div><div class="gami-seg"></div><div class="gami-seg"></div>
+        </div>
+        <div class="badge-strip">
+          <div class="badge-item earned">Mulai ✓</div>
+          <div class="badge-item">50% selesai</div>
+          <div class="badge-item">Profil lengkap</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">1. Berapa anggaran gaji nanny per bulan?</div>
+        <div class="pills">
+          <div class="pill">Di bawah Rp 2jt</div>
+          <div class="pill on">Rp 2–3 juta</div>
+          <div class="pill">Rp 3–4 juta</div>
+          <div class="pill">Rp 4–5 juta</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--red)">
+          <input type="checkbox" checked style="accent-color:var(--red)">
+          <span>Ini syarat mutlak — tidak bisa dikompromikan</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">2. Nanny harus tinggal di rumah?</div>
+        <div class="pills">
+          <div class="pill on">Ya, harus tinggal</div>
+          <div class="pill">Boleh pulang tiap hari</div>
+          <div class="pill">Bebas</div>
+        </div>
+      </div>
+
+      <div class="card card-orange" style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:#A35320;margin-bottom:6px">+ Tambah pertanyaan sendiri</div>
+        <textarea style="width:100%;font-size:13px;padding:10px 12px;border:1.5px solid #F5C4A0;border-radius:10px;background:transparent;height:56px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink2)" placeholder="Mis: Nanny harus bisa berbahasa Inggris dasar"></textarea>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px;color:var(--red)">
+          <input type="checkbox" style="accent-color:var(--red)">
+          <span>Jadikan syarat mutlak</span>
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--ink3);margin-bottom:14px">
+        Jawaban tersimpan otomatis setiap klik · bisa ditinggal dan dilanjutkan kapan saja
+      </div>
+      <button class="btn btn-primary" onclick="go('s12')">Bagian 2 selesai — lanjut →</button>
+      <button class="btn btn-ghost">Simpan &amp; lanjutkan nanti</button>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+<div class="ann"><h3>S10 Isi Preferensi</h3>
+  <div class="ai"><div class="ad aa"></div><div>Gamifikasi: orange card dengan DM Serif Display untuk judul — terasa festive</div></div>
+  <div class="ai"><div class="ad ar"></div><div>"Syarat mutlak" — checkbox merah agar terasa serius tapi tidak menakutkan</div></div>
+</div>
+</div>
+
+<!-- S12 LAPORAN KECOCOKAN -->
+<div class="stage" id="s12">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Laporan kecocokan</h2><p>Siti Rahayu × Keluarga Ria Putri</p></div>
+    <div class="bod">
+      <!-- Big score -->
+      <div style="text-align:center;padding:16px 0 14px">
+        <div class="display" style="font-family:'DM Serif Display',serif;font-size:52px;color:var(--green-dark);line-height:1">78<span style="font-size:28px">%</span></div>
+        <div class="tag tag-green" style="font-size:13px;padding:5px 14px;margin-top:6px">Cocok</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:6px">Berdasarkan preferensi kedua pihak · 12 Mei 2026</div>
+      </div>
+
+      <p class="eyebrow">Kecocokan per area</p>
+      <!-- Score bars -->
+      <div class="score-row">
+        <div class="score-label">Kondisi kerja &amp; ekspektasi</div>
+        <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:85%;background:var(--green)"></div></div></div>
+        <div class="score-val">85%</div>
+      </div>
+      <div class="score-row">
+        <div class="score-label">Nilai &amp; gaya hidup</div>
+        <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:80%;background:var(--green)"></div></div></div>
+        <div class="score-val">80%</div>
+      </div>
+      <div class="score-row">
+        <div class="score-label">Pengalaman &amp; kemampuan</div>
+        <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:62%;background:var(--orange)"></div></div></div>
+        <div class="score-val" style="color:var(--orange)">62%</div>
+      </div>
+
+      <p class="eyebrow" style="margin-top:14px">Perlu dibicarakan dulu</p>
+      <div class="card card-orange">
+        <div style="font-size:13px;font-weight:700;color:#A35320">Jam lembur</div>
+        <div style="font-size:12px;color:#7A4018;margin-top:4px;line-height:1.5">Bunda harap "sering", Siti pilih "sesekali". Klarifikasi sebelum mulai.</div>
+      </div>
+      <div class="card card-orange">
+        <div style="font-size:13px;font-weight:700;color:#A35320">Pengalaman anak usia Kira</div>
+        <div style="font-size:12px;color:#7A4018;margin-top:4px;line-height:1.5">Siti: 6 bulan pengalaman. Bunda harap minimal 1 tahun.</div>
+      </div>
+
+      <p class="eyebrow" style="margin-top:14px">Ingin hasil yang lebih lengkap?</p>
+      <div class="card" style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink)">Tes kepribadian &amp; sikap kerja</div>
+            <div style="font-size:12px;color:var(--ink3);margin-top:3px">Gambaran detail nanny</div>
+          </div>
+          <button class="btn btn-cta btn-sm">Rp 300rb</button>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink)">Penilaian langsung psikolog</div>
+            <div style="font-size:12px;color:var(--ink3);margin-top:3px">Wawancara privat · saran kedua pihak</div>
+          </div>
+          <button class="btn btn-cta btn-sm">Rp 1jt</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="go('s14')">Terima nanny ini →</button>
+      <button class="btn btn-ghost">Cari kandidat lain</button>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+<div class="ann"><h3>S12 Laporan</h3>
+  <div class="ai"><div class="ad at"></div><div>Skor utama 78% — DM Serif Display 52px, warna green-dark — jadi focal point</div></div>
+  <div class="ai"><div class="ad aa"></div><div>Score bar oranye untuk domain &lt;70% — color coding sesuai spec: 55-69% = orange</div></div>
+  <div class="ai"><div class="ad ag"></div><div>Penilaian psikolog Rp 1jt — sengaja berbeda visual dari placement fee</div></div>
+</div>
+</div>
+
+<!-- S14 PLACEMENT FEE -->
+<div class="stage" id="s14">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Konfirmasi penerimaan nanny</h2><p>Langkah terakhir sebelum Siti resmi mulai</p></div>
+    <div class="bod">
+      <div class="nanny-card" style="margin-bottom:12px">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div class="nanny-avatar">SR</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700;color:var(--ink)">Siti Rahayu</div>
+            <div style="font-size:12px;color:var(--ink3);margin-top:2px">Jangka panjang · menginap · mulai 20 Mei 2026</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+              <span style="font-size:11px;color:var(--ink3)">Tingkat kecocokan</span>
+              <div class="tag tag-green">78%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="eyebrow">Biaya penempatan nanny</p>
+      <div class="card card-orange" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#A35320">Jangka panjang — all-in</div>
+            <div style="font-size:12px;color:#7A4018;margin-top:4px;line-height:1.5">Termasuk: bonus untuk Siti kalau bertahan 3 bulan, dan fee untuk siapa pun yang merekomendasikan Siti ke Bunda.</div>
+            <div style="margin-top:6px"><span style="color:var(--orange);font-size:12px;font-weight:600;cursor:pointer">Selengkapnya tentang biaya ini →</span></div>
+          </div>
+          <div class="display" style="font-family:'DM Serif Display',serif;font-size:22px;color:#A35320;margin-left:12px;flex-shrink:0">1,2jt</div>
+        </div>
+      </div>
+
+      <div class="card card-green" style="margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--green-deeper);margin-bottom:5px">Jaminan kecocokan</div>
+        <div style="font-size:12px;color:var(--green-dark);line-height:1.5">Kalau dalam 3 bulan terasa tidak cocok: Bunda mendapat 1× penempatan nanny baru secara gratis. Prosedur klaim tersedia di halaman Bantuan.</div>
+      </div>
+
+      <div class="chk-row"><div class="chk-box on">✓</div><span>Saya setuju dengan syarat jaminan di atas</span></div>
+      <button class="btn btn-cta" style="margin-top:12px" onclick="go('s08')">Bayar Rp 1.200.000 &amp; konfirmasi</button>
+      <button class="btn btn-ghost">Kembali ke laporan</button>
+      <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--blue);cursor:pointer" onclick="go('s23tc')">Perbedaan biaya BY dan penyalur tradisional →</div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+
+<!-- S16 KABAR MINGGUAN -->
+<div class="stage" id="s16">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Kabar minggu pertama</h2><p>Siti Rahayu · 5 pertanyaan singkat, ~2 menit</p></div>
+    <div class="bod">
+      <div class="card card-green" style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--green-deeper);margin-bottom:5px">Mengapa ada kabar mingguan?</div>
+        <div style="font-size:12px;color:var(--green-dark);line-height:1.5">Minggu pertama sering jadi penentu. Dengan berbagi kabar lebih awal, kami bisa bantu sebelum hal kecil jadi besar. Siti juga mengisi dari sisinya — hasilnya untuk berdua.</div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">1. Secara umum, bagaimana kondisi Siti minggu ini?</div>
+        <div class="pills"><div class="pill on">Sangat baik</div><div class="pill">Baik</div><div class="pill">Cukup</div><div class="pill">Ada kendala</div></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">2. Ada yang perlu diperhatikan?</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="pill on" style="border-radius:10px">Tidak ada — sejauh ini baik-baik saja</div>
+          <div class="pill" style="border-radius:10px">Ada sedikit, tapi bisa saya tangani</div>
+          <div class="pill" style="border-radius:10px;color:var(--red);border-color:var(--red)">Ada, dan butuh bantuan tim BY</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">3. Siti terlihat nyaman &amp; beradaptasi?</div>
+        <div class="pills"><div class="pill on">Sangat terlihat</div><div class="pill">Cukup terlihat</div><div class="pill">Belum terlihat</div></div>
+      </div>
+      <div class="ig"><label>5. Pesan untuk tim BundaYakin? (opsional)</label><textarea placeholder="Tulis di sini..."></textarea></div>
+      <div style="background:var(--bg2);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--ink3);margin-bottom:14px">
+        Tidak ada jawaban benar atau salah — ini untuk membantu dua pihak merasa nyaman.
+      </div>
+      <button class="btn btn-primary" onclick="go('s08')">Kirim kabar minggu ini</button>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+<!-- S17 PEMANTAUAN PENUH -->
+<div class="stage" id="s17">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Pemantauan Bulan ke-1</h2><p>Siti Rahayu · isi sebelum 20 Juni 2026</p></div>
+    <div class="bod">
+      <div class="card card-green" style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--green-deeper);margin-bottom:5px">Untuk apa pemantauan ini?</div>
+        <div style="font-size:12px;color:var(--green-dark);line-height:1.5">Untuk menjaga kenyamanan kedua belah pihak. Siti juga mengisi dari sisinya — hasilnya kami kompilasi dan kirim via WA. Bahasa di laporan diperhalus oleh AI agar tetap konstruktif.</div>
+      </div>
+      <div style="display:flex;border-bottom:2px solid var(--border);margin-bottom:14px">
+        <div style="padding:8px 0;font-size:13px;font-weight:700;color:var(--green);border-bottom:2px solid var(--green);margin-right:20px;cursor:pointer;margin-bottom:-2px">Pertanyaan Bunda</div>
+        <div style="padding:8px 0;font-size:13px;color:var(--ink3);cursor:pointer">Ringkasan hasil</div>
+      </div>
+
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">1. Penilaian keseluruhan kinerja Siti bulan ini</div>
+        <div class="pills"><div class="pill">Sangat memuaskan</div><div class="pill on">Memuaskan</div><div class="pill">Cukup</div><div class="pill">Perlu perbaikan</div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">6. Siti aktif mengajak Kira main &amp; belajar?</div>
+        <div class="pills"><div class="pill on">Hangat &amp; aktif</div><div class="pill">Baik tapi kurang inisiatif</div><div class="pill">Biasa saja</div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">11. Rencana lanjut kerja sama?</div>
+        <div class="pills"><div class="pill on">Ya pasti</div><div class="pill">Ya tapi ada catatan</div><div class="pill">Masih dipertimbangkan</div><div class="pill">Tidak</div></div>
+      </div>
+      <div class="ig"><label>Catatan bebas (opsional)</label><textarea placeholder="Ada hal lain yang ingin Bunda sampaikan..."></textarea></div>
+      <div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.5">Siti sedang mengisi dari sisinya. Hasil dikirim ke Bunda lewat WA saat keduanya selesai.</div>
+      <button class="btn btn-primary" onclick="go('s08')">Kirim pemantauan</button>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+<!-- S19 DATA ANAK -->
+<div class="stage" id="s19">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Catatan tentang Kira</h2><p>Tersimpan · bisa dibagikan ke nanny baru kapan saja</p></div>
+    <div class="bod">
+      <div class="card card-green" style="margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--green-deeper)">Terakhir diperbarui: 10 Mei 2026</div>
+        <div style="font-size:12px;color:var(--green-dark);margin-top:3px">Pengingat pembaruan berikutnya: 10 Agustus 2026 (setiap 3 bulan)</div>
+      </div>
+      <div class="card">
+        <div class="mod">
+          <div class="mod-ic">👶</div>
+          <div style="flex:1"><div class="mod-t">Profil Kira</div><div class="mod-s">Nama · usia · alergi · dokter &amp; kontak darurat</div></div>
+          <div class="tag tag-green">Lengkap</div>
+        </div>
+        <div class="mod">
+          <div class="mod-ic" style="background:var(--purple-light)">❤️</div>
+          <div style="flex:1"><div class="mod-t">Kesukaan &amp; kebiasaan</div><div class="mod-s">Mainan · cara menenangkan · pola tidur</div></div>
+          <div class="tag tag-green">Lengkap</div>
+        </div>
+        <div class="mod">
+          <div class="mod-ic" style="background:var(--orange-light)">📈</div>
+          <div style="flex:1"><div class="mod-t">Perkembangan Kira</div><div class="mod-s">Milestone · catatan tumbuh kembang</div></div>
+          <div class="tag tag-orange">Perlu update</div>
+        </div>
+        <div class="mod">
+          <div class="mod-ic">📝</div>
+          <div style="flex:1"><div class="mod-t">Catatan kejadian penting</div><div class="mod-s">Insiden · pola perilaku</div></div>
+          <div class="tag tag-green">Lengkap</div>
+        </div>
+        <div class="mod">
+          <div class="mod-ic" style="background:var(--orange-light)">🏠</div>
+          <div style="flex:1"><div class="mod-t">Aturan rumah</div><div class="mod-s">Area akses · SOP darurat · aturan tamu</div></div>
+          <div class="tag tag-orange">Belum lengkap</div>
+        </div>
+        <div class="mod" style="border-bottom:none">
+          <div class="mod-ic" style="background:var(--blue-light)">📋</div>
+          <div style="flex:1"><div class="mod-t">Catatan dari nanny sebelumnya</div><div class="mod-s">Dari pemantauan · otomatis</div></div>
+          <div class="tag tag-blue">Otomatis</div>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.5">
+        Saat ganti nanny, catatan ini otomatis dikompilasi dan dibagikan ke nanny baru. Identitas nanny lama tidak ditampilkan.
+      </div>
+      <button class="btn btn-primary">Bagikan ke nanny baru</button>
+      <button class="btn btn-ghost">Lengkapi catatan</button>
+    </div>
+    <div class="nav-bottom">
+      <div class="nbi" onclick="go('s08')"><span class="nbi-ic">⊙</span>Beranda</div>
+      <div class="nbi"><span class="nbi-ic">⊕</span>Cari Nanny</div>
+      <div class="nbi on"><span class="nbi-ic">⊞</span>Catatan Anak</div>
+      <div class="nbi" onclick="go('s22')"><span class="nbi-ic">⊛</span>Akun</div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+<!-- S21 REFERRAL DASHBOARD -->
+<div class="stage" id="s21ref">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Referral saya</h2><p>Pantau siapa yang bergabung lewat kode rekomendasimu</p></div>
+    <div class="bod">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <div class="card-stat"><div class="stat-label">Total diterima</div><div class="stat-value" style="font-size:20px;color:var(--green-dark)">Rp 200rb</div><div class="stat-desc"><span class="stat-trend">2 referral</span> berhasil</div></div>
+        <div class="card-stat"><div class="stat-label">Diproses</div><div class="stat-value" style="font-size:20px;color:var(--orange)">Rp 125rb</div><div class="stat-desc">Menunggu 3 bln</div></div>
+      </div>
+
+      <p class="eyebrow">Merekomendasikan orang tua</p>
+      <div class="nanny-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="nanny-avatar" style="width:36px;height:36px;font-size:12px;background:var(--green-light);color:var(--green-dark)">BH</div>
+            <div><div style="font-size:13px;font-weight:600;color:var(--ink)">Bu Hana (orang tua)</div><div style="font-size:11px;color:var(--ink3)">Daftar lewat kodemu · deal 10 Mei</div></div>
+          </div>
+          <div class="tag tag-green">Fee masuk</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--green-dark);margin-top:8px">+ Rp 100.000 sudah ditransfer ke rekeningmu</div>
+      </div>
+
+      <p class="eyebrow">Merekomendasikan nanny</p>
+      <div class="nanny-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="nanny-avatar" style="width:36px;height:36px;font-size:12px">SD</div>
+            <div><div style="font-size:13px;font-weight:600;color:var(--ink)">Sus Dewi (nanny)</div><div style="font-size:11px;color:var(--ink3)">Dapat kerja via BY · mulai 1 Mar 2026</div></div>
+          </div>
+          <div class="tag tag-orange">Menunggu bln ke-3</div>
+        </div>
+        <div style="margin-top:8px">
+          <div style="font-size:12px;color:var(--green-dark);font-weight:600">+ Rp 75.000 sudah cair (tahap 1)</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:3px">Tahap 2: Rp 125.000 cair 1 Jun jika Sus masih bekerja</div>
+          <div class="prog-wrap" style="margin-top:6px"><div class="prog-bar" style="width:65%;background:var(--orange)"></div></div>
+          <div style="font-size:11px;color:var(--ink3)">65 hari dari 90 hari</div>
+        </div>
+      </div>
+
+      <p class="eyebrow" style="margin-top:14px">Kode rekomendasimu</p>
+      <div class="ref-box">
+        <div style="font-size:11px;color:var(--ink3)">Bagikan ke siapa saja — untuk orang tua maupun nanny</div>
+        <div class="ref-code">BY-REF-4829</div>
+        <div class="ref-hint">OT: Rp 100rb (jangka panjang) / Rp 75rb (temporer)<br>Nanny: Rp 75rb saat deal + Rp 125rb jika bertahan 3 bln</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+          <button class="btn btn-primary btn-sm">Kirim via WA</button>
+          <button class="btn btn-ghost btn-sm">Salin kode</button>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--blue);cursor:pointer;font-weight:600" onclick="go('s23tc')">Lihat syarat &amp; ketentuan referral →</div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+<!-- S22 SETTINGS OT -->
+<div class="stage" id="s22">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Akun &amp; pengaturan</h2><p>Ria Putri</p></div>
+    <div class="bod">
+      <p class="eyebrow">Langganan</p>
+      <div class="card card-green" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><div style="font-size:14px;font-weight:700;color:var(--green-deeper)">Langganan aktif</div><div style="font-size:12px;color:var(--green-dark);margin-top:3px">Berlaku 12 Mei 2026 – 11 Mei 2027</div></div>
+          <div class="tag tag-green">365 hari tersisa</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-top:10px;display:inline-flex">Perpanjang</button>
+      </div>
+      <p class="eyebrow">Kode rekomendasimu</p>
+      <div class="ref-box" style="margin-bottom:12px">
+        <div class="ref-code">BY-REF-4829</div>
+        <div class="ref-hint">Dapat Rp 100rb (jangka panjang) / Rp 75rb (temporer) saat terjadi penempatan via kode ini</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+          <button class="btn btn-primary btn-sm">Bagikan via WA</button>
+          <button class="btn btn-ghost btn-sm">Salin</button>
+        </div>
+      </div>
+      <p class="eyebrow">Notifikasi</p>
+      <div class="chk-row"><div class="chk-box on">✓</div><span>Notifikasi pemantauan berkala via WA</span></div>
+      <div class="chk-row"><div class="chk-box on">✓</div><span>Notifikasi saat nanny selesai isi preferensi</span></div>
+      <div class="chk-row"><div class="chk-box on">✓</div><span>Situasi yang perlu perhatian segera</span></div>
+      <div class="chk-row"><div class="chk-box on">✓</div><span>Pengingat perbarui catatan anak tiap 3 bulan</span></div>
+      <p class="eyebrow">Profil anak</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1.5px solid var(--border)"><span style="font-size:13px;color:var(--ink)">Kira · 2 tahun · Perempuan</span><button class="btn btn-ghost btn-sm">Edit</button></div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:10px;display:inline-flex">+ Tambah profil anak</button>
+      <p class="eyebrow">Privasi &amp; keamanan</p>
+      <div style="font-size:13px;color:var(--ink2);line-height:2.5">
+        <div style="cursor:pointer;color:var(--green);font-weight:600">Ganti kata sandi</div>
+        <div style="cursor:pointer;color:var(--green);font-weight:600">Unduh data saya</div>
+        <div style="cursor:pointer;color:var(--red);font-weight:600">Hapus akun</div>
+      </div>
+      <p class="eyebrow">Tentang</p>
+      <div style="font-size:13px;color:var(--ink3);line-height:2.5">
+        <div>Syarat &amp; Ketentuan</div>
+        <div>Kebijakan Privasi (PDP)</div>
+        <div style="cursor:pointer;color:var(--green);font-weight:600">Hubungi tim BundaYakin</div>
+        <div>Versi 1.0.0</div>
+      </div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+
+<!-- S23 T&C MODAL -->
+<div class="stage" id="s23tc">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="modal-bg" style="min-height:560px">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Syarat &amp; Ketentuan Program Referral BundaYakin</div>
+        <div class="modal-body">
+          <h4>Siapa yang bisa ikut?</h4>
+          <p>Semua pengguna terdaftar BundaYakin — baik orang tua maupun nanny — otomatis mendapat kode rekomendasi unik (BY-REF-XXXX) yang bisa dibagikan ke siapa saja.</p>
+          <h4>Kapan fee cair?</h4>
+          <ul>
+            <li><strong>Merekomendasikan orang tua (jangka panjang):</strong> Rp 100.000 cair setelah OT deal dengan nanny, placement fee sudah dibayar, dan OT konfirmasi nanny tiba di rumah lewat platform.</li>
+            <li><strong>Merekomendasikan orang tua (temporer/infal):</strong> Rp 75.000 dengan syarat yang sama.</li>
+            <li><strong>Merekomendasikan nanny (jangka panjang):</strong> Rp 75.000 saat kondisi di atas terpenuhi. Tambahan Rp 125.000 jika nanny masih bekerja di keluarga yang sama setelah 3 bulan (dibuktikan via pemantauan platform).</li>
+            <li><strong>Merekomendasikan nanny (temporer/infal):</strong> Rp 75.000 saat kondisi terpenuhi. Tidak ada tambahan.</li>
+          </ul>
+          <h4>Cara terima fee</h4>
+          <p>Ditransfer otomatis ke rekening atau e-wallet terdaftar dalam 3–5 hari kerja setelah syarat terpenuhi. Tidak perlu minta manual ke admin.</p>
+          <h4>Yang perlu diperhatikan</h4>
+          <ul>
+            <li>Penempatan harus terjadi dan terkonfirmasi lewat platform BY. Tidak berlaku jika transaksi di luar platform.</li>
+            <li>Pengguna yang sama tidak bisa pakai kode yang sama lebih dari sekali.</li>
+            <li>BundaYakin berhak verifikasi keabsahan referral sebelum mencairkan fee.</li>
+          </ul>
+          <div class="modal-footer">Ketentuan program referral ini dapat berubah sewaktu-waktu sesuai kebijakan manajemen BundaYakin. Perubahan akan diinformasikan melalui notifikasi dalam aplikasi. Dengan terus menggunakan fitur ini setelah perubahan diumumkan, Anda dianggap menyetujui ketentuan yang berlaku.</div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="go('s21ref')">Mengerti, tutup</button>
+      </div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+<!-- S15 DASHBOARD NANNY -->
+<div class="stage" id="s15">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div style="padding:14px 16px 0;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11px;color:var(--ink3)">Halo,</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink)">Sus Siti Rahayu</div>
+      </div>
+      <div class="tag tag-green">Aktif bekerja</div>
+    </div>
+    <div class="bod">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div class="card-stat"><div class="stat-label">Kecocokan</div><div class="stat-value" style="font-size:20px;color:var(--purple-dark)">78%</div></div>
+        <div class="card-stat"><div class="stat-label">Hari bekerja</div><div class="stat-value" style="font-size:20px;color:var(--purple-dark)">47</div></div>
+        <div class="card-stat"><div class="stat-label">Bonus menunggu</div><div class="stat-value" style="font-size:16px;color:var(--orange)">Rp 75rb</div></div>
+      </div>
+
+      <div class="nanny-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div><div style="font-size:14px;font-weight:700;color:var(--ink)">Keluarga Ria Putri</div><div style="font-size:12px;color:var(--ink3)">Mulai 15 Feb · Kira (2 thn) · Jakarta Selatan</div></div>
+          <div class="tag tag-green">Aktif</div>
+        </div>
+        <div class="prog-wrap"><div class="prog-bar" style="width:78%;background:var(--purple)"></div></div>
+      </div>
+
+      <div class="card card-orange">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><div style="font-size:13px;font-weight:700;color:#A35320">Bonus bertahan 3 bulan</div><div style="font-size:12px;color:#7A4018;margin-top:3px">Bertahan sampai 15 Mei → Rp 150.000</div></div>
+          <div class="tag tag-orange">43 hari lagi</div>
+        </div>
+      </div>
+
+      <p class="eyebrow">Pemantauan perlu diisi</p>
+      <div class="card card-purple">
+        <div style="font-size:13px;font-weight:700;color:var(--purple-dark)">Bulan ke-1 — dari sisi Sus</div>
+        <div style="font-size:12px;color:var(--purple-dark);margin-top:3px;line-height:1.5">Keluarga Ria juga lagi mengisi. Hasilnya kami kompilasikan.</div>
+        <button class="btn btn-purple btn-sm" style="margin-top:10px;display:inline-flex" onclick="go('s17')">Isi sekarang</button>
+      </div>
+
+      <p class="eyebrow" style="margin-top:14px">Psikotes kepribadian — gratis untuk Sus</p>
+      <div class="psiko">
+        <div class="psiko-title">Tingkatkan peluang dapat keluarga yang cocok</div>
+        <ul class="psiko-list">
+          <li>Sus 2× lebih mudah dicocokkan setelah mengisi psikotes</li>
+          <li>Dapat tips personal cara kerja sesuai karakter Sus</li>
+          <li>Badge "Terverifikasi Psikotes" di profil Sus</li>
+        </ul>
+        <button class="btn btn-purple btn-sm" style="margin-top:10px;display:inline-flex" onclick="go('s21n')">Isi psikotes gratis →</button>
+      </div>
+
+      <p class="eyebrow">Kode rekomendasimu</p>
+      <div class="ref-box">
+        <div style="font-size:11px;color:var(--ink3)">Ajak teman bergabung ke BundaYakin</div>
+        <div class="ref-code">BY-REF-2847</div>
+        <div class="ref-hint">OT: Rp 100rb/75rb · Nanny: Rp 75rb + Rp 125rb jika bertahan 3 bln</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+          <button class="btn btn-purple btn-sm">Kirim via WA</button>
+          <button class="btn btn-ghost btn-sm">Salin</button>
+        </div>
+      </div>
+    </div>
+    <div class="nav-bottom">
+      <div class="nbi on" style="color:var(--purple)"><span class="nbi-ic">⊙</span>Beranda</div>
+      <div class="nbi" onclick="go('s21n')"><span class="nbi-ic">📄</span>Profil</div>
+      <div class="nbi"><span class="nbi-ic">🏆</span>Bonus</div>
+      <div class="nbi" onclick="go('s24')"><span class="nbi-ic">⊛</span>Akun</div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+<div class="ann"><h3>S15 Dashboard Nanny</h3>
+  <div class="ai"><div class="ap"></div><div>DM Serif Display untuk sapaan "Sus Siti Rahayu" — tone personal</div></div>
+  <div class="ai"><div class="ap"></div><div>Stat card nilai DM Serif Display purple — nanny punya identity color sendiri</div></div>
+  <div class="ai"><div class="ap"></div><div>Progress bar nanny pakai warna purple, bukan teal — beda dari OT</div></div>
+  <div class="ai"><div class="aa"></div><div>Bonus countdown orange dengan DM Serif visual</div></div>
+</div>
+</div>
+
+<!-- S21N PSIKOTES NANNY -->
+<div class="stage" id="s21n">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Psikotes kepribadian — gratis</h2><p>~15–20 menit · hasil langsung keluar setelah selesai</p></div>
+    <div class="bod">
+      <div class="card card-orange" style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:#A35320;margin-bottom:6px">Sus dapat apa setelah selesai?</div>
+        <ul style="font-size:12px;color:#7A4018;padding-left:16px;line-height:1.8">
+          <li>Gambaran kepribadian dan gaya kerja Sus</li>
+          <li>Tips praktis cara kerja sesuai karakter Sus</li>
+          <li>Profil lebih menarik di mata keluarga</li>
+          <li>Badge "Terverifikasi Psikotes" di profil</li>
+        </ul>
+      </div>
+
+      <p class="eyebrow">Bagian 1 dari 3 — Gaya kerja</p>
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">1. Kalau ada anak yang nangis, Sus biasanya bagaimana?</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="pill on pu" style="border-radius:12px">Langsung saya gendong atau peluk supaya tenang</div>
+          <div class="pill" style="border-radius:12px">Tunggu sebentar dulu, lihat dulu kenapa nangisnya</div>
+          <div class="pill" style="border-radius:12px">Tergantung situasinya</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px">2. Kalau majikan kasih instruksi yang menurut Sus kurang masuk akal?</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="pill pu on" style="border-radius:12px">Tanya dulu dengan sopan kenapa begitu</div>
+          <div class="pill" style="border-radius:12px">Ikuti saja, majikan yang tahu rumahnya</div>
+          <div class="pill" style="border-radius:12px">Kerjakan tapi nanti dibicarakan</div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--ink3);margin-bottom:14px">
+        Tidak ada jawaban benar atau salah · jawaban tersimpan otomatis setiap klik
+      </div>
+
+      <div class="prog-wrap"><div class="prog-bar" style="width:25%;background:var(--purple)"></div></div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:14px">Bagian 1 dari 3</div>
+      <button class="btn btn-purple">Lanjut ke bagian 2 →</button>
+      <button class="btn btn-ghost">Simpan &amp; lanjutkan nanti</button>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+<!-- S24 SETTINGS NANNY -->
+<div class="stage" id="s24">
+<div class="phone">
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="screen">
+    <div class="sbar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="shd"><h2>Akun &amp; pengaturan</h2><p>Siti Rahayu</p></div>
+    <div class="bod">
+      <p class="eyebrow">Ketersediaan &amp; tipe kerja</p>
+      <div class="chk-row"><div class="chk-box on" style="border-color:var(--purple);background:var(--purple)">✓</div><span>Jangka panjang (tinggal / harian rutin)</span></div>
+      <div class="chk-row"><div class="chk-box on" style="border-color:var(--purple);background:var(--purple)">✓</div><span>Temporer / infal</span></div>
+      <div class="chk-row"><div class="chk-box"></div><span style="color:var(--ink3)">Harian / per jam (tersedia nanti)</span></div>
+      <p class="eyebrow">Status ketersediaan</p>
+      <div class="pills pu" style="margin-bottom:12px">
+        <div class="pill pu on">Aktif — siap tawaran</div>
+        <div class="pill pu">Sedang bekerja</div>
+        <div class="pill pu">Sembunyi sementara</div>
+      </div>
+      <p class="eyebrow">Visibilitas profil</p>
+      <div class="pills pu" style="margin-bottom:12px">
+        <div class="pill pu on">Terlihat oleh semua</div>
+        <div class="pill pu">Hanya keluarga yang undang</div>
+      </div>
+      <p class="eyebrow">Rekening / e-wallet untuk bonus</p>
+      <div class="ig"><label>Bank atau e-wallet</label><select><option selected>GoPay</option><option>BCA</option><option>OVO</option><option>DANA</option></select></div>
+      <div class="ig"><label>Nomor rekening / HP e-wallet</label><input type="text" value="081234567890"></div>
+      <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;display:inline-flex">Simpan perubahan rekening</button>
+      <p class="eyebrow">Notifikasi</p>
+      <div class="chk-row"><div class="chk-box on" style="border-color:var(--purple);background:var(--purple)">✓</div><span>Undangan dari keluarga baru</span></div>
+      <div class="chk-row"><div class="chk-box on" style="border-color:var(--purple);background:var(--purple)">✓</div><span>Pemantauan berkala</span></div>
+      <div class="chk-row"><div class="chk-box on" style="border-color:var(--purple);background:var(--purple)">✓</div><span>Bonus &amp; badge</span></div>
+      <p class="eyebrow">Akun</p>
+      <div style="font-size:13px;line-height:2.5">
+        <div style="cursor:pointer;color:var(--purple);font-weight:600">Edit nomor HP</div>
+        <div style="cursor:pointer;color:var(--purple);font-weight:600">Ganti kata sandi</div>
+        <div style="cursor:pointer;color:var(--purple);font-weight:600">Unduh data saya</div>
+        <div style="cursor:pointer;color:var(--red);font-weight:600">Hapus akun</div>
+      </div>
+      <p class="eyebrow">Tentang</p>
+      <div style="font-size:13px;color:var(--ink3);line-height:2.5">
+        <div>Syarat &amp; Ketentuan Nanny</div>
+        <div style="cursor:pointer;color:var(--purple);font-weight:600">Hubungi tim BundaYakin</div>
+        <div>Versi 1.0.0</div>
+      </div>
+    </div>
+  </div>
+  <div class="home-bar"><div class="home-line"></div></div>
+</div>
+</div>
+
+<script>
+const MAP = {
+  's01':'S01 Landing','s02':'S02 Register OT','s03':'S03 Register Nanny','s04':'S04 Login',
+  's06':'S06 Onboarding','s08':'S08 Dashboard OT','s09':'S09 Undang Nanny',
+  's10':'S10 Isi Preferensi','s12':'S12 Laporan','s14':'S14 Placement Fee',
+  's16':'S16 Kabar Mingguan','s17':'S17 Pemantauan','s19':'S19 Data Anak',
+  's21ref':'S21 Referral','s22':'S22 Settings OT','s23tc':'S23 T&C',
+  's15':'S15 Dashboard Nanny','s21n':'S21 Psikotes','s24':'S24 Settings Nanny'
+};
+function go(id) {
+  document.querySelectorAll('.stage').forEach(s => s.classList.remove('on'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('on');
+  document.querySelectorAll('.nb').forEach(b => {
+    b.classList.remove('on');
+    if (b.textContent.trim() === MAP[id]) b.classList.add('on');
+  });
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
