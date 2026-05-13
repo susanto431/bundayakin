@@ -27,7 +27,7 @@ export async function GET() {
           select: {
             id: true, name: true, dateOfBirth: true, ageGroup: true,
             gender: true, allergies: true, medicalNotes: true,
-            pantangan: true, schedule: true, schoolName: true, additionalNotes: true,
+            pantangan: true, schedule: true, schoolName: true, schoolSchedule: true, additionalNotes: true,
           },
         },
       },
@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       pantangan?: string
       schedule?: string
       schoolName?: string
+      schoolSchedule?: string
       additionalNotes?: string
     }
 
@@ -88,12 +89,13 @@ export async function POST(request: Request) {
         pantangan: body.pantangan?.trim() || null,
         schedule: body.schedule?.trim() || null,
         schoolName: body.schoolName?.trim() || null,
+        schoolSchedule: body.schoolSchedule?.trim() || null,
         additionalNotes: body.additionalNotes?.trim() || null,
       },
       select: {
         id: true, name: true, dateOfBirth: true, ageGroup: true,
         gender: true, allergies: true, medicalNotes: true,
-        pantangan: true, schedule: true, schoolName: true, additionalNotes: true,
+        pantangan: true, schedule: true, schoolName: true, schoolSchedule: true, additionalNotes: true,
       },
     })
 

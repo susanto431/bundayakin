@@ -43,6 +43,7 @@ export async function PATCH(
       pantangan?: string
       schedule?: string
       schoolName?: string
+      schoolSchedule?: string
       additionalNotes?: string
     }
 
@@ -62,12 +63,13 @@ export async function PATCH(
         ...(body.pantangan !== undefined && { pantangan: body.pantangan.trim() || null }),
         ...(body.schedule !== undefined && { schedule: body.schedule.trim() || null }),
         ...(body.schoolName !== undefined && { schoolName: body.schoolName.trim() || null }),
+        ...(body.schoolSchedule !== undefined && { schoolSchedule: body.schoolSchedule.trim() || null }),
         ...(body.additionalNotes !== undefined && { additionalNotes: body.additionalNotes.trim() || null }),
       },
       select: {
         id: true, name: true, dateOfBirth: true, ageGroup: true,
         gender: true, allergies: true, medicalNotes: true,
-        pantangan: true, schedule: true, schoolName: true, additionalNotes: true,
+        pantangan: true, schedule: true, schoolName: true, schoolSchedule: true, additionalNotes: true,
       },
     })
 
