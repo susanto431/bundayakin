@@ -36,6 +36,7 @@ export default async function MonitoringSummaryPage({
 
   const { timing: timingParam } = await searchParams
   const timing = timingParam as Timing | undefined
+  if (!timing) redirect("/dashboard/parent")
   const isWeekly = timing === "WEEK_1" || timing === "WEEK_2"
 
   const profile = await prisma.parentProfile.findUnique({
@@ -47,25 +48,21 @@ export default async function MonitoringSummaryPage({
         orderBy: { createdAt: "desc" },
         select: {
           nannyProfile: { select: { fullName: true } },
-          checkins: timing
-            ? { where: { timing }, select: { timing: true, status: true, parentConditionRating: true, parentConcernFlag: true, parentAdaptRating: true, parentFreeText: true, parentDoneAt: true } }
-            : false,
-          evaluations: timing
-            ? { where: { timing }, select: { timing: true, status: true, parentScores: true, parentNarrative: true, parentDoneAt: true, nannyDoneAt: true, aiSummary: true } }
-            : false,
+          checkins: { where: { timing }, select: { timing: true, status: true, parentConditionRating: true, parentConcernFlag: true, parentAdaptRating: true, parentFreeText: true, parentDoneAt: true } },
+          evaluations: { where: { timing }, select: { timing: true, status: true, parentScores: true, parentNarrative: true, parentDoneAt: true, nannyDoneAt: true, aiSummary: true } },
         },
       },
     },
   })
 
   const assignment = profile?.nannyAssignments?.[0]
-  if (!assignment || !timing) {
+  if (!assignment) {
     redirect("/dashboard/parent")
   }
 
   const nannyName = assignment.nannyProfile.fullName
-  const checkin = (assignment.checkins as { timing: string; status: string; parentConditionRating: string | null; parentConcernFlag: string | null; parentAdaptRating: string | null; parentFreeText: string | null; parentDoneAt: Date | null }[] | false)?.[0]
-  const evaluation = (assignment.evaluations as { timing: string; status: string; parentScores: unknown; parentNarrative: string | null; parentDoneAt: Date | null; nannyDoneAt: Date | null; aiSummary: string | null }[] | false)?.[0]
+  const checkin = assignment.checkins[0]
+  const evaluation = assignment.evaluations[0]
 
   const record = isWeekly ? checkin : evaluation
   if (!record) redirect("/dashboard/parent")
