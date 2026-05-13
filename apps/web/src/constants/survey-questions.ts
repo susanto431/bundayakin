@@ -229,7 +229,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
       ],
     },
     forParent: {
-      question: "Kamu kasih THR ke nanny?",
+      question: "Bunda kasih THR ke nanny?",
       options: [
         { value: "a", label: "Ya" },
         { value: "b", label: "Tidak" },
@@ -250,7 +250,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
       ],
     },
     forParent: {
-      question: "Kamu daftarkan nanny ke BPJS Kesehatan?",
+      question: "Bunda daftarkan nanny ke BPJS Kesehatan?",
       options: [
         { value: "a", label: "Ya" },
         { value: "b", label: "Tidak" },
@@ -998,9 +998,11 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     forParent: {
       question: "Nanny perlu bisa mengendarai:",
       options: [
-        { value: "a", label: "Motor (wajib)" },
-        { value: "b", label: "Mobil (wajib)" },
-        { value: "c", label: "Tidak perlu" },
+        { value: "a", label: "Sepeda" },
+        { value: "b", label: "Sepeda listrik" },
+        { value: "c", label: "Motor" },
+        { value: "d", label: "Mobil" },
+        { value: "e", label: "Tidak perlu" },
       ],
     },
     canBeDealbreaker: true,
@@ -1201,11 +1203,11 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
       ],
     },
     forParent: {
-      question: "Kamu nyaman kasih masukan langsung ke nanny?",
+      question: "Bunda nyaman kasih masukan langsung ke nanny?",
       options: [
-        { value: "a", label: "Ya, langsung saja" },
-        { value: "b", label: "Lebih suka pelan-pelan" },
-        { value: "c", label: "Lebih nyaman lewat tulisan" },
+        { value: "a", label: "Ya, bisa berterus terang langsung" },
+        { value: "b", label: "Bisa, tapi perlu disampaikan dengan halus" },
+        { value: "c", label: "Lebih nyaman lewat pesan tertulis dulu" },
       ],
     },
     canBeDealbreaker: false,
@@ -1252,10 +1254,22 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
       freeTextTriggers: ["spesifik"],
     },
     forParent: {
-      question: "Rumah kamu di area mana?",
-      options: [],
+      question: "Rumah Bunda di area mana?",
+      options: [
+        { value: "jaksel", label: "Jakarta Selatan" },
+        { value: "jakbar", label: "Jakarta Barat" },
+        { value: "jaktim", label: "Jakarta Timur" },
+        { value: "jakut", label: "Jakarta Utara" },
+        { value: "jakpus", label: "Jakarta Pusat" },
+        { value: "tangerang", label: "Tangerang / Tangsel" },
+        { value: "bekasi", label: "Bekasi" },
+        { value: "depok_bogor", label: "Depok / Bogor" },
+        { value: "bandung", label: "Bandung" },
+        { value: "surabaya", label: "Surabaya" },
+        { value: "lainnya", label: "Kota lain" },
+      ],
       hasFreeText: true,
-      // no freeTextTriggers → always show text input
+      freeTextTriggers: ["lainnya"],
     },
     canBeDealbreaker: true,
   },
@@ -1272,13 +1286,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
         { value: "c", label: "Tergantung kotanya" },
       ],
     },
-    forParent: {
-      question: "Posisi ini perlu nanny pindah kota?",
-      options: [
-        { value: "a", label: "Ya" },
-        { value: "b", label: "Tidak" },
-      ],
-    },
+    forParent: null,
     canBeDealbreaker: true,
   },
 

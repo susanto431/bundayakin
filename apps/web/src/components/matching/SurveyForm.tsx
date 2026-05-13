@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { SURVEY_QUESTIONS, ASPECT_META } from "@/constants/survey-questions"
+import { SURVEY_QUESTIONS } from "@/constants/survey-questions"
 import type { SurveyQuestion, QuestionSide } from "@/constants/survey-questions"
 import type { SurveyAnswers } from "@/types/survey"
 
@@ -17,7 +17,13 @@ type Props = {
 
 type CustomQ = { text: string; isDealbreaker: boolean }
 
-const ASPECT_ORDER = ["A1", "A2", "B1", "B2", "B3", "C1", "C2", "C3", "C4"] as const
+const SECTION_GROUPS = [
+  { key: "S1", label: "Kondisi Kerja & Tugas", subdomains: ["A1", "A2"] },
+  { key: "S2", label: "Nilai, Agama & Penampilan", subdomains: ["B1", "B2"] },
+  { key: "S3", label: "Gaya Pengasuhan", subdomains: ["B3"] },
+  { key: "S4", label: "Pengalaman & Kemampuan", subdomains: ["C1", "C2"] },
+  { key: "S5", label: "Komunikasi & Lingkungan", subdomains: ["C3", "C4"] },
+]
 
 function getSide(q: SurveyQuestion, role: "PARENT" | "NANNY"): QuestionSide | null {
   return role === "PARENT" ? q.forParent : q.forNanny
@@ -83,11 +89,13 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
   }).length
   const progressPct = totalQuestions > 0 ? Math.round((totalAnswered / totalQuestions) * 100) : 0
 
-  const aspects = ASPECT_ORDER
-    .map(a => ({
-      key: a,
-      ...ASPECT_META[a],
-      questions: visibleQuestions.filter(q => q.subdomain === a),
+  const aspects = SECTION_GROUPS
+    .map(g => ({
+      key: g.key,
+      label: g.label,
+      domain: "A" as const,
+      domainLabel: g.label,
+      questions: visibleQuestions.filter(q => g.subdomains.includes(q.subdomain)),
     }))
     .filter(a => a.questions.length > 0)
 

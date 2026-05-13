@@ -63,9 +63,30 @@ export default async function ParentMatchingPage() {
       <div className="bg-[#EEF2FC] border-l-4 border-[#5B7EC9] rounded-r-[12px] px-3.5 py-3 mb-4">
         <p className="text-[12px] font-bold text-[#5B7EC9]">Dapat nanny dari penyalur / kenalan? Tetap bisa pakai BY gratis</p>
         <p className="text-[11px] text-[#3A5A9A] mt-1 leading-relaxed">
-          Gunakan fitur pencocokan dan pemantauan secara gratis tanpa kewajiban bayar ke BY. Biaya penempatan BY hanya berlaku jika deal terjadi lewat platform kami.{" "}
-          <span className="text-[#5B7EC9] font-semibold cursor-pointer">Selengkapnya →</span>
+          Gunakan fitur pencocokan dan pemantauan secara gratis tanpa kewajiban bayar ke BY. Biaya penempatan BY hanya berlaku jika deal terjadi lewat platform kami.
         </p>
+        <Link
+          href="/dashboard/parent/terms"
+          className="inline-flex items-center mt-1.5 text-[11px] font-semibold text-[#5B7EC9] hover:underline"
+        >
+          Selengkapnya →
+        </Link>
+      </div>
+
+      {/* CTA: cari nanny via platform */}
+      <div className="bg-[#F3EEF8] border border-[#C8B8DC] rounded-[16px] p-3.5 mb-4">
+        <p className="text-[12px] font-bold text-[#5A3A7A] mb-0.5">Belum punya kandidat nanny?</p>
+        <p className="text-[11px] text-[#999AAA] leading-relaxed mb-2.5">
+          BundaYakin punya database nanny terverifikasi. Daftarkan kebutuhan Bunda dan kami bantu carikan yang cocok.
+        </p>
+        <a
+          href="https://wa.me/6281234567890?text=Halo%20tim%20BundaYakin%2C%20saya%20ingin%20mencari%20nanny%20lewat%20platform"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 bg-[#5A3A7A] hover:bg-[#3D2558] text-white text-[12px] font-semibold px-3.5 py-2 rounded-[10px] min-h-[36px] transition-all"
+        >
+          Minta bantu cari nanny →
+        </a>
       </div>
 
       {/* Cara kerja */}

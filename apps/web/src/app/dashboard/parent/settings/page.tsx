@@ -166,6 +166,21 @@ export default async function ParentSettingsPage() {
         + Tambah profil anak
       </Link>
 
+      {/* Bank account */}
+      <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Rekening Bank</p>
+      <div className="bg-[#F3EEF8] border border-[#C8B8DC] rounded-[14px] p-3.5 mb-4">
+        <p className="text-[12px] text-[#999AAA] leading-relaxed mb-2">
+          Fitur edit rekening bank untuk keperluan refund atau bonus referral sedang dalam pengembangan.
+        </p>
+        <a
+          href={WA_CONTACT}
+          target="_blank" rel="noreferrer"
+          className="inline-flex items-center text-[12px] text-[#5BBFB0] font-semibold hover:underline"
+        >
+          Hubungi tim untuk update rekening →
+        </a>
+      </div>
+
       {/* Privacy & security */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Privasi &amp; keamanan</p>
       <div className="space-y-2 mb-4 text-[13px]">
@@ -183,19 +198,31 @@ export default async function ParentSettingsPage() {
       </div>
 
       {/* About */}
-      <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Tentang</p>
+      <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Bantuan & Tentang</p>
       <div className="space-y-0 text-[13px] text-[#999AAA]">
+        <Link
+          href="/dashboard/parent/faq"
+          className="py-2.5 border-b border-[#F3EEF8] flex items-center justify-between hover:text-[#5A3A7A] transition-colors"
+        >
+          <span>Pertanyaan Umum (FAQ)</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </Link>
+        <a
+          href={WA_CONTACT}
+          target="_blank" rel="noreferrer"
+          className="py-2.5 border-b border-[#F3EEF8] flex items-center justify-between text-[#5BBFB0] font-semibold min-h-[40px] hover:underline"
+        >
+          <span>Hubungi tim BundaYakin</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </a>
         <Link href="/dashboard/parent/terms" className="py-2.5 border-b border-[#F3EEF8] flex items-center hover:text-[#5A3A7A] transition-colors">
           Syarat &amp; Ketentuan
         </Link>
         <div className="py-2.5 border-b border-[#F3EEF8]">Kebijakan Privasi (PDP)</div>
-        <a
-          href={WA_CONTACT}
-          target="_blank" rel="noreferrer"
-          className="py-2.5 flex items-center text-[#5BBFB0] font-semibold min-h-[40px] hover:underline"
-        >
-          Hubungi tim BundaYakin
-        </a>
         <div className="py-2.5">Versi 1.0.0</div>
       </div>
 
