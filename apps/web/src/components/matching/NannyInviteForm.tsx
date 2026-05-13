@@ -15,16 +15,17 @@ export default function NannyInviteForm({ inviteCode }: { inviteCode: string }) 
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
 
+  const canSend = name.trim().length > 0 && phone.trim().length > 0
+
   function handleSend() {
+    if (!canSend) return
     const intlPhone = toInternationalPhone(phone)
     const msg = encodeURIComponent(
-      `Halo ${name || "Kak"}, saya mengundang Anda untuk bergabung di BundaYakin. ` +
+      `Halo ${name.trim()}, saya mengundang Anda untuk bergabung di BundaYakin. ` +
       `Gunakan kode undangan *${inviteCode}* saat mendaftar agar kita langsung terhubung. ` +
       `Daftar di: https://bundayakin.com/auth/register/nanny`
     )
-    const url = phone
-      ? `https://api.whatsapp.com/send?phone=${intlPhone}&text=${msg}`
-      : `https://api.whatsapp.com/send?text=${msg}`
+    const url = `https://api.whatsapp.com/send?phone=${intlPhone}&text=${msg}`
     window.open(url, "_blank", "noopener,noreferrer")
   }
 
@@ -50,10 +51,14 @@ export default function NannyInviteForm({ inviteCode }: { inviteCode: string }) 
         />
         <button
           onClick={handleSend}
-          className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
+          disabled={!canSend}
+          className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] disabled:bg-[#C8B8DC] disabled:cursor-not-allowed text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
         >
           Kirim link via WhatsApp
         </button>
+        {!canSend && (
+          <p className="text-[11px] text-[#999AAA] text-center mt-1.5">Isi nama dan nomor HP nanny terlebih dahulu</p>
+        )}
       </div>
 
       {/* Divider */}

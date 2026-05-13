@@ -19,6 +19,10 @@ export default async function ParentMatchingPage() {
     ? await prisma.parentProfile.findUnique({
         where: { userId: session.user.id },
         select: {
+          fullName: true,
+          phone: true,
+          city: true,
+          district: true,
           surveyCompletedAt: true,
           matchingUsedCount: true,
           matchingResetAt: true,
@@ -55,6 +59,13 @@ export default async function ParentMatchingPage() {
   }))
 
   const inviteCode = `BY-${session?.user?.id?.slice(-4).toUpperCase() ?? "4829"}`
+
+  const parentName = profile?.fullName ?? session?.user?.name ?? "Orang tua"
+  const parentContact = session?.user?.email ?? profile?.phone ?? "-"
+  const parentLocation = [profile?.district, profile?.city].filter(Boolean).join(", ") || "Belum diisi"
+  const helpWaMessage = encodeURIComponent(
+    `Halo tim BundaYakin 👋\n\nSaya orang tua yang sudah terdaftar di BundaYakin dan ingin minta bantuan mencarikan nanny yang sesuai.\n\n📋 Info akun saya:\n• Nama: ${parentName}\n• Lokasi: ${parentLocation}\n• Kontak: ${parentContact}\n• Status matching: ${matchingUsed}/${matchingLimit} sudah dipakai\n\nSaya belum punya kandidat nanny. Mohon bantuannya untuk mencarikan nanny yang cocok. Terima kasih 🙏`
+  )
 
   const statusLabel = (s: string) => {
     if (s === "COMPLETED" || s === "NEGOTIATING") return { label: "Sudah isi", color: "bg-[#E5F6F4] text-[#2C5F5A] border-[#A8DDD8]" }
@@ -123,7 +134,7 @@ export default async function ParentMatchingPage() {
           BundaYakin punya database nanny terverifikasi. Daftarkan kebutuhan Bunda dan kami bantu carikan yang cocok.
         </p>
         <a
-          href="https://wa.me/6287888180363?text=Halo%20tim%20BundaYakin%2C%20saya%20ingin%20mencari%20nanny%20lewat%20platform"
+          href={`https://wa.me/6287888180363?text=${helpWaMessage}`}
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center gap-1.5 bg-[#5A3A7A] hover:bg-[#3D2558] text-white text-[12px] font-semibold px-3.5 py-2 rounded-[10px] min-h-[36px] transition-all"
