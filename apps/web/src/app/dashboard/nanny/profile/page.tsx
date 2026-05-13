@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import NannyProfileForm from "@/components/profile/NannyProfileForm"
+import EmailSection from "@/components/profile/EmailSection"
 
 export const metadata = { title: "Profil Saya — BundaYakin" }
 
@@ -80,6 +81,9 @@ export default async function NannyProfilePage() {
           <p className="text-xs text-[#999AAA]">{session?.user?.email}</p>
         </div>
       </div>
+
+      {/* Email */}
+      <EmailSection initialEmail={session?.user?.email ?? ""} />
 
       {/* Form */}
       <div className="bg-white border border-[#E0D0F0] rounded-[16px] p-5">

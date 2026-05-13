@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import ParentProfileForm from "@/components/profile/ParentProfileForm"
+import EmailSection from "@/components/profile/EmailSection"
 
 export const metadata = { title: "Profil Saya — BundaYakin" }
 
@@ -57,14 +58,8 @@ export default async function ParentProfilePage() {
         </div>
       </div>
 
-      {/* Email — read only */}
-      <div className="bg-[#F3EEF8] border border-[#E0D0F0] rounded-[12px] px-3.5 py-2.5 mb-5 flex items-center justify-between">
-        <div>
-          <p className="text-[10px] font-bold tracking-[1px] uppercase text-[#999AAA] mb-0.5">Email</p>
-          <p className="text-[13px] text-[#5A3A7A]">{email || "—"}</p>
-        </div>
-        <span className="text-[11px] text-[#C8B8DC] font-medium">Tidak dapat diubah</span>
-      </div>
+      {/* Email */}
+      <EmailSection initialEmail={email} />
 
       {/* Form */}
       <div className="bg-white border border-[#E0D0F0] rounded-[16px] p-4">
