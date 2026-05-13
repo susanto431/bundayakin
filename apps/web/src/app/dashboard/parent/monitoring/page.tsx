@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import MonitoringForm from "@/components/monitoring/MonitoringForm"
+import { getSubscriptionStatus } from "@/lib/subscription"
+import { PaidOnlyGate } from "@/components/layout/PaidOnlyGate"
 
 export const metadata = { title: "Pemantauan — BundaYakin" }
 
@@ -16,6 +18,8 @@ export default async function MonitoringPage({
 }) {
   const session = await auth()
   if (!session?.user?.id) redirect("/auth/login")
+
+  const { isPaid } = await getSubscriptionStatus(session.user.id)
 
   const { timing: timingParam } = await searchParams
 
@@ -38,6 +42,14 @@ export default async function MonitoringPage({
   })
 
   const assignment = profile?.nannyAssignments?.[0]
+
+  if (!isPaid) {
+    return (
+      <PaidOnlyGate featureName="Pemantauan Nanny" isPaid={false}>
+        {null}
+      </PaidOnlyGate>
+    )
+  }
 
   if (!assignment) {
     return (

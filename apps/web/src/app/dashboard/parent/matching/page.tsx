@@ -20,6 +20,9 @@ export default async function ParentMatchingPage() {
         where: { userId: session.user.id },
         select: {
           surveyCompletedAt: true,
+          matchingUsedCount: true,
+          matchingResetAt: true,
+          subscription: { select: { status: true, endDate: true } },
           matchingRequests: {
             orderBy: { createdAt: "desc" },
             take: 10,
@@ -33,6 +36,15 @@ export default async function ParentMatchingPage() {
         },
       })
     : null
+
+  const now = new Date()
+  const sub = profile?.subscription
+  const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && sub.endDate > now
+  const matchingLimit = isPaid ? 10 : 3
+  const windowActive = profile?.matchingResetAt && profile.matchingResetAt > now
+  const matchingUsed = windowActive ? (profile?.matchingUsedCount ?? 0) : 0
+  const matchingRemaining = Math.max(0, matchingLimit - matchingUsed)
+  const isLimitReached = matchingRemaining === 0
 
   const surveyDone = !!profile?.surveyCompletedAt
   const invitedNannies: InvitedNanny[] = (profile?.matchingRequests ?? []).map(r => ({
@@ -55,9 +67,40 @@ export default async function ParentMatchingPage() {
 
       {/* Header */}
       <div className="border-b border-[#E0D0F0] pb-3 mb-4">
-        <h1 className="text-[16px] font-bold text-[#5A3A7A]">Cocokkan dengan nanny</h1>
-        <p className="text-[12px] text-[#999AAA] mt-0.5">Sudah punya kandidat? Ajak isi dari sini</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-[16px] font-bold text-[#5A3A7A]">Cocokkan dengan nanny</h1>
+            <p className="text-[12px] text-[#999AAA] mt-0.5">Sudah punya kandidat? Ajak isi dari sini</p>
+          </div>
+          <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
+            isLimitReached
+              ? "bg-[#FAEAEA] text-[#C75D5D] border-[#F5C4A0]"
+              : matchingRemaining <= 1
+              ? "bg-[#FEF0E7] text-[#A35320] border-[#F5C4A0]"
+              : "bg-[#E5F6F4] text-[#2C5F5A] border-[#A8DDD8]"
+          }`}>
+            {isLimitReached ? "Habis" : `Sisa ${matchingRemaining}×`}
+          </span>
+        </div>
       </div>
+
+      {/* Limit warning / upgrade nudge */}
+      {isLimitReached && !isPaid && (
+        <div className="bg-[#5A3A7A] rounded-[20px] p-4 mb-4 relative overflow-hidden">
+          <div className="absolute -top-4 -right-4 w-20 h-20 bg-[#A97CC4]/20 rounded-full" />
+          <div className="relative z-10">
+            <p className="text-[10px] font-bold tracking-[2px] uppercase text-[#A8DDD8] mb-1">Jatah habis</p>
+            <p className="text-white font-semibold text-[14px] mb-0.5">3 matching gratis bulan ini sudah dipakai</p>
+            <p className="text-white/60 text-[12px] mb-3">Upgrade ke langganan tahunan untuk 10× matching per bulan + evaluasi + data anak</p>
+            <a
+              href="/dashboard/parent/subscription"
+              className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
+            >
+              Langganan — Rp 500rb/tahun
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Disclaimer */}
       <div className="bg-[#EEF2FC] border-l-4 border-[#5B7EC9] rounded-r-[12px] px-3.5 py-3 mb-4">

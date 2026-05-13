@@ -43,6 +43,12 @@ export async function POST(request: Request) {
       const oneYearLater = new Date(now)
       oneYearLater.setFullYear(oneYearLater.getFullYear() + 1)
 
+      // Find full transaction details
+      const fullTransaction = await prisma.transaction.findUnique({
+        where: { id: transaction.id },
+        select: { id: true, type: true, parentProfileId: true, nannyProfileId: true, subscriptionId: true, notes: true },
+      })
+
       // Update transaction
       await prisma.transaction.update({
         where: { id: transaction.id },
@@ -55,7 +61,7 @@ export async function POST(request: Request) {
       })
 
       // Activate subscription
-      if (transaction.subscriptionId) {
+      if (fullTransaction?.type === "SUBSCRIPTION" && transaction.subscriptionId) {
         const sub = await prisma.subscription.update({
           where: { id: transaction.subscriptionId },
           data: { status: "ACTIVE", startDate: now, endDate: oneYearLater },
@@ -69,6 +75,25 @@ export async function POST(request: Request) {
           entityId: transaction.subscriptionId,
           metadata: { orderId: order_id, paymentType: payment_type },
         })
+      }
+
+      // Unlock nanny profile (LinkedIn mode)
+      if (fullTransaction?.type === "NANNY_UNLOCK" && fullTransaction.parentProfileId && fullTransaction.nannyProfileId) {
+        await prisma.unlockedNanny.upsert({
+          where: {
+            parentId_nannyId: {
+              parentId: fullTransaction.parentProfileId,
+              nannyId: fullTransaction.nannyProfileId,
+            },
+          },
+          create: {
+            parentId: fullTransaction.parentProfileId,
+            nannyId: fullTransaction.nannyProfileId,
+            amountIDR: 100_000,
+          },
+          update: {},
+        })
+        console.info("[WEBHOOK] Nanny unlocked:", fullTransaction.parentProfileId, "→", fullTransaction.nannyProfileId)
       }
 
       console.info("[WEBHOOK] Payment SUCCESS:", order_id)

@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
+import LinkedInModeSection from "@/components/matching/LinkedInModeSection"
 
 export const metadata = { title: "Beranda — BundaYakin" }
 
@@ -14,7 +15,11 @@ export default async function ParentDashboardPage() {
         where: { userId: session.user.id },
         select: {
           id: true,
+          city: true,
           surveyCompletedAt: true,
+          matchingUsedCount: true,
+          matchingResetAt: true,
+          createdAt: true,
           subscription: { select: { status: true, startDate: true, endDate: true } },
           children: { orderBy: { createdAt: "asc" }, take: 1, select: { id: true, name: true } },
           matchingRequests: {
@@ -34,12 +39,24 @@ export default async function ParentDashboardPage() {
             take: 1,
             select: { id: true },
           },
+          unlockedNannies: { select: { nannyId: true } },
         },
       })
     : null
 
   const subscription = profile?.subscription
-  const isActive = subscription?.status === "ACTIVE"
+  const isPaid =
+    subscription?.status === "ACTIVE" &&
+    subscription?.endDate != null &&
+    subscription.endDate > new Date()
+  const matchingLimit = isPaid ? 10 : 3
+
+  // Cek apakah counter masih dalam window yang berlaku
+  const now = new Date()
+  const windowActive = profile?.matchingResetAt && profile.matchingResetAt > now
+  const matchingUsed = windowActive ? (profile?.matchingUsedCount ?? 0) : 0
+  const matchingRemaining = Math.max(0, matchingLimit - matchingUsed)
+
   const activeMatch = profile?.matchingRequests?.[0]
   const nannyName = activeMatch?.nannyProfile?.fullName ?? null
   const score = activeMatch?.matchingResult?.scoreOverall ? Math.round(activeMatch.matchingResult.scoreOverall) : null
@@ -79,6 +96,26 @@ export default async function ParentDashboardPage() {
     },
   ]
 
+  // Nanny openToJob untuk LinkedIn mode (sama kota jika ada, maks 5)
+  const unlockedIds = (profile?.unlockedNannies ?? []).map(u => u.nannyId)
+  const openToJobNannies = profile
+    ? await prisma.nannyProfile.findMany({
+        where: {
+          openToJob: true,
+          isAvailable: true,
+          ...(profile.city ? { city: profile.city } : {}),
+        },
+        select: {
+          id: true,
+          city: true,
+          yearsOfExperience: true,
+          nannyType: true,
+          preferredAgeGroup: true,
+        },
+        take: 5,
+        orderBy: { updatedAt: "desc" },
+      })
+    : []
 
   return (
     <div className="max-w-[480px] mx-auto px-4 pt-5 pb-28">
@@ -89,7 +126,7 @@ export default async function ParentDashboardPage() {
           <p className="text-[11px] text-[#999AAA]">Selamat datang,</p>
           <p className="font-[var(--font-dm-serif)] text-[20px] text-[#5A3A7A]"><em>Bunda</em> {firstName}</p>
         </div>
-        {isActive && (
+        {isPaid && (
           <span className="text-[11px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-2.5 py-1 rounded-full">
             Aktif
           </span>
@@ -113,13 +150,13 @@ export default async function ParentDashboardPage() {
       )}
 
       {/* Subscription banner (if not active) */}
-      {!isActive && (
+      {!isPaid && (
         <div className="bg-[#5A3A7A] rounded-[20px] p-4 mb-4 relative overflow-hidden">
           <div className="absolute -top-4 -right-4 w-20 h-20 bg-[#A97CC4]/20 rounded-full" />
           <div className="relative z-10">
             <p className="text-[10px] font-bold tracking-[2px] uppercase text-[#A8DDD8] mb-1">Langganan BundaYakin</p>
             <p className="text-white font-semibold text-[15px] mb-0.5">Aktifkan akses penuh</p>
-            <p className="text-white/60 text-[12px] mb-3">Matching, evaluasi, & monitoring nanny</p>
+            <p className="text-white/60 text-[12px] mb-3">Matching 10×/bln, evaluasi, monitoring &amp; data anak</p>
             <Link
               href="/dashboard/parent/subscription"
               className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
@@ -143,11 +180,29 @@ export default async function ParentDashboardPage() {
           </p>
         </div>
         <div className="flex-1 bg-white border border-[#E0D0F0] rounded-[14px] p-3.5">
-          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-1.5">Jatah bulan ini</p>
-          <p className="font-[var(--font-dm-serif)] text-[20px] text-[#5A3A7A] leading-none mb-1">3×</p>
-          <p className="text-[11px] text-[#999AAA]">Pencocokan gratis</p>
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-1.5">Sisa matching</p>
+          <p className="font-[var(--font-dm-serif)] text-[26px] text-[#5A3A7A] leading-none mb-1">
+            {matchingRemaining}×
+          </p>
+          <p className="text-[11px] text-[#999AAA]">
+            {isPaid ? "dari 10×/30 hari" : "gratis / 30 hari"}
+          </p>
         </div>
       </div>
+
+      {/* LinkedIn mode — nanny tersedia */}
+      {openToJobNannies.length > 0 && (
+        <LinkedInModeSection
+          nannies={openToJobNannies.map(n => ({
+            id: n.id,
+            city: n.city ?? "",
+            yearsOfExperience: n.yearsOfExperience ?? 0,
+            nannyType: n.nannyType,
+            isUnlocked: unlockedIds.includes(n.id),
+          }))}
+          isPaid={isPaid}
+        />
+      )}
 
       {/* Active nanny card */}
       {nannyName && score !== null && (
@@ -176,37 +231,41 @@ export default async function ParentDashboardPage() {
       )}
 
       {/* Timeline pemantauan */}
-      <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-3">Pemantauan berkala</p>
-      <div className="relative pl-5 mb-4">
-        <div className="absolute left-[7px] top-1 bottom-1 w-[2px] bg-[#E0D0F0]" />
-        {timelineItems.map((item) => {
-          const done = isDone(item.timing)
-          const active = nextPending === item.timing
-          const href = done
-            ? `/dashboard/parent/monitoring/summary?timing=${item.timing}`
-            : active
-            ? `/dashboard/parent/monitoring?timing=${item.timing}`
-            : null
+      {isPaid && (
+        <>
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-3">Pemantauan berkala</p>
+          <div className="relative pl-5 mb-4">
+            <div className="absolute left-[7px] top-1 bottom-1 w-[2px] bg-[#E0D0F0]" />
+            {timelineItems.map((item) => {
+              const done = isDone(item.timing)
+              const active = nextPending === item.timing
+              const href = done
+                ? `/dashboard/parent/monitoring/summary?timing=${item.timing}`
+                : active
+                ? `/dashboard/parent/monitoring?timing=${item.timing}`
+                : null
 
-          const inner = (
-            <>
-              <div className={`absolute -left-[17px] top-[3px] w-[10px] h-[10px] rounded-full border-2 border-[#FDFBFF] ${done ? "bg-[#5BBFB0]" : active ? "bg-[#E07B39]" : "bg-[#C8B8DC]"}`} />
-              <p className={`text-[13px] font-semibold ${active ? "text-[#E07B39]" : done ? "text-[#5A3A7A]" : "text-[#999AAA]"}`}>{item.label}</p>
-              <p className="text-[11px] text-[#999AAA] mt-0.5">{item.sub}</p>
-            </>
-          )
+              const inner = (
+                <>
+                  <div className={`absolute -left-[17px] top-[3px] w-[10px] h-[10px] rounded-full border-2 border-[#FDFBFF] ${done ? "bg-[#5BBFB0]" : active ? "bg-[#E07B39]" : "bg-[#C8B8DC]"}`} />
+                  <p className={`text-[13px] font-semibold ${active ? "text-[#E07B39]" : done ? "text-[#5A3A7A]" : "text-[#999AAA]"}`}>{item.label}</p>
+                  <p className="text-[11px] text-[#999AAA] mt-0.5">{item.sub}</p>
+                </>
+              )
 
-          return href ? (
-            <Link key={item.timing} href={href} className="relative mb-3.5 block hover:opacity-80 transition-opacity">
-              {inner}
-            </Link>
-          ) : (
-            <div key={item.timing} className="relative mb-3.5">
-              {inner}
-            </div>
-          )
-        })}
-      </div>
+              return href ? (
+                <Link key={item.timing} href={href} className="relative mb-3.5 block hover:opacity-80 transition-opacity">
+                  {inner}
+                </Link>
+              ) : (
+                <div key={item.timing} className="relative mb-3.5">
+                  {inner}
+                </div>
+              )
+            })}
+          </div>
+        </>
+      )}
 
       {/* Referral code */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Kode rekomendasimu</p>

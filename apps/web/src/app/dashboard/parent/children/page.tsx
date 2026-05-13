@@ -2,11 +2,20 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { ShareChildButton } from "@/components/children/ShareChildButton"
+import { getSubscriptionStatus } from "@/lib/subscription"
+import { PaidOnlyGate } from "@/components/layout/PaidOnlyGate"
 
 export const metadata = { title: "Catatan Anak — BundaYakin" }
 
 export default async function ChildrenPage() {
   const session = await auth()
+
+  if (session?.user?.id) {
+    const { isPaid } = await getSubscriptionStatus(session.user.id)
+    if (!isPaid) {
+      return <PaidOnlyGate featureName="Data &amp; Knowledge Transfer Anak" isPaid={false}>{null}</PaidOnlyGate>
+    }
+  }
 
   const profile = session?.user?.id
     ? await prisma.parentProfile.findUnique({

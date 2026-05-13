@@ -79,6 +79,7 @@ enum TransactionType {
   ADDON_PSIKOLOG        // Layer 3 — Rp 1.2–1.5 juta
   ADDON_TRACK_RECORD    // akses rekam jejak — Rp 50rb
   PLACEMENT_FEE         // fee penyaluran nanny
+  NANNY_UNLOCK          // 100rb — buka profil nanny (free tier LinkedIn mode)
 }
 
 enum TransactionStatus {
@@ -233,6 +234,13 @@ model ParentProfile {
   // Track record access purchased
   trackRecordAccess TrackRecordAccess[]
 
+  // Matching counter (rolling 30-day window dari tanggal daftar)
+  matchingUsedCount Int      @default(0)
+  matchingResetAt   DateTime?
+
+  // Nanny profiles unlocked via 100k payment (free tier LinkedIn mode)
+  unlockedNannies UnlockedNanny[]
+
   // Referrals given by this parent
   referralsGiven ParentReferral[]
 
@@ -341,6 +349,9 @@ model NannyProfile {
   surveyAnswers       Json?              // snapshot SurveyAnswers dari SurveyForm
   surveyCompletedAt   DateTime?
 
+  // LinkedIn mode — nanny aktif cari keluarga baru
+  openToJob           Boolean            @default(false)
+
   // Availability
   isAvailable         Boolean            @default(true)
   createdAt           DateTime           @default(now())
@@ -370,8 +381,12 @@ model NannyProfile {
   // Referral
   referralsGiven    Referral[] @relation("ReferrerNanny")
 
+  // Parents who unlocked this nanny's profile (LinkedIn mode)
+  unlockedByParents UnlockedNanny[]
+
   @@index([userId])
   @@index([isAvailable])
+  @@index([openToJob])
   @@index([city])
 }
 
@@ -856,6 +871,24 @@ model Referral {
 
   @@index([referrerNannyId])
   @@index([referredNannyId])
+}
+
+// ============================================================
+// UNLOCKED NANNY — profil nanny yang dibuka parent (100rb, free tier LinkedIn mode)
+// ============================================================
+
+model UnlockedNanny {
+  id        String   @id @default(cuid())
+  parentId  String   // ParentProfile.id
+  nannyId   String   // NannyProfile.id
+  paidAt    DateTime @default(now())
+  amountIDR Int      @default(100000)
+
+  parent ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  nanny  NannyProfile  @relation(fields: [nannyId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, nannyId])
+  @@index([parentId])
 }
 
 // ============================================================
