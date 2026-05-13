@@ -1,0 +1,41 @@
+{
+  "name": "BundaYakin — Online Nanny Assessment",
+  "short_name": "BundaYakin",
+  "description": "Platform kecocokan dan pemantauan nanny berbasis psikologi. Karena Si Kecil Layak Dapat yang Terbaik.",
+  "start_url": "/dashboard/parent",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FDFBFF",
+  "theme_color": "#5A3A7A",
+  "lang": "id",
+  "categories": ["lifestyle", "health", "parenting"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Catatan Anak",
+      "short_name": "Catatan",
+      "url": "/dashboard/parent/children",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Pemantauan Nanny",
+      "short_name": "Monitor",
+      "url": "/dashboard/parent/monitoring",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+    }
+  ]
+}
