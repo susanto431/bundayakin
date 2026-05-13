@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import { ShareChildButton } from "@/components/children/ShareChildButton"
 
 export const metadata = { title: "Catatan Anak — BundaYakin" }
 
@@ -21,6 +22,11 @@ export default async function ChildrenPage() {
               gender: true,
               allergies: true,
               medicalNotes: true,
+              pantangan: true,
+              schedule: true,
+              schoolName: true,
+              schoolSchedule: true,
+              additionalNotes: true,
               updatedAt: true,
             },
           },
@@ -33,8 +39,9 @@ export default async function ChildrenPage() {
   const lastUpdated = child?.updatedAt.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) ?? "-"
 
   const hasProfile = !!child?.name
+  const hasDevelopment = !!(child?.medicalNotes || child?.schoolName || child?.schoolSchedule)
+  const hasRules = !!(child?.pantangan || child?.schedule || child?.additionalNotes)
 
-  // Derive module completion — in production these would be real fields
   const modules = [
     {
       icon: "👶",
@@ -47,43 +54,23 @@ export default async function ChildrenPage() {
       isEditable: true,
     },
     {
-      icon: "❤️",
-      bg: "bg-[#F3EEF8]",
-      title: "Kesukaan & kebiasaan",
-      sub: "Mainan · cara menenangkan · pola tidur",
-      status: "Lengkap",
-      statusColor: "bg-[#E5F6F4] text-[#2C5F5A] border-[#A8DDD8]",
-      href: "/onboarding/parent?section=habits",
-      isEditable: true,
-    },
-    {
       icon: "📈",
       bg: "bg-[#FEF0E7]",
       title: "Perkembangan " + childName,
-      sub: "Milestone · catatan tumbuh kembang",
-      status: "Perlu update",
-      statusColor: "bg-[#FEF0E7] text-[#A35320] border-[#F5C4A0]",
-      href: "/onboarding/parent?section=development",
-      isEditable: true,
-    },
-    {
-      icon: "📝",
-      bg: "bg-white",
-      title: "Catatan kejadian penting",
-      sub: "Insiden · pola perilaku",
-      status: "Lengkap",
-      statusColor: "bg-[#E5F6F4] text-[#2C5F5A] border-[#A8DDD8]",
-      href: "/onboarding/parent?section=incidents",
+      sub: "Milestone · catatan tumbuh kembang · sekolah",
+      status: hasDevelopment ? "Lengkap" : "Belum lengkap",
+      statusColor: hasDevelopment ? "bg-[#E5F6F4] text-[#2C5F5A] border-[#A8DDD8]" : "bg-[#FEF0E7] text-[#A35320] border-[#F5C4A0]",
+      href: "/dashboard/parent/children/development",
       isEditable: true,
     },
     {
       icon: "🏠",
       bg: "bg-[#FEF0E7]",
       title: "Aturan rumah",
-      sub: "Area akses · SOP darurat · aturan tamu",
-      status: "Belum lengkap",
-      statusColor: "bg-[#FEF0E7] text-[#A35320] border-[#F5C4A0]",
-      href: "/onboarding/parent?section=rules",
+      sub: "Pantangan · rutinitas harian · aturan tamu",
+      status: hasRules ? "Lengkap" : "Belum lengkap",
+      statusColor: hasRules ? "bg-[#E5F6F4] text-[#2C5F5A] border-[#A8DDD8]" : "bg-[#FEF0E7] text-[#A35320] border-[#F5C4A0]",
+      href: "/dashboard/parent/children/rules",
       isEditable: true,
     },
     {
@@ -97,6 +84,18 @@ export default async function ChildrenPage() {
       isEditable: false,
     },
   ]
+
+  const shareChild = child ? {
+    name: child.name,
+    ageGroup: child.ageGroup,
+    allergies: child.allergies,
+    medicalNotes: child.medicalNotes,
+    pantangan: child.pantangan,
+    schedule: child.schedule,
+    additionalNotes: child.additionalNotes,
+    schoolName: child.schoolName,
+    schoolSchedule: child.schoolSchedule,
+  } : null
 
   return (
     <div className="max-w-[480px] mx-auto px-4 pt-5 pb-28">
@@ -162,17 +161,18 @@ export default async function ChildrenPage() {
       </div>
 
       {/* CTAs */}
-      <div className="space-y-2">
-        <button className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all">
-          Bagikan ke nanny baru
-        </button>
-        <Link
-          href="/onboarding/parent"
-          className="w-full flex items-center justify-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[13px] min-h-[48px] rounded-[10px] hover:bg-[#F3EEF8] transition-all"
-        >
-          Lengkapi catatan
-        </Link>
-      </div>
+      {shareChild ? (
+        <ShareChildButton child={shareChild} />
+      ) : (
+        <div className="space-y-2">
+          <Link
+            href="/onboarding/parent"
+            className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
+          >
+            Mulai isi catatan anak
+          </Link>
+        </div>
+      )}
 
     </div>
   )

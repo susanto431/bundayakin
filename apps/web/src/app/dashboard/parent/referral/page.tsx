@@ -1,15 +1,67 @@
 import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
+import Link from "next/link"
+import { CopyButton } from "@/components/settings/CopyButton"
 
 export const metadata = { title: "Referral — BundaYakin" }
 
 export default async function ReferralPage() {
   const session = await auth()
 
-  const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "4829"}`
+  const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "0000"}`
 
-  // In production, fetch real referral stats from DB
-  const totalEarned = 200000
-  const pendingAmount = 125000
+  const profile = session?.user?.id
+    ? await prisma.parentProfile.findUnique({
+        where: { userId: session.user.id },
+        select: {
+          referralsGiven: {
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              refereeType: true,
+              refereeName: true,
+              status: true,
+              bonusIDR: true,
+              bonusPaidAt: true,
+              dealAt: true,
+              createdAt: true,
+              updatedAt: true,
+              notes: true,
+            },
+          },
+        },
+      })
+    : null
+
+  const referrals = profile?.referralsGiven ?? []
+  const parentReferrals = referrals.filter(r => r.refereeType === "PARENT")
+  const nannyReferrals = referrals.filter(r => r.refereeType === "NANNY")
+
+  const totalEarned = referrals
+    .filter(r => r.status === "PAID" && r.bonusIDR)
+    .reduce((sum, r) => sum + (r.bonusIDR ?? 0), 0)
+
+  const totalPending = referrals
+    .filter(r => r.status === "DEAL" && r.bonusIDR)
+    .reduce((sum, r) => sum + (r.bonusIDR ?? 0), 0)
+
+  const successCount = referrals.filter(r => r.status === "PAID").length
+
+  function statusBadge(status: string) {
+    if (status === "PAID") return { label: "Fee masuk", color: "bg-[#E5F6F4] text-[#2C5F5A] border-[#A8DDD8]" }
+    if (status === "DEAL") return { label: "Menunggu konfirmasi", color: "bg-[#FEF0E7] text-[#A35320] border-[#F5C4A0]" }
+    if (status === "REGISTERED") return { label: "Sudah daftar", color: "bg-[#EEF2FC] text-[#5B7EC9] border-[#B5C8EF]" }
+    return { label: "Menunggu", color: "bg-white text-[#999AAA] border-[#E0D0F0]" }
+  }
+
+  function initials(name?: string | null) {
+    if (!name) return "?"
+    return name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
+  }
+
+  function formatDate(d: Date) {
+    return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+  }
 
   return (
     <div className="max-w-[480px] mx-auto px-4 pt-5 pb-28">
@@ -25,67 +77,105 @@ export default async function ReferralPage() {
         <div className="flex-1 bg-white border border-[#E0D0F0] rounded-[14px] p-3.5">
           <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-1.5">Total diterima</p>
           <p className="font-[var(--font-dm-serif)] text-[20px] leading-none mb-1" style={{ color: "#2C5F5A" }}>
-            Rp {(totalEarned / 1000).toFixed(0)}rb
+            {totalEarned > 0 ? `Rp ${(totalEarned / 1000).toFixed(0)}rb` : "Rp 0"}
           </p>
           <p className="text-[11px] text-[#999AAA]">
-            <span className="text-[#5BBFB0] font-semibold">2 referral</span> berhasil
+            {successCount > 0
+              ? <><span className="text-[#5BBFB0] font-semibold">{successCount} referral</span> berhasil</>
+              : "Belum ada referral"}
           </p>
         </div>
         <div className="flex-1 bg-white border border-[#E0D0F0] rounded-[14px] p-3.5">
           <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-1.5">Diproses</p>
           <p className="font-[var(--font-dm-serif)] text-[20px] leading-none mb-1 text-[#E07B39]">
-            Rp {(pendingAmount / 1000).toFixed(0)}rb
+            {totalPending > 0 ? `Rp ${(totalPending / 1000).toFixed(0)}rb` : "Rp 0"}
           </p>
-          <p className="text-[11px] text-[#999AAA]">Menunggu 3 bln</p>
+          <p className="text-[11px] text-[#999AAA]">
+            {totalPending > 0 ? "Menunggu konfirmasi" : "Tidak ada yang pending"}
+          </p>
         </div>
       </div>
 
       {/* Referred parents */}
-      <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Merekomendasikan orang tua</p>
-      <div className="bg-white border border-[#E0D0F0] rounded-[16px] p-3.5 mb-3">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-[#E5F6F4] border-2 border-[#A8DDD8] flex items-center justify-center font-semibold text-[12px] text-[#2C5F5A]">
-              BH
-            </div>
-            <div>
-              <p className="text-[13px] font-semibold text-[#5A3A7A]">Bu Hana (orang tua)</p>
-              <p className="text-[11px] text-[#999AAA]">Daftar lewat kodemu · deal 10 Mei</p>
-            </div>
+      {parentReferrals.length > 0 && (
+        <>
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Merekomendasikan orang tua</p>
+          <div className="space-y-2 mb-4">
+            {parentReferrals.map(r => {
+              const badge = statusBadge(r.status)
+              return (
+                <div key={r.id} className="bg-white border border-[#E0D0F0] rounded-[16px] p-3.5">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <div className="w-9 h-9 rounded-full bg-[#E5F6F4] border-2 border-[#A8DDD8] flex items-center justify-center font-semibold text-[12px] text-[#2C5F5A]">
+                        {initials(r.refereeName)}
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-semibold text-[#5A3A7A]">{r.refereeName ?? "Orang tua"}</p>
+                        <p className="text-[11px] text-[#999AAA]">
+                          Daftar lewat kodemu · {formatDate(r.createdAt)}
+                          {r.dealAt && ` · deal ${formatDate(r.dealAt)}`}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={`text-[11px] font-semibold border px-2.5 py-0.5 rounded-full ${badge.color}`}>
+                      {badge.label}
+                    </span>
+                  </div>
+                  {r.status === "PAID" && r.bonusIDR && (
+                    <p className="text-[12px] font-bold text-[#2C5F5A] mt-2.5">
+                      + Rp {r.bonusIDR.toLocaleString("id-ID")} sudah ditransfer ke rekeningmu
+                    </p>
+                  )}
+                </div>
+              )
+            })}
           </div>
-          <span className="text-[11px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-2.5 py-0.5 rounded-full">
-            Fee masuk
-          </span>
-        </div>
-        <p className="text-[12px] font-bold text-[#2C5F5A] mt-2.5">+ Rp 100.000 sudah ditransfer ke rekeningmu</p>
-      </div>
+        </>
+      )}
 
       {/* Referred nannies */}
-      <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Merekomendasikan nanny</p>
-      <div className="bg-white border border-[#E0D0F0] rounded-[16px] p-3.5 mb-4">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-[#F3EEF8] border-2 border-[#E0D0F0] flex items-center justify-center font-semibold text-[12px] text-[#5A3A7A]">
-              SD
-            </div>
-            <div>
-              <p className="text-[13px] font-semibold text-[#5A3A7A]">Sus Dewi (nanny)</p>
-              <p className="text-[11px] text-[#999AAA]">Dapat kerja via BY · mulai 1 Mar 2026</p>
-            </div>
+      {nannyReferrals.length > 0 && (
+        <>
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Merekomendasikan nanny</p>
+          <div className="space-y-2 mb-4">
+            {nannyReferrals.map(r => {
+              const badge = statusBadge(r.status)
+              return (
+                <div key={r.id} className="bg-white border border-[#E0D0F0] rounded-[16px] p-3.5">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <div className="w-9 h-9 rounded-full bg-[#F3EEF8] border-2 border-[#E0D0F0] flex items-center justify-center font-semibold text-[12px] text-[#5A3A7A]">
+                        {initials(r.refereeName)}
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-semibold text-[#5A3A7A]">{r.refereeName ?? "Nanny"}</p>
+                        <p className="text-[11px] text-[#999AAA]">Dapat kerja via BY · {formatDate(r.createdAt)}</p>
+                      </div>
+                    </div>
+                    <span className={`text-[11px] font-semibold border px-2.5 py-0.5 rounded-full ${badge.color}`}>
+                      {badge.label}
+                    </span>
+                  </div>
+                  {r.notes && (
+                    <p className="text-[12px] text-[#999AAA] mt-2">{r.notes}</p>
+                  )}
+                </div>
+              )
+            })}
           </div>
-          <span className="text-[11px] font-semibold bg-[#FEF0E7] text-[#A35320] border border-[#F5C4A0] px-2.5 py-0.5 rounded-full">
-            Menunggu bln ke-3
-          </span>
+        </>
+      )}
+
+      {/* Empty state */}
+      {referrals.length === 0 && (
+        <div className="bg-[#F3EEF8] border border-[#C8B8DC] rounded-[16px] p-4 text-center mb-4">
+          <p className="text-[13px] font-semibold text-[#5A3A7A] mb-1">Belum ada referral</p>
+          <p className="text-[12px] text-[#999AAA] leading-relaxed">
+            Bagikan kode di bawah ke teman atau nanny kenalan Bunda. Setiap referral yang berhasil dapat bonus.
+          </p>
         </div>
-        <div className="mt-2.5">
-          <p className="text-[12px] text-[#2C5F5A] font-semibold">+ Rp 75.000 sudah cair (tahap 1)</p>
-          <p className="text-[12px] text-[#999AAA] mt-0.5">Tahap 2: Rp 125.000 cair 1 Jun jika Sus masih bekerja</p>
-          <div className="bg-[#F3EEF8] rounded-full h-[7px] overflow-hidden mt-2">
-            <div className="h-full rounded-full bg-[#E07B39] transition-all" style={{ width: "65%" }} />
-          </div>
-          <p className="text-[11px] text-[#999AAA] mt-1">65 hari dari 90 hari</p>
-        </div>
-      </div>
+      )}
 
       {/* Referral code */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Kode rekomendasimu</p>
@@ -104,16 +194,17 @@ export default async function ReferralPage() {
           >
             Kirim via WA
           </a>
-          <button className="inline-flex items-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] hover:bg-[#F3EEF8] transition-all">
-            Salin kode
-          </button>
+          <CopyButton text={referralCode} />
         </div>
       </div>
 
       <div className="text-center">
-        <button className="text-[12px] text-[#5B7EC9] font-semibold">
+        <Link
+          href="/dashboard/parent/terms"
+          className="text-[12px] text-[#5B7EC9] font-semibold hover:underline"
+        >
           Lihat syarat &amp; ketentuan referral →
-        </button>
+        </Link>
       </div>
 
     </div>

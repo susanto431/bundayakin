@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 
-const WA_CONTACT = "https://wa.me/6281234567890?text=Halo%20tim%20BundaYakin%2C%20saya%20butuh%20bantuan"
+const WA_CONTACT = "https://wa.me/6287888180363?text=Halo%20tim%20BundaYakin%2C%20saya%20butuh%20bantuan"
 
 const FAQS = [
   {

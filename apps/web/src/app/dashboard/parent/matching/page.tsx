@@ -80,7 +80,7 @@ export default async function ParentMatchingPage() {
           BundaYakin punya database nanny terverifikasi. Daftarkan kebutuhan Bunda dan kami bantu carikan yang cocok.
         </p>
         <a
-          href="https://wa.me/6281234567890?text=Halo%20tim%20BundaYakin%2C%20saya%20ingin%20mencari%20nanny%20lewat%20platform"
+          href="https://wa.me/6287888180363?text=Halo%20tim%20BundaYakin%2C%20saya%20ingin%20mencari%20nanny%20lewat%20platform"
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center gap-1.5 bg-[#5A3A7A] hover:bg-[#3D2558] text-white text-[12px] font-semibold px-3.5 py-2 rounded-[10px] min-h-[36px] transition-all"

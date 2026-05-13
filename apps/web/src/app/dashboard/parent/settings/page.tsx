@@ -6,7 +6,7 @@ import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton"
 
 export const metadata = { title: "Akun & Pengaturan — BundaYakin" }
 
-const WA_CONTACT = "https://wa.me/6281234567890?text=Halo%20tim%20BundaYakin%2C%20saya%20butuh%20bantuan"
+const WA_CONTACT = "https://wa.me/6287888180363?text=Halo%20tim%20BundaYakin%2C%20saya%20butuh%20bantuan"
 
 export default async function ParentSettingsPage() {
   const session = await auth()

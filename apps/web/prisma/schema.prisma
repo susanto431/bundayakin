@@ -233,6 +233,9 @@ model ParentProfile {
   // Track record access purchased
   trackRecordAccess TrackRecordAccess[]
 
+  // Referrals given by this parent
+  referralsGiven ParentReferral[]
+
   @@index([userId])
 }
 
@@ -893,4 +896,27 @@ model ActivityLog {
   @@index([userId])
   @@index([action])
   @@index([createdAt])
+}
+
+// ============================================================
+// PARENT REFERRAL — parent merekomendasikan orang tua / nanny lain
+// ============================================================
+
+model ParentReferral {
+  id            String    @id @default(cuid())
+  referrerId    String    // parentProfile yang mereferral
+  refereeType   String    // "PARENT" | "NANNY"
+  refereeName   String?
+  refereePhone  String?
+  status        String    @default("PENDING") // "PENDING" | "REGISTERED" | "DEAL" | "PAID"
+  bonusIDR      Int?
+  bonusPaidAt   DateTime?
+  dealAt        DateTime?
+  notes         String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  referrer ParentProfile @relation(fields: [referrerId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
 }
