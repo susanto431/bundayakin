@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { SURVEY_QUESTIONS, ASPECT_META } from "@/constants/survey-questions"
 import type { SurveyQuestion, QuestionSide } from "@/constants/survey-questions"
 import type { SurveyAnswers } from "@/types/survey"
@@ -40,12 +41,14 @@ function showFreeText(side: QuestionSide, value: string | undefined): boolean {
 }
 
 export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: Props) {
+  const router = useRouter()
   const [answers, setAnswers] = useState<SurveyAnswers>({})
   const [customQ, setCustomQ] = useState<Record<string, CustomQ>>({})
   const [currentAspectIdx, setCurrentAspectIdx] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [savedDraft, setSavedDraft] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
@@ -194,6 +197,7 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
   function handleSaveDraft() {
     persist(answers, customQ, currentAspectIdx)
     onProgress?.(answers)
+    setSavedDraft(true)
   }
 
   async function handleSubmit() {
@@ -220,6 +224,38 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
         {[1, 2, 3].map(i => (
           <div key={i} className="bg-white border border-[#E0D0F0] rounded-[16px] p-4 h-44 animate-pulse" />
         ))}
+      </div>
+    )
+  }
+
+  if (savedDraft) {
+    const dashboardPath = role === "NANNY" ? "/dashboard/nanny" : "/dashboard/parent"
+    return (
+      <div className="px-4 pt-16 max-w-[480px] mx-auto text-center">
+        <div className="w-16 h-16 bg-[#E5F6F4] rounded-full mx-auto mb-4 flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5BBFB0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" />
+          </svg>
+        </div>
+        <p className="font-[var(--font-dm-serif)] text-[22px] text-[#5A3A7A] mb-2">Draft tersimpan</p>
+        <p className="text-[13px] text-[#999AAA] leading-relaxed mb-1">
+          {totalAnswered} dari {totalQuestions} pertanyaan sudah diisi.
+        </p>
+        <p className="text-[12px] text-[#999AAA] mb-6">Bisa dilanjutkan kapan saja dari halaman ini.</p>
+        <div className="space-y-2">
+          <button
+            onClick={() => router.push(dashboardPath)}
+            className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[13px] px-5 py-2.5 rounded-[10px] min-h-[44px] transition-all"
+          >
+            Kembali ke beranda
+          </button>
+          <button
+            onClick={() => setSavedDraft(false)}
+            className="w-full flex items-center justify-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[13px] min-h-[44px] rounded-[10px] hover:bg-[#F3EEF8] transition-all"
+          >
+            Lanjutkan isi sekarang
+          </button>
+        </div>
       </div>
     )
   }

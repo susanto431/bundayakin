@@ -346,15 +346,17 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     forNanny: {
       question: "Kamu mau bantu cuci baju?",
       options: [
-        { value: "a", label: "Ya" },
-        { value: "b", label: "Tidak" },
+        { value: "a", label: "Ya, semua baju di rumah" },
+        { value: "b", label: "Hanya baju anak" },
+        { value: "c", label: "Tidak" },
       ],
     },
     forParent: {
       question: "Nanny perlu cuci baju?",
       options: [
-        { value: "a", label: "Ya" },
-        { value: "b", label: "Tidak" },
+        { value: "a", label: "Ya, semua baju keluarga" },
+        { value: "b", label: "Hanya baju anak" },
+        { value: "c", label: "Tidak perlu" },
       ],
     },
     canBeDealbreaker: false,
@@ -390,15 +392,17 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     forNanny: {
       question: "Kamu mau bantu setrika?",
       options: [
-        { value: "a", label: "Ya" },
-        { value: "b", label: "Tidak" },
+        { value: "a", label: "Ya, semua baju di rumah" },
+        { value: "b", label: "Hanya baju anak" },
+        { value: "c", label: "Tidak" },
       ],
     },
     forParent: {
       question: "Nanny perlu setrika?",
       options: [
-        { value: "a", label: "Ya" },
-        { value: "b", label: "Tidak" },
+        { value: "a", label: "Ya, semua baju keluarga" },
+        { value: "b", label: "Hanya baju anak" },
+        { value: "c", label: "Tidak perlu" },
       ],
     },
     canBeDealbreaker: false,
