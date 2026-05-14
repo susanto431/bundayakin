@@ -61,10 +61,11 @@ export default async function ParentMatchingPage() {
   const inviteCode = `BY-${session?.user?.id?.slice(-4).toUpperCase() ?? "4829"}`
 
   const parentName = profile?.fullName ?? session?.user?.name ?? "Orang tua"
-  const parentContact = session?.user?.email ?? profile?.phone ?? "-"
+  const parentPhone = profile?.phone ?? "-"
+  const parentEmail = session?.user?.email ?? "-"
   const parentLocation = [profile?.district, profile?.city].filter(Boolean).join(", ") || "Belum diisi"
   const helpWaMessage = encodeURIComponent(
-    `Halo tim BundaYakin 👋\n\nSaya orang tua yang sudah terdaftar di BundaYakin dan ingin minta bantuan mencarikan nanny yang sesuai.\n\n📋 Info akun saya:\n• Nama: ${parentName}\n• Lokasi: ${parentLocation}\n• Kontak: ${parentContact}\n• Status matching: ${matchingUsed}/${matchingLimit} sudah dipakai\n\nSaya belum punya kandidat nanny. Mohon bantuannya untuk mencarikan nanny yang cocok. Terima kasih 🙏`
+    `Halo tim BundaYakin 👋\n\nSaya orang tua yang sudah terdaftar di BundaYakin dan ingin minta bantuan mencarikan nanny yang sesuai.\n\n📋 Info akun saya:\n• Nama: ${parentName}\n• Kode akun: ${inviteCode}\n• Nomor HP: ${parentPhone}\n• Email: ${parentEmail}\n• Lokasi: ${parentLocation}\n• Status matching: ${matchingUsed}/${matchingLimit} sudah dipakai\n\nSaya belum punya kandidat nanny. Mohon bantuannya untuk mencarikan nanny yang cocok. Terima kasih 🙏`
   )
 
   const statusLabel = (s: string) => {
