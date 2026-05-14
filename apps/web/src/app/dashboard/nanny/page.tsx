@@ -173,7 +173,7 @@ export default async function NannyDashboardPage() {
         <p className="text-[11px] text-[#999AAA] mb-1">Ajak teman bergabung ke BundaYakin</p>
         <p className="font-[var(--font-dm-serif)] text-[24px] tracking-[4px] text-[#5A3A7A] my-1.5">{referralCode}</p>
         <p className="text-[11px] text-[#999AAA] mb-3 leading-relaxed">
-          OT: Rp 100rb/75rb · Nanny: Rp 75rb + Rp 125rb jika bertahan 3 bln
+          Orang tua: Rp 100rb/75rb · Nanny: Rp 75rb + Rp 125rb jika bertahan 3 bln
         </p>
         <div className="flex gap-2 justify-center">
           <a

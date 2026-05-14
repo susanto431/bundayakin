@@ -8,7 +8,7 @@ export default function NannySettingsPage() {
   const [status, setStatus] = useState("active")
   const [visibility, setVisibility] = useState("all")
   const [bank, setBank] = useState("GoPay")
-  const [bankNumber, setBankNumber] = useState("081234567890")
+  const [bankNumber, setBankNumber] = useState("")
   const [notifications, setNotifications] = useState({
     invite: true,
     monitoring: true,
@@ -26,6 +26,13 @@ export default function NannySettingsPage() {
         setOpenToJobFetched(true)
       })
       .catch(() => setOpenToJobFetched(true))
+
+    fetch("/api/nanny/profile")
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.data?.phone) setBankNumber(d.data.phone)
+      })
+      .catch(() => {})
   }, [])
 
   async function handleOpenToJobToggle() {
