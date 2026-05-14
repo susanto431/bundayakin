@@ -92,8 +92,10 @@ function LoginForm() {
               className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[48px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#999AAA] outline-none transition-all"
             />
           </div>
-          <div className="text-right text-[12px] text-[#5BBFB0] font-semibold cursor-pointer mb-4 hover:underline">
-            Lupa password? Reset via SMS/WA →
+          <div className="text-right mb-4">
+            <Link href="/auth/forgot-password" className="text-[12px] text-[#5BBFB0] font-semibold hover:underline">
+              Lupa password? Reset via SMS/WA →
+            </Link>
           </div>
 
           <button

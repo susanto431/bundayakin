@@ -91,7 +91,7 @@ export default async function LandingPage() {
           <div className="text-[12px] font-bold text-[#5B7EC9] mb-1">Biaya penempatan nanny</div>
           <div className="text-[11px] text-[#3A5A9A] leading-relaxed">
             Jika nanny deal lewat BY: Rp 1.200.000 (jangka panjang) atau Rp 600.000 (temporer). Termasuk bonus untuk nanny yang bertahan dan fee untuk referrer.{" "}
-            <span className="text-[#5B7EC9] font-semibold cursor-pointer">Selengkapnya →</span>
+            <Link href="/pricing" className="text-[#5B7EC9] font-semibold hover:underline">Selengkapnya →</Link>
           </div>
         </div>
 
