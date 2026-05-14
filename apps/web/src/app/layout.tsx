@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google"
 import "./globals.css"
 import { ServiceWorkerRegister } from "@/components/layout/ServiceWorkerRegister"
+import { PostHogProvider } from "@/components/layout/PostHogProvider"
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -65,7 +66,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${jakarta.variable} ${dmSerif.variable} antialiased`}>
-        {children}
+        <PostHogProvider>
+          {children}
+        </PostHogProvider>
         <ServiceWorkerRegister />
       </body>
     </html>
