@@ -10,8 +10,9 @@ export async function POST(req: NextRequest) {
       password?: string
       role?: string
       phone?: string
+      familyCode?: string
     }
-    const { name, email, password, role, phone } = body
+    const { name, email, password, role, phone, familyCode } = body
 
     if (!name || !password || !role) {
       return NextResponse.json({ success: false, error: "Data tidak lengkap" }, { status: 400 })
@@ -51,6 +52,51 @@ export async function POST(req: NextRequest) {
       },
       select: { id: true, email: true, name: true, role: true },
     })
+
+    // Always create the role-specific profile immediately so survey and matching work.
+    if (role === "NANNY") {
+      const nannyProfile = await prisma.nannyProfile.create({
+        data: { userId: user.id, fullName: name, phone: phone ?? null, openToJob: true },
+        select: { id: true },
+      })
+
+      // Link to parent via familyCode if provided (format: BY-XXXX)
+      if (familyCode) {
+        const suffix = familyCode.replace(/^BY-/i, "").toLowerCase()
+        if (suffix.length >= 4) {
+          try {
+            const parentUser = await prisma.user.findFirst({
+              where: { role: "PARENT", id: { endsWith: suffix } },
+              select: { id: true },
+            })
+            if (parentUser) {
+              const parentProfile = await prisma.parentProfile.findUnique({
+                where: { userId: parentUser.id },
+                select: { id: true },
+              })
+              if (parentProfile) {
+                await prisma.matchingRequest.create({
+                  data: {
+                    parentProfileId: parentProfile.id,
+                    nannyProfileId: nannyProfile.id,
+                    status: "PENDING",
+                  },
+                })
+                console.info("[REGISTER] MatchingRequest created via familyCode", familyCode)
+              }
+            }
+          } catch (e) {
+            // Non-fatal: matching link failure shouldn't block registration
+            console.error("[REGISTER] familyCode link failed", e)
+          }
+        }
+      }
+    } else if (role === "PARENT") {
+      await prisma.parentProfile.create({
+        data: { userId: user.id, fullName: name, phone: phone ?? null },
+        select: { id: true },
+      })
+    }
 
     return NextResponse.json({ success: true, data: user }, { status: 201 })
   } catch (error) {
