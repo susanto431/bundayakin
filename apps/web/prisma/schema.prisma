@@ -953,3 +953,19 @@ model ParentReferral {
 
   @@index([referrerId])
 }
+
+// ============================================================
+// OTP TOKEN — untuk reset password via WA
+// ============================================================
+
+model OtpToken {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  type      String   @default("RESET_OTP") // "RESET_OTP" | "RESET_SESSION"
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([phone, type])
+}

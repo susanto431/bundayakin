@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { LogoutButton } from "@/components/settings/LogoutButton"
 
 export default function NannySettingsPage() {
   const [workTypes, setWorkTypes] = useState({ longterm: true, temporary: true })
@@ -211,6 +212,9 @@ export default function NannySettingsPage() {
         {["Edit nomor HP", "Ganti kata sandi", "Unduh data saya"].map(label => (
           <button key={label} className="block py-2.5 text-[#A97CC4] font-semibold min-h-[40px]">{label}</button>
         ))}
+        <div className="py-1">
+          <LogoutButton />
+        </div>
         <button className="block py-2.5 text-[#C75D5D] font-semibold min-h-[40px]">Hapus akun</button>
       </div>
 

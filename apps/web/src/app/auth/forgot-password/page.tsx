@@ -3,8 +3,6 @@
 import { useState } from "react"
 import Link from "next/link"
 
-const ADMIN_WA = "6287888180363"
-
 function BYLogo() {
   return (
     <svg width="56" height="56" viewBox="0 0 60 60" aria-hidden="true">
@@ -16,14 +14,105 @@ function BYLogo() {
   )
 }
 
+type Step = "phone" | "otp" | "password" | "done"
+
 export default function ForgotPasswordPage() {
-  const [identifier, setIdentifier] = useState("")
+  const [step, setStep] = useState<Step>("phone")
+  const [phone, setPhone] = useState("")
+  const [otp, setOtp] = useState("")
+  const [resetToken, setResetToken] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [cooldown, setCooldown] = useState(0)
 
-  const waMessage = identifier
-    ? `Halo, saya lupa kata sandi akun BundaYakin saya. Nomor HP/email saya: ${identifier}. Mohon bantu reset kata sandi. Terima kasih.`
-    : "Halo, saya lupa kata sandi akun BundaYakin saya. Mohon bantu reset kata sandi. Terima kasih."
+  function startCooldown() {
+    setCooldown(60)
+    const t = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) { clearInterval(t); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+  }
 
-  const waUrl = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(waMessage)}`
+  async function handleSendOtp(e: React.FormEvent) {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+    try {
+      const res = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      })
+      const data = await res.json() as { success: boolean; error?: string }
+      if (!data.success) { setError(data.error ?? "Gagal mengirim OTP"); return }
+      setStep("otp")
+      startCooldown()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleResend() {
+    if (cooldown > 0) return
+    setError("")
+    setLoading(true)
+    try {
+      const res = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      })
+      const data = await res.json() as { success: boolean; error?: string }
+      if (!data.success) { setError(data.error ?? "Gagal mengirim ulang OTP"); return }
+      startCooldown()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleVerifyOtp(e: React.FormEvent) {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+    try {
+      const res = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, code: otp }),
+      })
+      const data = await res.json() as { success: boolean; resetToken?: string; error?: string }
+      if (!data.success) { setError(data.error ?? "Kode OTP salah"); return }
+      setResetToken(data.resetToken!)
+      setStep("password")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleResetPassword(e: React.FormEvent) {
+    e.preventDefault()
+    setError("")
+    if (newPassword !== confirmPassword) { setError("Kata sandi tidak sama"); return }
+    setLoading(true)
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, resetToken, newPassword }),
+      })
+      const data = await res.json() as { success: boolean; error?: string }
+      if (!data.success) { setError(data.error ?? "Gagal mereset kata sandi"); return }
+      setStep("done")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const stepIndex = { phone: 1, otp: 2, password: 3, done: 3 }[step]
 
   return (
     <main className="min-h-screen bg-[#FDFBFF] font-[var(--font-jakarta)]">
@@ -35,58 +124,168 @@ export default function ForgotPasswordPage() {
           <p className="text-[11px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mt-0.5">Online Nanny Assessment</p>
         </div>
 
-        <h1 className="font-[var(--font-dm-serif)] text-[20px] text-[#5A3A7A] mb-1">Lupa kata sandi?</h1>
-        <p className="text-[13px] text-[#666666] leading-relaxed mb-6">
-          Reset kata sandi dilakukan melalui WhatsApp — tim BundaYakin akan membantu Anda dalam hitungan menit.
-        </p>
+        <h1 className="font-[var(--font-dm-serif)] text-[20px] text-[#5A3A7A] mb-1">Reset kata sandi</h1>
 
-        <div className="mb-4">
-          <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">
-            Nomor HP atau email akun Anda <span className="text-[#999AAA] font-normal">(opsional)</span>
-          </label>
-          <input
-            type="text"
-            value={identifier}
-            onChange={e => setIdentifier(e.target.value)}
-            placeholder="0812... atau email@..."
-            className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[48px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#999AAA] outline-none transition-all"
-          />
-          <p className="text-[11px] text-[#999AAA] mt-1.5">
-            Isi agar pesan ke admin sudah terisi otomatis — mempercepat proses reset.
-          </p>
-        </div>
+        {/* Step indicator */}
+        {step !== "done" && (
+          <div className="flex items-center gap-2 mb-6">
+            {[1, 2, 3].map(n => (
+              <div key={n} className="flex items-center gap-2">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-all ${
+                  n < stepIndex ? "bg-[#5BBFB0] text-white" :
+                  n === stepIndex ? "bg-[#5A3A7A] text-white" :
+                  "bg-[#E0D0F0] text-[#999AAA]"
+                }`}>{n < stepIndex ? "✓" : n}</div>
+                {n < 3 && <div className={`flex-1 h-[2px] w-8 ${n < stepIndex ? "bg-[#5BBFB0]" : "bg-[#E0D0F0]"}`} />}
+              </div>
+            ))}
+            <p className="ml-2 text-[12px] text-[#999AAA]">
+              {step === "phone" && "Masukkan nomor WA"}
+              {step === "otp" && "Verifikasi OTP"}
+              {step === "password" && "Buat kata sandi baru"}
+            </p>
+          </div>
+        )}
 
-        <a
-          href={waUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#1DA851] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] mb-4 transition-all"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.554 4.103 1.523 5.824L.057 23.857a.75.75 0 00.916.916l6.033-1.466A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.497-5.242-1.369l-.376-.218-3.9.948.967-3.793-.236-.389A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-          </svg>
-          Hubungi Admin via WhatsApp
-        </a>
+        {error && (
+          <div className="bg-[#FAEAEA] border-l-4 border-[#C75D5D] rounded-r-[12px] px-4 py-3 text-[13px] text-[#C75D5D] mb-4">
+            {error}
+          </div>
+        )}
 
-        <div className="bg-[#EEF2FC] border-l-4 border-[#5B7EC9] rounded-r-[12px] px-3.5 py-3 mb-6">
-          <div className="text-[12px] font-bold text-[#5B7EC9] mb-1">Cara reset kata sandi</div>
-          <ol className="text-[12px] text-[#3A5A9A] leading-relaxed list-decimal pl-4 space-y-1">
-            <li>Klik tombol di atas untuk buka WhatsApp</li>
-            <li>Kirim pesan — tim kami aktif setiap hari</li>
-            <li>Kata sandi baru akan dikirim melalui WA</li>
-            <li>Masuk dan ganti kata sandi di Pengaturan</li>
-          </ol>
-        </div>
+        {/* Step 1: Phone */}
+        {step === "phone" && (
+          <form onSubmit={handleSendOtp}>
+            <p className="text-[13px] text-[#666666] leading-relaxed mb-4">
+              Masukkan nomor WhatsApp yang terdaftar di akun BundaYakin Anda. Kami akan kirim kode OTP ke nomor tersebut.
+            </p>
+            <div className="mb-4">
+              <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">Nomor WhatsApp</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                placeholder="0812 3456 7890"
+                required
+                className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[48px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#999AAA] outline-none transition-all"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading || !phone}
+              className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] mb-3 transition-all disabled:opacity-50"
+            >
+              {loading ? "Mengirim..." : "Kirim kode OTP"}
+            </button>
+          </form>
+        )}
 
-        <div className="border-t border-[#E0D0F0] mb-4" />
+        {/* Step 2: OTP */}
+        {step === "otp" && (
+          <form onSubmit={handleVerifyOtp}>
+            <p className="text-[13px] text-[#666666] leading-relaxed mb-4">
+              Kode 6 digit sudah dikirim ke WhatsApp <strong>{phone}</strong>. Berlaku 10 menit.
+            </p>
+            <div className="mb-4">
+              <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">Kode OTP</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                value={otp}
+                onChange={e => setOtp(e.target.value.replace(/\D/g, ""))}
+                placeholder="_ _ _ _ _ _"
+                required
+                className="w-full px-3.5 py-2.5 text-[18px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[56px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#E0D0F0] outline-none transition-all tracking-[0.4em] text-center font-bold"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading || otp.length < 6}
+              className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] mb-3 transition-all disabled:opacity-50"
+            >
+              {loading ? "Memverifikasi..." : "Verifikasi OTP"}
+            </button>
+            <div className="text-center text-[12px] text-[#999AAA]">
+              Tidak menerima kode?{" "}
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={cooldown > 0 || loading}
+                className="text-[#5BBFB0] font-semibold disabled:text-[#999AAA] disabled:cursor-not-allowed"
+              >
+                {cooldown > 0 ? `Kirim ulang (${cooldown}s)` : "Kirim ulang"}
+              </button>
+            </div>
+          </form>
+        )}
 
-        <Link
-          href="/auth/login"
-          className="flex items-center justify-center w-full bg-transparent border-[1.5px] border-[#C8B8DC] hover:bg-[#F3EEF8] text-[#666666] font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
-        >
-          ← Kembali ke halaman masuk
-        </Link>
+        {/* Step 3: New password */}
+        {step === "password" && (
+          <form onSubmit={handleResetPassword}>
+            <p className="text-[13px] text-[#666666] leading-relaxed mb-4">
+              Verifikasi berhasil. Buat kata sandi baru untuk akun Anda.
+            </p>
+            <div className="mb-3.5">
+              <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">Kata sandi baru</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                placeholder="Minimal 8 karakter"
+                required
+                minLength={8}
+                className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[48px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#999AAA] outline-none transition-all"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">Ulangi kata sandi</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[48px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#999AAA] outline-none transition-all"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading || !newPassword || !confirmPassword}
+              className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all disabled:opacity-50"
+            >
+              {loading ? "Menyimpan..." : "Simpan kata sandi baru"}
+            </button>
+          </form>
+        )}
+
+        {/* Done */}
+        {step === "done" && (
+          <div>
+            <div className="bg-[#E5F6F4] border-l-4 border-[#5BBFB0] rounded-r-[12px] px-4 py-3 text-[13px] text-[#2C5F5A] mb-6">
+              Kata sandi berhasil diubah! Silakan masuk dengan kata sandi baru Anda.
+            </div>
+            <Link
+              href="/auth/login"
+              className="flex items-center justify-center w-full bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
+            >
+              Masuk sekarang
+            </Link>
+          </div>
+        )}
+
+        {step !== "done" && (
+          <>
+            <div className="border-t border-[#E0D0F0] my-4" />
+            <Link
+              href="/auth/login"
+              className="flex items-center justify-center w-full bg-transparent border-[1.5px] border-[#C8B8DC] hover:bg-[#F3EEF8] text-[#666666] font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
+            >
+              ← Kembali ke halaman masuk
+            </Link>
+          </>
+        )}
 
       </div>
     </main>

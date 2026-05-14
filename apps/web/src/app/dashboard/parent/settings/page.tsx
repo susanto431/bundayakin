@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton"
+import { LogoutButton } from "@/components/settings/LogoutButton"
 
 export const metadata = { title: "Akun & Pengaturan — BundaYakin" }
 
@@ -194,6 +195,7 @@ export default async function ParentSettingsPage() {
         >
           Unduh data saya
         </a>
+        <LogoutButton />
         <DeleteAccountButton />
       </div>
 
