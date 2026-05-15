@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Script from "next/script"
+import { usePostHog } from "posthog-js/react"
 
 // Midtrans Snap types
 declare global {
@@ -41,11 +42,13 @@ export default function MidtransButton({
   const [error, setError] = useState<string | null>(null)
   // Cache snap token within the same page session
   const [cachedToken, setCachedToken] = useState<string | null>(null)
+  const posthog = usePostHog()
 
   async function handlePay() {
     if (loading) return
     setLoading(true)
     setError(null)
+    posthog.capture("subscription_payment_initiated")
 
     try {
       let token = cachedToken
@@ -64,23 +67,28 @@ export default function MidtransButton({
 
       window.snap?.pay(token, {
         onSuccess: () => {
+          posthog.capture("subscription_payment_success")
           setLoading(false)
           onSuccess?.()
           window.location.reload()
         },
         onPending: () => {
+          posthog.capture("subscription_payment_pending")
           setLoading(false)
         },
         onError: () => {
+          posthog.capture("subscription_payment_error")
           setLoading(false)
           setError("Pembayaran gagal. Coba lagi.")
           setCachedToken(null)
         },
         onClose: () => {
+          posthog.capture("subscription_payment_closed")
           setLoading(false)
         },
       })
     } catch {
+      posthog.capture("subscription_payment_error", { reason: "network" })
       setLoading(false)
       setError("Terjadi kesalahan. Coba lagi.")
     }

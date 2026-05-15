@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { LogoutButton } from "@/components/settings/LogoutButton"
+import { DeleteNannyAccountButton } from "@/components/settings/DeleteNannyAccountButton"
 
 export default function NannySettingsPage() {
   const [workTypes, setWorkTypes] = useState({ longterm: true, temporary: true })
@@ -14,12 +16,13 @@ export default function NannySettingsPage() {
     monitoring: true,
     bonus: true,
   })
+  const [bankSaveState, setBankSaveState] = useState<"idle" | "loading" | "saved" | "error">("idle")
   const [openToJob, setOpenToJob] = useState(false)
   const [openToJobLoading, setOpenToJobLoading] = useState(false)
   const [openToJobFetched, setOpenToJobFetched] = useState(false)
 
   useEffect(() => {
-    fetch("/api/nanny/open-to-job")
+    fetch("/api/nanny/open-to-job", { cache: "no-store" })
       .then(r => r.json())
       .then(d => {
         if (d.success) setOpenToJob(d.data.openToJob)
@@ -35,6 +38,23 @@ export default function NannySettingsPage() {
       .catch(() => {})
   }, [])
 
+  async function handleSaveBank() {
+    if (!bankNumber.trim() || bankSaveState === "loading") return
+    setBankSaveState("loading")
+    try {
+      const res = await fetch("/api/nanny/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: bankNumber.trim() }),
+      })
+      const d = await res.json()
+      setBankSaveState(d.success ? "saved" : "error")
+      if (d.success) setTimeout(() => setBankSaveState("idle"), 2500)
+    } catch {
+      setBankSaveState("error")
+    }
+  }
+
   async function handleOpenToJobToggle() {
     if (openToJobLoading) return
     setOpenToJobLoading(true)
@@ -47,7 +67,12 @@ export default function NannySettingsPage() {
         body: JSON.stringify({ openToJob: next }),
       })
       const d = await res.json()
-      if (!d.success) setOpenToJob(!next)
+      if (d.success) {
+        const confirm = await fetch("/api/nanny/open-to-job", { cache: "no-store" }).then(r => r.json())
+        if (confirm.success) setOpenToJob(confirm.data.openToJob)
+      } else {
+        setOpenToJob(!next)
+      }
     } catch {
       setOpenToJob(!next)
     } finally {
@@ -188,9 +213,17 @@ export default function NannySettingsPage() {
           className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[48px] focus:border-[#A97CC4] outline-none transition-all"
         />
       </div>
-      <button className="inline-flex items-center bg-[#E5F6F4] hover:bg-[#A8DDD8] text-[#1E4A45] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] border border-[#A8DDD8] transition-all mb-4">
-        Simpan perubahan rekening
+      <button
+        onClick={handleSaveBank}
+        disabled={bankSaveState === "loading"}
+        className="inline-flex items-center bg-[#E5F6F4] hover:bg-[#A8DDD8] disabled:opacity-60 text-[#1E4A45] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] border border-[#A8DDD8] transition-all mb-1"
+      >
+        {bankSaveState === "loading" ? "Menyimpan..." : bankSaveState === "saved" ? "Tersimpan ✓" : "Simpan perubahan rekening"}
       </button>
+      {bankSaveState === "error" && (
+        <p className="text-[11px] text-[#C75D5D] mb-3">Gagal menyimpan. Coba lagi.</p>
+      )}
+      {bankSaveState !== "error" && <div className="mb-3" />}
 
       {/* Notifications */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Notifikasi</p>
@@ -216,20 +249,37 @@ export default function NannySettingsPage() {
       {/* Account actions */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Akun</p>
       <div className="space-y-0 text-[13px] mb-4">
-        {["Edit nomor HP", "Ganti kata sandi", "Unduh data saya"].map(label => (
-          <button key={label} className="block py-2.5 text-[#A97CC4] font-semibold min-h-[40px]">{label}</button>
-        ))}
+        <Link href="/dashboard/nanny/profile" className="block py-2.5 text-[#A97CC4] font-semibold min-h-[40px]">
+          Edit nomor HP &amp; profil
+        </Link>
+        <Link href="/dashboard/nanny/settings/password" className="block py-2.5 text-[#A97CC4] font-semibold min-h-[40px]">
+          Ganti kata sandi
+        </Link>
+        <a
+          href="/api/nanny/export"
+          download="data-nanny-bundayakin.json"
+          className="block py-2.5 text-[#A97CC4] font-semibold min-h-[40px]"
+        >
+          Unduh data saya
+        </a>
         <div className="py-1">
           <LogoutButton />
         </div>
-        <button className="block py-2.5 text-[#C75D5D] font-semibold min-h-[40px]">Hapus akun</button>
+        <DeleteNannyAccountButton />
       </div>
 
       {/* About */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Tentang</p>
       <div className="space-y-0 text-[13px] text-[#999AAA]">
         <div className="py-2.5 border-b border-[#F3EEF8]">Syarat &amp; Ketentuan Nanny</div>
-        <button className="py-2.5 block text-[#A97CC4] font-semibold min-h-[40px]">Hubungi tim BundaYakin</button>
+        <a
+          href="https://wa.me/6287888180363?text=Halo%20tim%20BundaYakin%2C%20saya%20nanny%20yang%20terdaftar%20dan%20butuh%20bantuan"
+          target="_blank"
+          rel="noreferrer"
+          className="py-2.5 block text-[#A97CC4] font-semibold min-h-[40px]"
+        >
+          Hubungi tim BundaYakin
+        </a>
         <div className="py-2.5">Versi 1.0.0</div>
       </div>
 

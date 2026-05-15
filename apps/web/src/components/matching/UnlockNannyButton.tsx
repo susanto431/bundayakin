@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { usePostHog } from "posthog-js/react"
 
 type Props = {
   nannyId: string       // NannyProfile.id
@@ -10,11 +11,13 @@ type Props = {
 export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const posthog = usePostHog()
 
   async function handleUnlock() {
     if (loading) return
     setLoading(true)
     setError(null)
+    posthog.capture("nanny_profile_unlock_initiated", { nanny_id: nannyId })
 
     try {
       const res = await fetch("/api/matching/unlock", {
@@ -36,6 +39,7 @@ export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
 
       // Paid tier — langsung terbuka tanpa payment
       if (data.data?.unlocked && data.data?.free) {
+        posthog.capture("nanny_profile_unlock_success", { nanny_id: nannyId, method: "subscription" })
         setLoading(false)
         onUnlocked()
         return
@@ -51,6 +55,7 @@ export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
 
       window.snap?.pay(snapToken, {
         onSuccess: () => {
+          posthog.capture("nanny_profile_unlock_success", { nanny_id: nannyId, method: "payment" })
           setLoading(false)
           onUnlocked()
         },
@@ -58,6 +63,7 @@ export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
           setLoading(false)
         },
         onError: () => {
+          posthog.capture("nanny_profile_unlock_payment_error", { nanny_id: nannyId })
           setLoading(false)
           setError("Pembayaran gagal. Coba lagi.")
         },

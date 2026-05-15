@@ -2,15 +2,18 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 
 export function StartMatchingButton({ nannyUserId }: { nannyUserId: string }) {
   const router = useRouter()
   const [state, setState] = useState<"idle" | "loading" | "error">("idle")
   const [errorMsg, setErrorMsg] = useState("")
+  const posthog = usePostHog()
 
   async function handleStart() {
     setState("loading")
     setErrorMsg("")
+    posthog.capture("ai_matching_started", { nanny_user_id: nannyUserId })
     try {
       const res = await fetch("/api/matching/score", {
         method: "POST",
@@ -19,12 +22,15 @@ export function StartMatchingButton({ nannyUserId }: { nannyUserId: string }) {
       })
       const data = await res.json() as { success: boolean; error?: string }
       if (!data.success) {
+        posthog.capture("ai_matching_error", { nanny_user_id: nannyUserId, reason: data.error })
         setErrorMsg(data.error ?? "Gagal memulai matching")
         setState("error")
         return
       }
+      posthog.capture("ai_matching_success", { nanny_user_id: nannyUserId })
       router.refresh()
     } catch {
+      posthog.capture("ai_matching_error", { nanny_user_id: nannyUserId, reason: "network" })
       setErrorMsg("Tidak dapat terhubung ke server")
       setState("error")
     }

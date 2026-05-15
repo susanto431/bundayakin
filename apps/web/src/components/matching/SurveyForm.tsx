@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import { SURVEY_QUESTIONS } from "@/constants/survey-questions"
 import type { SurveyQuestion, QuestionSide } from "@/constants/survey-questions"
 import type { SurveyAnswers } from "@/types/survey"
@@ -48,6 +49,7 @@ function showFreeText(side: QuestionSide, value: string | undefined): boolean {
 
 export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: Props) {
   const router = useRouter()
+  const posthog = usePostHog()
   const [answers, setAnswers] = useState<SurveyAnswers>({})
   const [customQ, setCustomQ] = useState<Record<string, CustomQ>>({})
   const [currentAspectIdx, setCurrentAspectIdx] = useState(0)
@@ -211,6 +213,7 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
   async function handleSubmit() {
     setIsSubmitting(true)
     setSubmitError(null)
+    posthog.capture("survey_submitted", { role })
     try {
       if (onSubmit) await onSubmit(answers)
       setIsSubmitted(true)
@@ -220,6 +223,7 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
       )
     } catch (err) {
       console.error("[SurveyForm] submit error", err)
+      posthog.capture("survey_submit_error", { role })
       setSubmitError("Gagal menyimpan preferensi. Coba lagi.")
     } finally {
       setIsSubmitting(false)

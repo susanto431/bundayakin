@@ -131,3 +131,20 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ success: false, error: "Gagal menyimpan profil" }, { status: 500 })
   }
 }
+
+export async function DELETE() {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    }
+    if (session.user.role !== "NANNY") {
+      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
+    }
+    await prisma.user.delete({ where: { id: session.user.id } })
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("[NANNY_PROFILE_DELETE]", error)
+    return NextResponse.json({ success: false, error: "Gagal menghapus akun" }, { status: 500 })
+  }
+}
