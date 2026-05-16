@@ -245,6 +245,9 @@ model ParentProfile {
   // Referrals given by this parent
   referralsGiven ParentReferral[]
 
+  // Match results (Sprint 2 direktori)
+  matchResults MatchResult[]
+
   @@index([userId])
 }
 
@@ -390,6 +393,9 @@ model NannyProfile {
 
   // Parents who unlocked this nanny's profile (LinkedIn mode)
   unlockedByParents UnlockedNanny[]
+
+  // Match results (Sprint 2 direktori)
+  matchResults MatchResult[]
 
   @@index([userId])
   @@index([isAvailable])
@@ -959,6 +965,50 @@ model ParentReferral {
   referrer ParentProfile @relation(fields: [referrerId], references: [id], onDelete: Cascade)
 
   @@index([referrerId])
+}
+
+// ============================================================
+// MATCH RESULT — cache skor kecocokan untuk direktori nanny (Sprint 2)
+// Berbeda dari MatchingResult: ini direct cache tanpa MatchingRequest
+// ============================================================
+
+model MatchResult {
+  id              String    @id @default(cuid())
+  parentProfileId String
+  nannyProfileId  String
+
+  parentProfile   ParentProfile @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+  nannyProfile    NannyProfile  @relation(fields: [nannyProfileId], references: [id], onDelete: Cascade)
+
+  // Skor 0–100
+  skorKeseluruhan Int
+  skorDomainA     Int?
+  skorDomainB     Int?
+  skorDomainC     Int?
+
+  // Narasi dari Claude API
+  kekuatan        String[]  @default([])
+  potensiLemah    String[]  @default([])
+  potensiKonflik  String[]  @default([])
+  caraMengatasi   String[]  @default([])
+  tipsOrangTua    String[]  @default([])
+  tipsNanny       String[]  @default([])
+
+  // Dealbreaker
+  dealbreakerFlags Json?
+  adaDealbreaker  Boolean   @default(false)
+
+  // Status akses kontak (demo: simulasi bayar)
+  kontakTerbuka   Boolean   @default(false)
+  dibayarAt       DateTime?
+
+  // Cache — tidak perlu hit Claude API tiap kali
+  generatedAt     DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([parentProfileId, nannyProfileId])
+  @@index([parentProfileId])
+  @@index([nannyProfileId])
 }
 
 // ============================================================
