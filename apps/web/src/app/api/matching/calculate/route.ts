@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic"
+export const maxDuration = 60
 
 // POST /api/matching/calculate
 // Body: { nannyProfileId: string }
@@ -197,7 +198,8 @@ export async function POST(req: NextRequest) {
     console.info("[MATCHING_CALCULATE]", parentProfile.id, nannyProfileId, `skor=${result.skor_keseluruhan}`)
     return NextResponse.json({ success: true, data: matchResult })
   } catch (error) {
-    console.error("[MATCHING_CALCULATE]", error)
-    return NextResponse.json({ success: false, error: "Kalkulasi matching gagal" }, { status: 500 })
+    const errMsg = error instanceof Error ? error.message : String(error)
+    console.error("[MATCHING_CALCULATE]", errMsg)
+    return NextResponse.json({ success: false, error: errMsg }, { status: 500 })
   }
 }
