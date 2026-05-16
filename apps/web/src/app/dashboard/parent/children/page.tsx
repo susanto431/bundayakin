@@ -52,7 +52,7 @@ export default async function ChildrenPage() {
               </div>
               <div className="bg-[#F3EEF8] rounded-[10px] p-3">
                 <p className="text-[11px] font-bold text-[#5A3A7A] mb-1">📋 Catatan dari Nanny (diisi Sus)</p>
-                <p className="text-[12px] text-[#5A3A7A]">"Aisyah mulai lancar bilang kalimat 3 kata. Suka lagu anak-anak sebelum tidur. Sering rewel saat tumbuh gigi."</p>
+                <p className="text-[12px] text-[#5A3A7A]">&ldquo;Aisyah mulai lancar bilang kalimat 3 kata. Suka lagu anak-anak sebelum tidur. Sering rewel saat tumbuh gigi.&rdquo;</p>
                 <p className="text-[11px] text-[#999AAA] mt-0.5">Ditambahkan oleh nanny · 2 Mei 2026</p>
               </div>
             </div>
