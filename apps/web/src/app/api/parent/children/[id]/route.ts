@@ -38,6 +38,7 @@ export async function PATCH(
       name?: string
       dateOfBirth?: string
       gender?: string
+      profilePhotoUrl?: string
       allergies?: string
       medicalNotes?: string
       pantangan?: string
@@ -45,6 +46,10 @@ export async function PATCH(
       schoolName?: string
       schoolSchedule?: string
       additionalNotes?: string
+      caraMenenangkan?: string
+      doList?: string[]
+      dontList?: string[]
+      sortOrder?: number
     }
 
     const dobUpdate = body.dateOfBirth ? new Date(body.dateOfBirth) : undefined
@@ -58,6 +63,7 @@ export async function PATCH(
           ageGroup: deriveAgeGroup(dobUpdate),
         }),
         ...(body.gender !== undefined && { gender: body.gender.trim() || null }),
+        ...(body.profilePhotoUrl !== undefined && { profilePhotoUrl: body.profilePhotoUrl.trim() || null }),
         ...(body.allergies !== undefined && { allergies: body.allergies.trim() || null }),
         ...(body.medicalNotes !== undefined && { medicalNotes: body.medicalNotes.trim() || null }),
         ...(body.pantangan !== undefined && { pantangan: body.pantangan.trim() || null }),
@@ -65,11 +71,16 @@ export async function PATCH(
         ...(body.schoolName !== undefined && { schoolName: body.schoolName.trim() || null }),
         ...(body.schoolSchedule !== undefined && { schoolSchedule: body.schoolSchedule.trim() || null }),
         ...(body.additionalNotes !== undefined && { additionalNotes: body.additionalNotes.trim() || null }),
+        ...(body.caraMenenangkan !== undefined && { caraMenenangkan: body.caraMenenangkan.trim() || null }),
+        ...(body.doList !== undefined && { doList: body.doList }),
+        ...(body.dontList !== undefined && { dontList: body.dontList }),
+        ...(body.sortOrder !== undefined && { sortOrder: body.sortOrder }),
       },
       select: {
         id: true, name: true, dateOfBirth: true, ageGroup: true,
-        gender: true, allergies: true, medicalNotes: true,
-        pantangan: true, schedule: true, schoolName: true, schoolSchedule: true, additionalNotes: true,
+        gender: true, profilePhotoUrl: true, allergies: true, medicalNotes: true,
+        pantangan: true, schedule: true, schoolName: true, schoolSchedule: true,
+        additionalNotes: true, caraMenenangkan: true, doList: true, dontList: true, sortOrder: true,
       },
     })
 

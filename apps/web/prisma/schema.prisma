@@ -259,6 +259,7 @@ model ChildProfile {
   dateOfBirth     DateTime
   ageGroup        ChildAgeGroup
   gender          String?
+  profilePhotoUrl String?
   allergies       String?        @db.Text  // narasi bebas
   medicalNotes    String?        @db.Text  // kondisi kesehatan khusus
   pantangan       String?        @db.Text  // pantangan makanan / aktivitas
@@ -266,6 +267,10 @@ model ChildProfile {
   schoolName      String?
   schoolSchedule  String?
   additionalNotes String?        @db.Text
+  caraMenenangkan String?        @db.Text  // cara menenangkan saat rewel
+  doList          String[]                 // hal yang boleh/perlu dilakukan nanny
+  dontList        String[]                 // hal yang tidak boleh dilakukan nanny
+  sortOrder       Int            @default(0) // urutan tampil multi-anak
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 

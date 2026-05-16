@@ -23,11 +23,12 @@ export async function GET() {
       where: { userId: session.user.id },
       select: {
         children: {
-          orderBy: { dateOfBirth: "asc" },
+          orderBy: [{ sortOrder: "asc" }, { dateOfBirth: "asc" }],
           select: {
             id: true, name: true, dateOfBirth: true, ageGroup: true,
-            gender: true, allergies: true, medicalNotes: true,
-            pantangan: true, schedule: true, schoolName: true, schoolSchedule: true, additionalNotes: true,
+            gender: true, profilePhotoUrl: true, allergies: true, medicalNotes: true,
+            pantangan: true, schedule: true, schoolName: true, schoolSchedule: true,
+            additionalNotes: true, caraMenenangkan: true, doList: true, dontList: true, sortOrder: true,
           },
         },
       },
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
       name: string
       dateOfBirth: string
       gender?: string
+      profilePhotoUrl?: string
       allergies?: string
       medicalNotes?: string
       pantangan?: string
@@ -58,6 +60,10 @@ export async function POST(request: Request) {
       schoolName?: string
       schoolSchedule?: string
       additionalNotes?: string
+      caraMenenangkan?: string
+      doList?: string[]
+      dontList?: string[]
+      sortOrder?: number
     }
 
     if (!body.name?.trim() || !body.dateOfBirth) {
@@ -84,6 +90,7 @@ export async function POST(request: Request) {
         dateOfBirth: dob,
         ageGroup: deriveAgeGroup(dob),
         gender: body.gender?.trim() || null,
+        profilePhotoUrl: body.profilePhotoUrl?.trim() || null,
         allergies: body.allergies?.trim() || null,
         medicalNotes: body.medicalNotes?.trim() || null,
         pantangan: body.pantangan?.trim() || null,
@@ -91,11 +98,16 @@ export async function POST(request: Request) {
         schoolName: body.schoolName?.trim() || null,
         schoolSchedule: body.schoolSchedule?.trim() || null,
         additionalNotes: body.additionalNotes?.trim() || null,
+        caraMenenangkan: body.caraMenenangkan?.trim() || null,
+        doList: body.doList ?? [],
+        dontList: body.dontList ?? [],
+        sortOrder: body.sortOrder ?? 0,
       },
       select: {
         id: true, name: true, dateOfBirth: true, ageGroup: true,
-        gender: true, allergies: true, medicalNotes: true,
-        pantangan: true, schedule: true, schoolName: true, schoolSchedule: true, additionalNotes: true,
+        gender: true, profilePhotoUrl: true, allergies: true, medicalNotes: true,
+        pantangan: true, schedule: true, schoolName: true, schoolSchedule: true,
+        additionalNotes: true, caraMenenangkan: true, doList: true, dontList: true, sortOrder: true,
       },
     })
 

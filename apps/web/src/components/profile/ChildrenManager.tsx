@@ -1,26 +1,38 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
+import Link from "next/link"
+import Image from "next/image"
 
 type Child = {
   id: string
   name: string
   dateOfBirth: string
   gender: string | null
+  profilePhotoUrl: string | null
   allergies: string | null
   medicalNotes: string | null
   pantangan: string | null
   schedule: string | null
   schoolName: string | null
+  schoolSchedule: string | null
   additionalNotes: string | null
+  caraMenenangkan: string | null
+  doList: string[]
+  dontList: string[]
+  sortOrder: number
 }
 
-type ChildForm = Omit<Child, "id">
+type ChildForm = Omit<Child, "id"> & { doListRaw: string; dontListRaw: string }
 
 const EMPTY_FORM: ChildForm = {
   name: "", dateOfBirth: "", gender: "",
+  profilePhotoUrl: null,
   allergies: "", medicalNotes: "", pantangan: "",
-  schedule: "", schoolName: "", additionalNotes: "",
+  schedule: "", schoolName: "", schoolSchedule: "",
+  additionalNotes: "", caraMenenangkan: "",
+  doList: [], dontList: [], doListRaw: "", dontListRaw: "",
+  sortOrder: 0,
 }
 
 const INPUT_CLASS =
@@ -31,6 +43,13 @@ const TEXTAREA_CLASS =
 
 const LABEL_CLASS = "block text-sm font-semibold text-[#5A3A7A] mb-1.5"
 
+const AVATAR_COLORS = [
+  { bg: "bg-[#E5F6F4]", text: "text-[#2C5F5A]" },
+  { bg: "bg-[#F3EEF8]", text: "text-[#5A3A7A]" },
+  { bg: "bg-[#FEF0E7]", text: "text-[#A35320]" },
+  { bg: "bg-[#EEF2FC]", text: "text-[#3A5A9A]" },
+]
+
 function calcAge(dob: string): string {
   const birth = new Date(dob)
   const now = new Date()
@@ -40,7 +59,11 @@ function calcAge(dob: string): string {
   if (months < 12) return `${months} bulan`
   const years = Math.floor(months / 12)
   const rem = months % 12
-  return rem > 0 ? `${years} tahun ${rem} bulan` : `${years} tahun`
+  return rem > 0 ? `${years} thn ${rem} bln` : `${years} tahun`
+}
+
+function initials(name: string) {
+  return name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()
 }
 
 type DrawerMode = "add" | "edit"
@@ -52,11 +75,13 @@ export default function ChildrenManager({ initial }: { initial: Child[] }) {
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState<ChildForm>(EMPTY_FORM)
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   function openAdd() {
-    setForm(EMPTY_FORM)
+    setForm({ ...EMPTY_FORM, sortOrder: children.length })
     setDrawerMode("add")
     setEditId(null)
     setError(null)
@@ -68,12 +93,20 @@ export default function ChildrenManager({ initial }: { initial: Child[] }) {
       name: child.name,
       dateOfBirth: child.dateOfBirth.slice(0, 10),
       gender: child.gender ?? "",
+      profilePhotoUrl: child.profilePhotoUrl,
       allergies: child.allergies ?? "",
       medicalNotes: child.medicalNotes ?? "",
       pantangan: child.pantangan ?? "",
       schedule: child.schedule ?? "",
       schoolName: child.schoolName ?? "",
+      schoolSchedule: child.schoolSchedule ?? "",
       additionalNotes: child.additionalNotes ?? "",
+      caraMenenangkan: child.caraMenenangkan ?? "",
+      doList: child.doList,
+      dontList: child.dontList,
+      doListRaw: child.doList.join("\n"),
+      dontListRaw: child.dontList.join("\n"),
+      sortOrder: child.sortOrder,
     })
     setDrawerMode("edit")
     setEditId(child.id)
@@ -82,7 +115,36 @@ export default function ChildrenManager({ initial }: { initial: Child[] }) {
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    const { name, value } = e.target
+    setForm(prev => ({
+      ...prev,
+      [name]: value,
+      ...(name === "doListRaw" && { doList: value.split("\n").map(s => s.trim()).filter(Boolean) }),
+      ...(name === "dontListRaw" && { dontList: value.split("\n").map(s => s.trim()).filter(Boolean) }),
+    }))
+  }
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    setError(null)
+    try {
+      const fd = new FormData()
+      fd.append("file", file)
+      const res = await fetch("/api/upload", { method: "POST", body: fd })
+      const data = (await res.json()) as { success: boolean; url?: string; error?: string }
+      if (!data.success || !data.url) {
+        setError(data.error ?? "Gagal upload foto")
+        return
+      }
+      setForm(prev => ({ ...prev, profilePhotoUrl: data.url! }))
+    } catch {
+      setError("Tidak dapat mengunggah foto")
+    } finally {
+      setUploading(false)
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -93,11 +155,29 @@ export default function ChildrenManager({ initial }: { initial: Child[] }) {
     const url = drawerMode === "add" ? "/api/parent/children" : `/api/parent/children/${editId}`
     const method = drawerMode === "add" ? "POST" : "PATCH"
 
+    const payload = {
+      name: form.name,
+      dateOfBirth: form.dateOfBirth,
+      gender: form.gender,
+      profilePhotoUrl: form.profilePhotoUrl,
+      allergies: form.allergies,
+      medicalNotes: form.medicalNotes,
+      pantangan: form.pantangan,
+      schedule: form.schedule,
+      schoolName: form.schoolName,
+      schoolSchedule: form.schoolSchedule,
+      additionalNotes: form.additionalNotes,
+      caraMenenangkan: form.caraMenenangkan,
+      doList: form.doList,
+      dontList: form.dontList,
+      sortOrder: form.sortOrder,
+    }
+
     try {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       })
       const data = (await res.json()) as { success: boolean; data?: Child; error?: string }
       if (!data.success || !data.data) {
@@ -143,50 +223,71 @@ export default function ChildrenManager({ initial }: { initial: Child[] }) {
           </div>
         )}
 
-        {children.map(child => (
-          <div key={child.id} className="bg-white border border-[#E0D0F0] rounded-[16px] p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#F3EEF8] rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A97CC4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="7" r="4" /><path d="M5.5 20a7.5 7.5 0 0 1 13 0" />
-                  </svg>
+        {children.map((child, idx) => {
+          const color = AVATAR_COLORS[idx % AVATAR_COLORS.length]
+          return (
+            <div key={child.id} className="bg-white border border-[#E0D0F0] rounded-[16px] p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  {/* Avatar */}
+                  <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${child.profilePhotoUrl ? "" : color.bg}`}>
+                    {child.profilePhotoUrl ? (
+                      <Image src={child.profilePhotoUrl} alt={child.name} width={44} height={44} className="object-cover w-full h-full" />
+                    ) : (
+                      <span className={`text-sm font-bold ${color.text}`}>{initials(child.name)}</span>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-[#5A3A7A]">{child.name}</p>
+                    <p className="text-xs text-[#999AAA]">
+                      {calcAge(child.dateOfBirth)}
+                      {child.gender ? ` · ${child.gender}` : ""}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-sm text-[#5A3A7A]">{child.name}</p>
-                  <p className="text-xs text-[#999AAA]">
-                    {calcAge(child.dateOfBirth)}
-                    {child.gender ? ` · ${child.gender}` : ""}
-                  </p>
+                <div className="flex gap-1">
+                  <button onClick={() => openEdit(child)}
+                    className="text-xs text-[#5BBFB0] font-semibold hover:text-[#2C5F5A] min-h-[32px] px-2 transition-colors">
+                    Edit
+                  </button>
+                  <button onClick={() => setDeleteId(child.id)}
+                    className="text-xs text-[#999AAA] hover:text-[#C75D5D] min-h-[32px] px-2 transition-colors">
+                    Hapus
+                  </button>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => openEdit(child)}
-                  className="text-xs text-[#5BBFB0] font-semibold hover:text-[#2C5F5A] min-h-[32px] px-2 transition-colors">
-                  Edit
-                </button>
-                <button onClick={() => setDeleteId(child.id)}
-                  className="text-xs text-[#999AAA] hover:text-[#C75D5D] min-h-[32px] px-2 transition-colors">
-                  Hapus
-                </button>
+
+              {/* Quick info */}
+              {(child.allergies || child.medicalNotes) && (
+                <div className="mt-3 pt-3 border-t border-[#F3EEF8] space-y-1">
+                  {child.allergies && (
+                    <p className="text-xs text-[#666666]">
+                      <span className="font-semibold text-[#5A3A7A]">Alergi:</span> {child.allergies}
+                    </p>
+                  )}
+                  {child.medicalNotes && (
+                    <p className="text-xs text-[#666666]">
+                      <span className="font-semibold text-[#5A3A7A]">Catatan medis:</span> {child.medicalNotes}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Cari Nanny CTA */}
+              <div className="mt-3 pt-3 border-t border-[#F3EEF8]">
+                <Link
+                  href={`/dashboard/parent/matching?childId=${child.id}`}
+                  className="flex items-center justify-center gap-1.5 w-full bg-[#F3EEF8] hover:bg-[#E8DDFF] text-[#5A3A7A] font-semibold text-xs py-2 rounded-[8px] transition-colors min-h-[36px]"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+                  </svg>
+                  Cari Nanny untuk {child.name}
+                </Link>
               </div>
             </div>
-            {(child.allergies || child.medicalNotes) && (
-              <div className="mt-3 pt-3 border-t border-[#F3EEF8] space-y-1">
-                {child.allergies && (
-                  <p className="text-xs text-[#666666]">
-                    <span className="font-semibold text-[#5A3A7A]">Alergi:</span> {child.allergies}
-                  </p>
-                )}
-                {child.medicalNotes && (
-                  <p className="text-xs text-[#666666]">
-                    <span className="font-semibold text-[#5A3A7A]">Catatan medis:</span> {child.medicalNotes}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       <button
@@ -247,6 +348,32 @@ export default function ChildrenManager({ initial }: { initial: Child[] }) {
                 </div>
               )}
 
+              {/* Foto */}
+              <div>
+                <label className={LABEL_CLASS}>Foto Anak (opsional)</label>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-full overflow-hidden bg-[#F3EEF8] flex items-center justify-center flex-shrink-0">
+                    {form.profilePhotoUrl ? (
+                      <Image src={form.profilePhotoUrl} alt="preview" width={56} height={56} className="object-cover w-full h-full" />
+                    ) : (
+                      <span className="text-base font-bold text-[#A97CC4]">{form.name ? initials(form.name) : "?"}</span>
+                    )}
+                  </div>
+                  <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handlePhotoUpload} />
+                  <button type="button" disabled={uploading} onClick={() => fileRef.current?.click()}
+                    className="text-xs text-[#5BBFB0] font-semibold border border-[#A8DDD8] rounded-[8px] px-3 py-2 min-h-[36px] hover:bg-[#E5F6F4] disabled:opacity-50 transition-all">
+                    {uploading ? "Mengunggah…" : "Pilih Foto"}
+                  </button>
+                  {form.profilePhotoUrl && (
+                    <button type="button" onClick={() => setForm(p => ({ ...p, profilePhotoUrl: null }))}
+                      className="text-xs text-[#999AAA] hover:text-[#C75D5D] font-semibold">
+                      Hapus
+                    </button>
+                  )}
+                </div>
+                <p className="text-[11px] text-[#999AAA] mt-1.5">Maks 5 MB · JPG, PNG, atau WebP</p>
+              </div>
+
               <div>
                 <label htmlFor="name" className={LABEL_CLASS}>Nama Anak <span className="text-[#C75D5D]">*</span></label>
                 <input id="name" name="name" type="text" value={form.name} onChange={handleChange}
@@ -295,6 +422,32 @@ export default function ChildrenManager({ initial }: { initial: Child[] }) {
               </div>
 
               <div>
+                <label htmlFor="caraMenenangkan" className={LABEL_CLASS}>Cara Menenangkan</label>
+                <textarea id="caraMenenangkan" name="caraMenenangkan" value={form.caraMenenangkan ?? ""}
+                  onChange={handleChange} rows={2}
+                  placeholder="cth: digendong sambil dinyanyikan, diberi empeng, diajak jalan-jalan"
+                  className={TEXTAREA_CLASS} />
+              </div>
+
+              <div>
+                <label htmlFor="doListRaw" className={LABEL_CLASS}>Yang Boleh Dilakukan Nanny</label>
+                <textarea id="doListRaw" name="doListRaw" value={form.doListRaw}
+                  onChange={handleChange} rows={3}
+                  placeholder={"Satu hal per baris, cth:\nBoleh ajak main di luar\nBoleh beri MPASI sendiri"}
+                  className={TEXTAREA_CLASS} />
+                <p className="text-[11px] text-[#999AAA] mt-1">Satu item per baris</p>
+              </div>
+
+              <div>
+                <label htmlFor="dontListRaw" className={LABEL_CLASS}>Yang Tidak Boleh Dilakukan Nanny</label>
+                <textarea id="dontListRaw" name="dontListRaw" value={form.dontListRaw}
+                  onChange={handleChange} rows={3}
+                  placeholder={"Satu hal per baris, cth:\nJangan berikan susu formula biasa\nJangan nonton layar lebih 30 menit"}
+                  className={TEXTAREA_CLASS} />
+                <p className="text-[11px] text-[#999AAA] mt-1">Satu item per baris</p>
+              </div>
+
+              <div>
                 <label htmlFor="schoolName" className={LABEL_CLASS}>Nama Sekolah / TK / PAUD</label>
                 <input id="schoolName" name="schoolName" type="text" value={form.schoolName ?? ""}
                   onChange={handleChange} placeholder="Jika sudah sekolah (opsional)" className={INPUT_CLASS} />
@@ -315,12 +468,11 @@ export default function ChildrenManager({ initial }: { initial: Child[] }) {
                   placeholder="Hal lain yang penting untuk nanny ketahui"
                   className={TEXTAREA_CLASS} />
               </div>
-
             </div>
 
-            {/* Fixed footer — always visible */}
+            {/* Fixed footer */}
             <div className="flex-shrink-0 px-5 pt-3 pb-6 border-t border-[#F3EEF8]">
-              <button type="submit" disabled={loading}
+              <button type="submit" disabled={loading || uploading}
                 className="w-full bg-[#5BBFB0] hover:bg-[#2C5F5A] disabled:bg-[#C8B8DC] text-white font-semibold py-3.5 rounded-[12px] min-h-[52px] text-sm transition-all">
                 {loading ? "Menyimpan..." : drawerMode === "add" ? "Tambah Anak" : "Simpan Perubahan"}
               </button>
