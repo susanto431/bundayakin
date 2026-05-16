@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
@@ -109,7 +111,7 @@ export default async function ChildrenPage() {
 
   const child = profile?.children?.[0]
   const childName = child?.name ?? "si Kecil"
-  const lastUpdated = child?.updatedAt.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) ?? "-"
+  const lastUpdated = child?.updatedAt?.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) ?? "-"
 
   const hasProfile = !!child?.name
   const hasDevelopment = !!(child?.medicalNotes || child?.schoolName || child?.schoolSchedule)
