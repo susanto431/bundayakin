@@ -198,8 +198,11 @@ export async function POST(req: NextRequest) {
     console.info("[MATCHING_CALCULATE]", parentProfile.id, nannyProfileId, `skor=${result.skor_keseluruhan}`)
     return NextResponse.json({ success: true, data: matchResult })
   } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error)
-    console.error("[MATCHING_CALCULATE]", errMsg)
-    return NextResponse.json({ success: false, error: errMsg }, { status: 500 })
+    console.error("[MATCHING_CALCULATE]", error)
+    const raw = error instanceof Error ? error.message : String(error)
+    const userMsg = raw.includes("credit balance is too low")
+      ? "Fitur kalkulasi AI sedang tidak tersedia. Silakan coba beberapa saat lagi."
+      : "Kalkulasi matching gagal. Silakan coba lagi."
+    return NextResponse.json({ success: false, error: userMsg }, { status: 500 })
   }
 }
