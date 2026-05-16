@@ -120,7 +120,11 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
       try {
         const res = await fetch(`/api/matching/detail?nannyProfileId=${nannyProfileId}`)
         if (res.status === 404) {
-          // No match yet — trigger calculation
+          const json = await res.json().catch(() => ({ error: "Hasil matching tidak ditemukan" }))
+          // Only auto-calculate when the match row doesn't exist yet
+          if (json?.error && json.error !== "Hasil matching tidak ditemukan") {
+            throw new Error(json.error)
+          }
           await calculateMatch()
           return
         }

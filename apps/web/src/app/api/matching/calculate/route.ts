@@ -140,13 +140,18 @@ export async function POST(req: NextRequest) {
     if (!jsonMatch) throw new Error("Claude tidak mengembalikan JSON yang valid")
     const result = JSON.parse(jsonMatch[0]) as MatchingPromptResult
 
+    const skorKeseluruhan = Math.round(result.skor_keseluruhan ?? 0)
+    const skorDomainA = result.skor_domain?.A != null ? Math.round(result.skor_domain.A) : null
+    const skorDomainB = result.skor_domain?.B != null ? Math.round(result.skor_domain.B) : null
+    const skorDomainC = result.skor_domain?.C != null ? Math.round(result.skor_domain.C) : null
+
     await prisma.matchResult.upsert({
       where: { parentProfileId_nannyProfileId: { parentProfileId: parentProfile.id, nannyProfileId } },
       update: {
-        skorKeseluruhan: result.skor_keseluruhan,
-        skorDomainA: result.skor_domain?.A ?? null,
-        skorDomainB: result.skor_domain?.B ?? null,
-        skorDomainC: result.skor_domain?.C ?? null,
+        skorKeseluruhan,
+        skorDomainA,
+        skorDomainB,
+        skorDomainC,
         kekuatan: result.kekuatan ?? [],
         potensiLemah: result.potensi_lemah ?? [],
         potensiKonflik: result.potensi_konflik ?? [],
@@ -160,10 +165,10 @@ export async function POST(req: NextRequest) {
       create: {
         parentProfileId: parentProfile.id,
         nannyProfileId,
-        skorKeseluruhan: result.skor_keseluruhan,
-        skorDomainA: result.skor_domain?.A ?? null,
-        skorDomainB: result.skor_domain?.B ?? null,
-        skorDomainC: result.skor_domain?.C ?? null,
+        skorKeseluruhan,
+        skorDomainA,
+        skorDomainB,
+        skorDomainC,
         kekuatan: result.kekuatan ?? [],
         potensiLemah: result.potensi_lemah ?? [],
         potensiKonflik: result.potensi_konflik ?? [],
