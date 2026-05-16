@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import LocationSelector from "./LocationSelector"
 
 const NANNY_TYPE_OPTIONS = [
   { value: "LIVE_IN",    label: "Live-in (tinggal di rumah)" },
@@ -35,6 +36,7 @@ type InitialData = {
   fullName: string
   phone: string
   dateOfBirth: string
+  province: string
   city: string
   district: string
   bio: string
@@ -54,6 +56,11 @@ export default function NannyProfileForm({ initial }: { initial: InitialData }) 
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState("")
+
+  function setLocation(field: "province" | "city" | "district", value: string) {
+    setForm(f => ({ ...f, [field]: value }))
+    setSaved(false)
+  }
 
   function set(field: keyof InitialData, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -83,6 +90,7 @@ export default function NannyProfileForm({ initial }: { initial: InitialData }) 
           fullName: form.fullName,
           phone: form.phone,
           dateOfBirth: form.dateOfBirth || null,
+          province: form.province,
           city: form.city,
           district: form.district,
           bio: form.bio,
@@ -143,28 +151,16 @@ export default function NannyProfileForm({ initial }: { initial: InitialData }) 
               className="w-full border-[1.5px] border-[#E0D0F0] rounded-[10px] px-4 py-3 text-base text-[#5A3A7A] focus:outline-none focus:border-[#5BBFB0] min-h-[48px]"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-semibold text-[#5A3A7A] mb-1">Kota / Kabupaten</label>
-              <input
-                type="text"
-                value={form.city}
-                onChange={e => set("city", e.target.value)}
-                placeholder="Bandung"
-                className="w-full border-[1.5px] border-[#E0D0F0] rounded-[10px] px-4 py-3 text-base text-[#5A3A7A] placeholder-[#C8B8DC] focus:outline-none focus:border-[#5BBFB0] min-h-[48px]"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-[#5A3A7A] mb-1">Kecamatan</label>
-              <input
-                type="text"
-                value={form.district}
-                onChange={e => set("district", e.target.value)}
-                placeholder="Cicendo"
-                className="w-full border-[1.5px] border-[#E0D0F0] rounded-[10px] px-4 py-3 text-base text-[#5A3A7A] placeholder-[#C8B8DC] focus:outline-none focus:border-[#5BBFB0] min-h-[48px]"
-              />
-            </div>
-          </div>
+          <LocationSelector
+            province={form.province}
+            city={form.city}
+            district={form.district}
+            onProvinceChange={v => setLocation("province", v)}
+            onCityChange={v => setLocation("city", v)}
+            onDistrictChange={v => setLocation("district", v)}
+            labelClass="block text-sm font-semibold text-[#5A3A7A] mb-1"
+            selectClass="w-full border-[1.5px] border-[#E0D0F0] rounded-[10px] px-4 py-3 text-base text-[#5A3A7A] focus:outline-none focus:border-[#5BBFB0] min-h-[48px] bg-white appearance-none"
+          />
           <div>
             <label className="block text-sm font-semibold text-[#5A3A7A] mb-1">Agama</label>
             <input

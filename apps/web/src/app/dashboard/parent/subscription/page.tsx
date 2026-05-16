@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import MidtransButton from "@/components/payment/MidtransButton"
+import CancelSubscriptionButton from "@/components/payment/CancelSubscriptionButton"
 
 export const metadata = { title: "Langganan — BundaYakin" }
 
@@ -150,6 +151,9 @@ export default async function SubscriptionPage() {
             <MidtransButton label="Perpanjang Sekarang" />
           </div>
         )}
+
+        {/* Cancel subscription */}
+        {isActive && <CancelSubscriptionButton endDate={endDate} />}
       </div>
 
       {/* Guarantee note */}

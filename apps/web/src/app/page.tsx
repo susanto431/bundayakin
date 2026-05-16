@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 
 export default async function LandingPage() {
   const session = await auth()
@@ -13,16 +14,14 @@ export default async function LandingPage() {
 
         {/* Logo */}
         <div className="flex items-center gap-2.5 mb-5">
-          <svg width="44" height="44" viewBox="0 0 60 60" aria-hidden="true">
-            <circle cx="22" cy="28" r="20" fill="#A97CC4" />
-            <circle cx="38" cy="28" r="20" fill="#5BBFB0" />
-            <circle cx="30" cy="20" r="9" fill="#fff" />
-            <ellipse cx="30" cy="36" rx="12" ry="8" fill="#fff" opacity=".9" />
-          </svg>
-          <div>
-            <div className="font-[var(--font-dm-serif)] text-xl text-[#5A3A7A] leading-none">BundaYakin</div>
-            <div className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mt-0.5">Online Nanny Assessment</div>
-          </div>
+          <Image
+            src="/images/logo_bundayakin.png"
+            alt="BundaYakin"
+            width={120}
+            height={44}
+            className="h-11 w-auto object-contain"
+            priority
+          />
         </div>
 
         {/* Badge */}

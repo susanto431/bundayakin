@@ -20,6 +20,7 @@ export async function GET() {
         fullName: true,
         phone: true,
         dateOfBirth: true,
+        province: true,
         city: true,
         district: true,
         bio: true,
@@ -57,6 +58,7 @@ export async function PATCH(request: Request) {
       fullName?: string
       phone?: string
       dateOfBirth?: string
+      province?: string
       city?: string
       district?: string
       bio?: string
@@ -83,6 +85,7 @@ export async function PATCH(request: Request) {
         fullName: body.fullName?.trim() ?? session.user.name ?? "Nanny",
         phone: body.phone?.trim() || null,
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
+        province: body.province?.trim() || null,
         city: body.city?.trim() || null,
         district: body.district?.trim() || null,
         bio: body.bio?.trim() || null,
@@ -101,6 +104,7 @@ export async function PATCH(request: Request) {
         ...(body.fullName !== undefined && { fullName: body.fullName.trim() }),
         ...(body.phone !== undefined && { phone: body.phone.trim() || null }),
         ...(body.dateOfBirth !== undefined && { dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null }),
+        ...(body.province !== undefined && { province: body.province.trim() || null }),
         ...(body.city !== undefined && { city: body.city.trim() || null }),
         ...(body.district !== undefined && { district: body.district.trim() || null }),
         ...(body.bio !== undefined && { bio: body.bio.trim() || null }),

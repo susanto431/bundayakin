@@ -15,6 +15,7 @@ export default async function NannyProfilePage() {
           fullName: true,
           phone: true,
           dateOfBirth: true,
+          province: true,
           city: true,
           district: true,
           bio: true,
@@ -37,6 +38,7 @@ export default async function NannyProfilePage() {
     dateOfBirth: profile?.dateOfBirth
       ? profile.dateOfBirth.toISOString().split("T")[0]
       : "",
+    province: profile?.province ?? "",
     city: profile?.city ?? "",
     district: profile?.district ?? "",
     bio: profile?.bio ?? "",

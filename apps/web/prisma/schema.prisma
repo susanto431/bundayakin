@@ -199,6 +199,7 @@ model ParentProfile {
   userId          String   @unique
   fullName        String
   phone           String?
+  province        String?  // provinsi
   city            String?
   district        String?  // kecamatan
   address         String?  @db.Text
@@ -307,6 +308,7 @@ model NannyProfile {
   dateOfBirth         DateTime?
   gender              String?            @default("Perempuan")
   phone               String?
+  province            String?            // provinsi
   city                String?
   district            String?
   address             String?            @db.Text

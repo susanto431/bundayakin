@@ -12,7 +12,7 @@ export async function GET() {
 
     const profile = await prisma.parentProfile.findUnique({
       where: { userId: session.user.id },
-      select: { id: true, fullName: true, phone: true, city: true, district: true, address: true },
+      select: { id: true, fullName: true, phone: true, province: true, city: true, district: true, address: true },
     })
 
     return NextResponse.json({ success: true, data: profile })
@@ -32,6 +32,7 @@ export async function PATCH(request: Request) {
     const body = (await request.json()) as {
       fullName?: string
       phone?: string
+      province?: string
       city?: string
       district?: string
       address?: string
@@ -47,6 +48,7 @@ export async function PATCH(request: Request) {
         userId: session.user.id,
         fullName: body.fullName?.trim() ?? session.user.name ?? "Orang tua",
         phone: body.phone?.trim() || null,
+        province: body.province?.trim() || null,
         city: body.city?.trim() || null,
         district: body.district?.trim() || null,
         address: body.address?.trim() || null,
@@ -54,11 +56,12 @@ export async function PATCH(request: Request) {
       update: {
         ...(body.fullName !== undefined && { fullName: body.fullName.trim() }),
         ...(body.phone !== undefined && { phone: body.phone.trim() || null }),
+        ...(body.province !== undefined && { province: body.province.trim() || null }),
         ...(body.city !== undefined && { city: body.city.trim() || null }),
         ...(body.district !== undefined && { district: body.district.trim() || null }),
         ...(body.address !== undefined && { address: body.address.trim() || null }),
       },
-      select: { id: true, fullName: true, phone: true, city: true, district: true, address: true },
+      select: { id: true, fullName: true, phone: true, province: true, city: true, district: true, address: true },
     })
 
     await logActivity({

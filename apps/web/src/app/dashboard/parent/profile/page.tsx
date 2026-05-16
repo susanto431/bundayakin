@@ -12,13 +12,14 @@ export default async function ParentProfilePage() {
   const profile = session?.user?.id
     ? await prisma.parentProfile.findUnique({
         where: { userId: session.user.id },
-        select: { fullName: true, phone: true, city: true, district: true, address: true },
+        select: { fullName: true, phone: true, province: true, city: true, district: true, address: true },
       })
     : null
 
   const initial = {
     fullName: profile?.fullName ?? session?.user?.name ?? "",
     phone: profile?.phone ?? "",
+    province: profile?.province ?? "",
     city: profile?.city ?? "",
     district: profile?.district ?? "",
     address: profile?.address ?? "",

@@ -11,7 +11,15 @@ const FAQS = [
     items: [
       {
         q: "Berapa biaya langganan BundaYakin?",
-        a: "Langganan BundaYakin untuk orang tua seharga Rp 500.000/tahun. Ini sudah mencakup akses penuh ke fitur pencocokan (matching), pemantauan nanny, dan evaluasi berkala.",
+        a: "Langganan BundaYakin untuk orang tua seharga Rp 500.000/tahun. Ini sudah mencakup akses penuh ke fitur pencocokan (matching), pemantauan nanny, catatan anak, dan evaluasi berkala.",
+      },
+      {
+        q: "Bagaimana cara membatalkan paket berlangganan?",
+        a: "Masuk ke Akun → Langganan, lalu scroll ke bawah dan pilih 'Batalkan Langganan'. Sistem akan meminta konfirmasi. Setelah dikonfirmasi, akses Bunda tetap aktif hingga akhir periode yang sudah dibayar — tidak ada biaya tambahan dan tidak ada pemotongan. Setelah periode berakhir, akun beralih ke paket gratis (3 matching/bulan, tanpa catatan anak & monitoring).",
+      },
+      {
+        q: "Apakah ada pengembalian dana jika saya batalkan sebelum tahun habis?",
+        a: "Saat ini BundaYakin belum menyediakan pro-rate refund. Pembatalan akan menghentikan perpanjangan otomatis, namun akses tetap aktif sampai tanggal berakhir yang tertera. Jika ada situasi khusus, hubungi tim BY via WhatsApp untuk dibantu.",
       },
       {
         q: "Apakah ada biaya tambahan jika saya dapat nanny dari penyalur / kenalan sendiri?",

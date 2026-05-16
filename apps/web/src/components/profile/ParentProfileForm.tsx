@@ -1,10 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import LocationSelector from "./LocationSelector"
 
 type ProfileData = {
   fullName: string
   phone: string
+  province: string
   city: string
   district: string
   address: string
@@ -23,6 +25,11 @@ export default function ParentProfileForm({ initial }: { initial: ProfileData })
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setSaved(false)
+  }
+
+  function handleLocationChange(field: "province" | "city" | "district", value: string) {
+    setForm(prev => ({ ...prev, [field]: value }))
     setSaved(false)
   }
 
@@ -76,18 +83,14 @@ export default function ParentProfileForm({ initial }: { initial: ProfileData })
           onChange={handleChange} placeholder="cth: 08123456789" className={INPUT_CLASS} />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label htmlFor="city" className={LABEL_CLASS}>Kota</label>
-          <input id="city" name="city" type="text" value={form.city}
-            onChange={handleChange} placeholder="cth: Jakarta" className={INPUT_CLASS} />
-        </div>
-        <div>
-          <label htmlFor="district" className={LABEL_CLASS}>Kecamatan</label>
-          <input id="district" name="district" type="text" value={form.district}
-            onChange={handleChange} placeholder="cth: Menteng" className={INPUT_CLASS} />
-        </div>
-      </div>
+      <LocationSelector
+        province={form.province}
+        city={form.city}
+        district={form.district}
+        onProvinceChange={v => handleLocationChange("province", v)}
+        onCityChange={v => handleLocationChange("city", v)}
+        onDistrictChange={v => handleLocationChange("district", v)}
+      />
 
       <div>
         <label htmlFor="address" className={LABEL_CLASS}>Alamat</label>
