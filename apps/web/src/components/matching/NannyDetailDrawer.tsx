@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
+import Image from "next/image"
 import PaymentModal from "./PaymentModal"
 
 type MatchDetail = {
@@ -75,16 +76,11 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
   const [showPayment, setShowPayment] = useState(false)
   const [calculating, setCalculating] = useState(false)
 
-  async function fetchDetail() {
+  const fetchDetail = useCallback(async () => {
     setLoading(true)
     setError("")
     try {
       const res = await fetch(`/api/matching/detail?nannyProfileId=${nannyProfileId}`)
-      if (res.status === 404) {
-        // No match yet — trigger calculation
-        await calculateMatch()
-        return
-      }
       const json = await res.json()
       if (!json.success) throw new Error(json.error)
       setDetail(json.data)
@@ -93,10 +89,11 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
     } finally {
       setLoading(false)
     }
-  }
+  }, [nannyProfileId])
 
-  async function calculateMatch() {
+  const calculateMatch = useCallback(async () => {
     setCalculating(true)
+    setError("")
     try {
       const res = await fetch("/api/matching/calculate", {
         method: "POST",
@@ -105,19 +102,39 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
       })
       const json = await res.json()
       if (!json.success) throw new Error(json.error)
+      // Calculate endpoint now returns full data with nannyProfile
       setDetail(json.data)
       onMatchCalculated?.()
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal menghitung kecocokan")
+      setError(e instanceof Error ? e.message : "Kalkulasi matching gagal")
     } finally {
       setCalculating(false)
       setLoading(false)
     }
-  }
+  }, [nannyProfileId, onMatchCalculated])
 
   useEffect(() => {
-    fetchDetail()
-  }, [nannyProfileId])
+    const run = async () => {
+      setLoading(true)
+      setError("")
+      try {
+        const res = await fetch(`/api/matching/detail?nannyProfileId=${nannyProfileId}`)
+        if (res.status === 404) {
+          // No match yet — trigger calculation
+          await calculateMatch()
+          return
+        }
+        const json = await res.json()
+        if (!json.success) throw new Error(json.error)
+        setDetail(json.data)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Gagal memuat data")
+      } finally {
+        setLoading(false)
+      }
+    }
+    run()
+  }, [nannyProfileId, calculateMatch])
 
   function handlePaymentSuccess() {
     setShowPayment(false)
@@ -154,18 +171,18 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
         <div className="flex-1 overflow-y-auto">
           {(loading || calculating) && (
             <div className="flex flex-col items-center justify-center h-64 gap-3">
-              <div className="w-8 h-8 border-3 border-[#5BBFB0] border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-[3px] border-[#5BBFB0] border-t-transparent rounded-full animate-spin" />
               <p className="text-sm text-[#666666]">
                 {calculating ? "Menghitung kecocokan via AI..." : "Memuat data..."}
               </p>
             </div>
           )}
 
-          {error && !loading && (
+          {error && !loading && !calculating && (
             <div className="p-5">
               <p className="text-[#C75D5D] text-sm">{error}</p>
               <button
-                onClick={fetchDetail}
+                onClick={() => calculateMatch()}
                 className="mt-3 text-sm text-[#5BBFB0] underline"
               >
                 Coba lagi
@@ -173,12 +190,19 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
             </div>
           )}
 
-          {detail && !loading && (
+          {detail && !loading && !calculating && (
             <div className="p-5 space-y-5">
               {/* Nanny info */}
               <div className="flex items-start gap-3">
                 {nanny?.profilePhotoUrl ? (
-                  <img src={nanny.profilePhotoUrl} alt={nanny.fullName} className="w-16 h-16 rounded-full object-cover" />
+                  <Image
+                    src={nanny.profilePhotoUrl}
+                    alt={nanny.fullName}
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                    unoptimized
+                  />
                 ) : (
                   <div className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl flex-shrink-0"
                     style={{ backgroundColor: "#A97CC4" }}>
@@ -237,10 +261,10 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
                       {detail.potensiLemah.length > 1 && (
                         <div
                           className="mt-2 rounded-lg p-3 text-sm text-[#999AAA] text-center"
-                          style={{ backgroundColor: "#F5F5F8", filter: "blur(0px)" }}
+                          style={{ backgroundColor: "#F5F5F8" }}
                         >
                           <span className="blur-sm select-none">{detail.potensiLemah[1]}</span>
-                          <p className="mt-1 text-xs not-italic text-[#999AAA] blur-none">
+                          <p className="mt-1 text-xs text-[#999AAA]">
                             🔒 Buka laporan lengkap untuk melihat semua
                           </p>
                         </div>
@@ -298,7 +322,7 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
                   className="w-full py-4 rounded-xl font-bold text-white text-base transition-opacity hover:opacity-90"
                   style={{ backgroundColor: "#5BBFB0" }}
                 >
-                  Buka Kontak & Laporan Lengkap — Rp 100.000
+                  Buka Kontak &amp; Laporan Lengkap — Rp 100.000
                 </button>
               )}
 

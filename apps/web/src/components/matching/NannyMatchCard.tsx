@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import type { NannyDirectoryItem } from "@/app/api/nanny/directory/route"
 
 type Props = {
@@ -27,10 +28,13 @@ function getScoreTier(skor: number | null, dealbreaker: boolean): ScoreTier {
 function NannyAvatar({ nama, fotoUrl }: { nama: string; fotoUrl: string | null }) {
   if (fotoUrl) {
     return (
-      <img
+      <Image
         src={fotoUrl}
         alt={nama}
+        width={56}
+        height={56}
         className="w-14 h-14 rounded-full object-cover flex-shrink-0"
+        unoptimized
       />
     )
   }

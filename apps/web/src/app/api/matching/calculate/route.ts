@@ -129,15 +129,18 @@ export async function POST(req: NextRequest) {
     })
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1500,
+      model: "claude-sonnet-4-6",
+      max_tokens: 2000,
       messages: [{ role: "user", content: prompt }],
     })
 
     const rawText = response.content[0].type === "text" ? response.content[0].text : "{}"
-    const result = JSON.parse(rawText.replace(/```json|```/g, "").trim()) as MatchingPromptResult
+    // Extract JSON — strip markdown code fences and any leading/trailing text
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) throw new Error("Claude tidak mengembalikan JSON yang valid")
+    const result = JSON.parse(jsonMatch[0]) as MatchingPromptResult
 
-    const matchResult = await prisma.matchResult.upsert({
+    await prisma.matchResult.upsert({
       where: { parentProfileId_nannyProfileId: { parentProfileId: parentProfile.id, nannyProfileId } },
       update: {
         skorKeseluruhan: result.skor_keseluruhan,
@@ -169,6 +172,20 @@ export async function POST(req: NextRequest) {
         tipsNanny: result.tips_nanny ?? [],
         dealbreakerFlags: result.dealbreaker_flags ?? [],
         adaDealbreaker: result.ada_dealbreaker ?? false,
+      },
+    })
+
+    // Return with nannyProfile included so the drawer can render without a second fetch
+    const matchResult = await prisma.matchResult.findUnique({
+      where: { parentProfileId_nannyProfileId: { parentProfileId: parentProfile.id, nannyProfileId } },
+      include: {
+        nannyProfile: {
+          select: {
+            id: true, userId: true, fullName: true, dateOfBirth: true, city: true,
+            educationLevel: true, yearsOfExperience: true, nannyType: true,
+            profilePhotoUrl: true, phone: true, bio: true,
+          },
+        },
       },
     })
 
