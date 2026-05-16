@@ -4,6 +4,7 @@ import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton"
 import { LogoutButton } from "@/components/settings/LogoutButton"
+import RoleSwitcher from "@/components/settings/RoleSwitcher"
 
 export const metadata = { title: "Akun & Pengaturan — BundaYakin" }
 
@@ -198,6 +199,9 @@ export default async function ParentSettingsPage() {
         <LogoutButton />
         <DeleteAccountButton />
       </div>
+
+      {/* Role Switcher — hanya muncul untuk akun developer */}
+      <RoleSwitcher />
 
       {/* About */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Bantuan & Tentang</p>

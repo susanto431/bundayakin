@@ -37,11 +37,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!isValid) return null
 
+        const canSwitchRoles = user.phone === "087888180363" || user.role === "ADMIN"
+
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
+          canSwitchRoles,
         }
       },
     }),

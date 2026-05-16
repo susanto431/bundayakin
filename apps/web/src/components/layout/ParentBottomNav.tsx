@@ -11,7 +11,7 @@ const navItems = [
     icon: "⊙",
   },
   {
-    href: "/dashboard/parent/matching",
+    href: "/dashboard/parent/cari-nanny",
     label: "Cari Nanny",
     exact: false,
     icon: "⊕",

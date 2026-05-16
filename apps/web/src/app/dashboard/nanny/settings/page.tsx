@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { LogoutButton } from "@/components/settings/LogoutButton"
 import { DeleteNannyAccountButton } from "@/components/settings/DeleteNannyAccountButton"
+import RoleSwitcher from "@/components/settings/RoleSwitcher"
 
 export default function NannySettingsPage() {
   const [workTypes, setWorkTypes] = useState({ longterm: true, temporary: true })
@@ -282,6 +283,9 @@ export default function NannySettingsPage() {
         </a>
         <div className="py-2.5">Versi 1.0.0</div>
       </div>
+
+      {/* Role Switcher — hanya muncul untuk akun developer */}
+      <RoleSwitcher />
 
     </div>
   )
