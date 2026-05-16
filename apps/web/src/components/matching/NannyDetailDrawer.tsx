@@ -195,7 +195,7 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
           )}
 
           {detail && !loading && !calculating && (
-            <div className="p-5 pb-8 space-y-5">
+            <div className="p-5 pb-24 space-y-5">
               {/* Nanny info */}
               <div className="flex items-start gap-3">
                 {nanny?.profilePhotoUrl ? (
