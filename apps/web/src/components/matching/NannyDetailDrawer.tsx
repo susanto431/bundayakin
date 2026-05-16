@@ -154,12 +154,12 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/30"
+        className="fixed inset-0 z-[55] bg-black/30"
         onClick={onClose}
       />
 
       {/* Drawer */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl flex flex-col overflow-hidden">
+      <div className="fixed inset-y-0 right-0 z-[60] w-full max-w-md bg-white shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: "#E0D0F0" }}>
           <h2 className="font-bold text-[#5A3A7A]">Detail Nanny</h2>
