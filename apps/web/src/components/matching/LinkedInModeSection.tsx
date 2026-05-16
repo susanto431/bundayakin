@@ -50,6 +50,7 @@ export default function LinkedInModeSection({ nannies, isPaid }: Props) {
 
       <div className="space-y-2">
         {nannies.map(nanny => {
+          const nannyTypes = Array.isArray(nanny.nannyType) ? nanny.nannyType : []
           const isUnlocked = isPaid || unlockedIds.includes(nanny.id)
 
           return (
@@ -81,7 +82,7 @@ export default function LinkedInModeSection({ nannies, isPaid }: Props) {
                   </p>
                   <p className="text-[12px] text-[#999AAA] mt-0.5">
                     {nanny.yearsOfExperience > 0 ? `${nanny.yearsOfExperience} thn pengalaman` : "Pengalaman baru"}
-                    {nanny.nannyType.length > 0 && ` · ${typeLabel(nanny.nannyType)}`}
+                    {nannyTypes.length > 0 && ` · ${typeLabel(nannyTypes)}`}
                   </p>
                   {!isUnlocked && (
                     <div className="flex gap-1 mt-1.5">

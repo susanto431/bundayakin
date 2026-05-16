@@ -6,15 +6,16 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, Suspense } from "react"
 
 function PostHogPageview() {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ""
   const searchParams = useSearchParams()
   const ph = usePostHog()
 
   useEffect(() => {
     if (!pathname || !ph) return
     let url = window.origin + pathname
-    if (searchParams.toString()) {
-      url += "?" + searchParams.toString()
+    const query = searchParams?.toString()
+    if (query) {
+      url += "?" + query
     }
     ph.capture("$pageview", { $current_url: url })
   }, [pathname, searchParams, ph])
@@ -24,7 +25,10 @@ function PostHogPageview() {
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+    const apiKey = process.env.NEXT_PUBLIC_POSTHOG_KEY
+    if (!apiKey) return
+
+    posthog.init(apiKey, {
       api_host: "/ingest",
       ui_host: "https://us.posthog.com",
       capture_pageview: false,

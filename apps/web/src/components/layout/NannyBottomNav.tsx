@@ -12,7 +12,7 @@ const navItems = [
 ]
 
 export default function NannyBottomNav() {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ""
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-[1.5px] border-[#E0D0F0]">

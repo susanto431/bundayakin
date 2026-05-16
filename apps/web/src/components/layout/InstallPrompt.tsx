@@ -12,12 +12,22 @@ export function InstallPrompt() {
   const [show, setShow] = useState(false)
   const [installing, setInstalling] = useState(false)
 
+  function wasDismissed() {
+    try {
+      return sessionStorage.getItem("pwa-dismissed") === "1"
+    } catch {
+      return false
+    }
+  }
+
   useEffect(() => {
     // Don't show if already running as installed PWA
-    if (window.matchMedia("(display-mode: standalone)").matches) return
+    if (typeof window.matchMedia === "function" && window.matchMedia("(display-mode: standalone)").matches) {
+      return
+    }
 
     // Don't show if dismissed in this session
-    if (sessionStorage.getItem("pwa-dismissed")) return
+    if (wasDismissed()) return
 
     const handler = (e: Event) => {
       e.preventDefault()
@@ -43,7 +53,11 @@ export function InstallPrompt() {
   }
 
   function handleDismiss() {
-    sessionStorage.setItem("pwa-dismissed", "1")
+    try {
+      sessionStorage.setItem("pwa-dismissed", "1")
+    } catch {
+      // Ignore browsers that block storage access.
+    }
     setShow(false)
   }
 
