@@ -9,7 +9,7 @@ export default async function NannyDashboardLayout({
 }) {
   const session = await auth()
 
-  if (!session || session.user.role !== "NANNY") {
+  if (!session?.user?.canSwitchRoles && session?.user?.role !== "NANNY") {
     redirect("/auth/login")
   }
 

@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google"
 import "./globals.css"
 import { ServiceWorkerRegister } from "@/components/layout/ServiceWorkerRegister"
 import { PostHogProvider } from "@/components/layout/PostHogProvider"
+import { AuthSessionProvider } from "@/components/layout/AuthSessionProvider"
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -66,9 +67,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${jakarta.variable} ${dmSerif.variable} antialiased`}>
-        <PostHogProvider>
-          {children}
-        </PostHogProvider>
+        <AuthSessionProvider>
+          <PostHogProvider>
+            {children}
+          </PostHogProvider>
+        </AuthSessionProvider>
         <ServiceWorkerRegister />
       </body>
     </html>

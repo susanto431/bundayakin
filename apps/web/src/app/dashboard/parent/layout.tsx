@@ -10,7 +10,7 @@ export default async function ParentDashboardLayout({
 }) {
   const session = await auth()
 
-  if (!session || session.user.role !== "PARENT") {
+  if (!session?.user?.canSwitchRoles && session?.user?.role !== "PARENT") {
     redirect("/auth/login")
   }
 

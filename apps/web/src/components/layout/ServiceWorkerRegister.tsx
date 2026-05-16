@@ -6,7 +6,8 @@ export function ServiceWorkerRegister() {
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
-        .register("/sw.js", { scope: "/" })
+        .register("/sw.js", { scope: "/", updateViaCache: "none" })
+        .then((registration) => registration.update())
         .catch(() => {})
     }
   }, [])
