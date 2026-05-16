@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // GET /api/matching/detail?nannyProfileId=...
 // Ambil MatchResult lengkap untuk pasangan parent (session) + nanny tertentu.
 

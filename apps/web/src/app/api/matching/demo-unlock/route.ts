@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // POST /api/matching/demo-unlock
 // Body: { nannyProfileId: string }
 // Demo only — set kontakTerbuka = true tanpa payment. Ganti dengan Midtrans di Sprint 3.

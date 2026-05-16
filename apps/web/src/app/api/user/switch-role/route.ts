@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // POST /api/user/switch-role
 // Body: { role: "PARENT" | "NANNY" | "ADMIN" }
 // Hanya untuk akun dengan canSwitchRoles = true (phone 087888180363 atau ADMIN).

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // GET /api/matching/results
 // Ambil semua MatchResult untuk parent yang sedang login, termasuk data nanny dasar.
 

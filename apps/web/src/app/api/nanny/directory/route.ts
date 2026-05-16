@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // GET /api/nanny/directory
 // Query params: ?kota=&tipe=&page=1&limit=12
 // Auth: parent yang login

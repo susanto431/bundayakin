@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // POST /api/matching/calculate
 // Body: { nannyProfileId: string }
 // Auth: hanya parent yang login
