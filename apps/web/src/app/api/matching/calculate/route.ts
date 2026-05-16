@@ -47,12 +47,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Profil orang tua tidak ditemukan" }, { status: 404 })
     }
 
-    // Cek cache MatchResult (< 7 hari)
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    // Cek cache MatchResult — jika sudah ada, kembalikan selamanya tanpa re-calculate
     const existing = await prisma.matchResult.findUnique({
       where: { parentProfileId_nannyProfileId: { parentProfileId: parentProfile.id, nannyProfileId } },
+      include: {
+        nannyProfile: {
+          select: {
+            id: true, userId: true, fullName: true, dateOfBirth: true, city: true,
+            educationLevel: true, yearsOfExperience: true, nannyType: true,
+            profilePhotoUrl: true, phone: true, bio: true,
+          },
+        },
+      },
     })
-    if (existing && existing.generatedAt > sevenDaysAgo) {
+    if (existing) {
       return NextResponse.json({ success: true, data: existing })
     }
 

@@ -195,7 +195,7 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
           )}
 
           {detail && !loading && !calculating && (
-            <div className="p-5 space-y-5">
+            <div className="p-5 pb-8 space-y-5">
               {/* Nanny info */}
               <div className="flex items-start gap-3">
                 {nanny?.profilePhotoUrl ? (
@@ -319,16 +319,6 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
                 </>
               )}
 
-              {/* CTA — buka kontak */}
-              {!detail.kontakTerbuka && !detail.adaDealbreaker && (
-                <button
-                  onClick={() => setShowPayment(true)}
-                  className="w-full py-4 rounded-xl font-bold text-white text-base transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: "#5BBFB0" }}
-                >
-                  Buka Kontak &amp; Laporan Lengkap — Rp 100.000
-                </button>
-              )}
 
               {/* Bio */}
               {nanny?.bio && detail.kontakTerbuka && (
@@ -340,6 +330,19 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
             </div>
           )}
         </div>
+
+        {/* Sticky CTA — di luar scroll area agar tidak tertutup footer */}
+        {detail && !loading && !calculating && !detail.kontakTerbuka && !detail.adaDealbreaker && (
+          <div className="flex-shrink-0 px-5 py-4 border-t" style={{ borderColor: "#E0D0F0", backgroundColor: "#fff" }}>
+            <button
+              onClick={() => setShowPayment(true)}
+              className="w-full py-4 rounded-xl font-bold text-white text-base transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#5BBFB0" }}
+            >
+              Buka Kontak &amp; Laporan Lengkap — Rp 100.000
+            </button>
+          </div>
+        )}
       </div>
 
       {showPayment && detail && (
