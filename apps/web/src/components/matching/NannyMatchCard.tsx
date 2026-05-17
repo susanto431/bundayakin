@@ -19,10 +19,9 @@ function getScoreTier(skor: number | null, dealbreaker: boolean): ScoreTier {
     return { label: "Tidak Cocok", color: "#999AAA", bg: "#F5F5F8" }
   }
   if (skor === null) return { label: "Menghitung...", color: "#999AAA", bg: "#F5F5F8" }
-  if (skor >= 85) return { label: "Sangat Cocok", color: "#5BBFB0", bg: "#E5F6F4" }
-  if (skor >= 70) return { label: "Cocok", color: "#5BBFB0", bg: "#E5F6F4" }
-  if (skor >= 55) return { label: "Cukup Cocok", color: "#E07B39", bg: "#FEF0E7" }
-  return { label: "Kurang Cocok", color: "#C75D5D", bg: "#FAEAEA" }
+  if (skor >= 80) return { label: "Sangat Cocok", color: "#5BBFB0", bg: "#E5F6F4" }
+  if (skor >= 60) return { label: "Cukup Cocok", color: "#E07B39", bg: "#FEF0E7" }
+  return { label: "Perlu Dipertimbangkan", color: "#C75D5D", bg: "#FAEAEA" }
 }
 
 function NannyAvatar({ nama, fotoUrl }: { nama: string; fotoUrl: string | null }) {

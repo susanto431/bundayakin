@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import PaymentModal from "./PaymentModal"
+import UnlockContactButton from "./UnlockContactButton"
 
 type MatchDetail = {
   id: string
@@ -37,6 +39,9 @@ type Props = {
   nannyProfileId: string
   onClose: () => void
   onMatchCalculated?: () => void
+  flowType?: "REFERRAL" | "TALENT_POOL"
+  remainingQuota?: number
+  onContactUnlocked?: () => void
 }
 
 function DomainBar({ label, skor }: { label: string; skor: number | null }) {
@@ -69,7 +74,14 @@ function BulletList({ items, className }: { items: string[]; className?: string 
   )
 }
 
-export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalculated }: Props) {
+export default function NannyDetailDrawer({
+  nannyProfileId,
+  onClose,
+  onMatchCalculated,
+  flowType,
+  remainingQuota = 0,
+  onContactUnlocked,
+}: Props) {
   const [detail, setDetail] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -142,6 +154,11 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
 
   function handlePaymentSuccess() {
     setShowPayment(false)
+    fetchDetail()
+  }
+
+  function handleContactUnlocked() {
+    onContactUnlocked?.()
     fetchDetail()
   }
 
@@ -225,6 +242,14 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
                 </div>
               </div>
 
+              {/* Link profil lengkap */}
+              <Link
+                href={`/dashboard/parent/nanny/${nannyProfileId}`}
+                className="inline-block text-sm text-[#A97CC4] font-medium hover:underline"
+              >
+                Lihat profil lengkap →
+              </Link>
+
               {/* Skor */}
               {detail.adaDealbreaker ? (
                 <div className="rounded-xl p-4" style={{ backgroundColor: "#FAEAEA" }}>
@@ -305,7 +330,7 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
                     <p className="font-semibold text-[#2C5F5A] mb-2">📞 Kontak Nanny</p>
                     {nanny?.phone ? (
                       <a
-                        href={`https://wa.me/62${nanny.phone.replace(/^0/, "")}`}
+                        href={`https://wa.me/${nanny.phone.replace(/\D/g, "").replace(/^0/, "62")}`}
                         target="_blank"
                         rel="noreferrer"
                         className="block text-[#5BBFB0] font-medium underline"
@@ -334,13 +359,24 @@ export default function NannyDetailDrawer({ nannyProfileId, onClose, onMatchCalc
         {/* Sticky CTA — di luar scroll area agar tidak tertutup footer */}
         {detail && !loading && !calculating && !detail.kontakTerbuka && !detail.adaDealbreaker && (
           <div className="flex-shrink-0 px-5 py-4 border-t" style={{ borderColor: "#E0D0F0", backgroundColor: "#fff" }}>
-            <button
-              onClick={() => setShowPayment(true)}
-              className="w-full py-4 rounded-xl font-bold text-white text-base transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#5BBFB0" }}
-            >
-              Buka Kontak &amp; Laporan Lengkap — Rp 100.000
-            </button>
+            {flowType === "TALENT_POOL" ? (
+              <UnlockContactButton
+                nannyProfileId={nannyProfileId}
+                contactApiPath={`/api/nanny/${nannyProfileId}/contact`}
+                flowType="TALENT_POOL"
+                remainingQuota={remainingQuota}
+                alreadyUnlocked={false}
+                onUnlocked={handleContactUnlocked}
+              />
+            ) : (
+              <button
+                onClick={() => setShowPayment(true)}
+                className="w-full py-4 rounded-xl font-bold text-white text-base transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#5BBFB0" }}
+              >
+                Buka Kontak &amp; Laporan Lengkap — Rp 100.000
+              </button>
+            )}
           </div>
         )}
       </div>

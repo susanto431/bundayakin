@@ -10,6 +10,7 @@ type Props = {
   flowType: "REFERRAL" | "TALENT_POOL"
   remainingQuota: number
   alreadyUnlocked: boolean
+  onUnlocked?: () => void
 }
 
 type ContactInfo = { phone: string | null; whatsapp: string | null }
@@ -28,6 +29,7 @@ export default function UnlockContactButton({
   flowType,
   remainingQuota,
   alreadyUnlocked,
+  onUnlocked,
 }: Props) {
   const [state, setState] = useState<State>(
     alreadyUnlocked ? { kind: "loading" } : { kind: "idle" }
@@ -74,6 +76,7 @@ export default function UnlockContactButton({
         setState({ kind: "error", message: data.error ?? "Gagal membuka kontak" })
         return
       }
+      onUnlocked?.()
       await loadContact()
     } catch {
       setState({ kind: "error", message: "Terjadi kesalahan. Coba lagi." })
