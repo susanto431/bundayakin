@@ -156,6 +156,33 @@ export default async function ParentMatchingPage() {
         </p>
       </div>
 
+      {/* Talent Pool entry point */}
+      {isPaid ? (
+        <a
+          href="/dashboard/parent/cari-nanny"
+          className="flex items-center justify-between bg-[#E5F6F4] border border-[#A8DDD8] rounded-[16px] p-3.5 mb-4 hover:bg-[#D0EEE9] transition-colors"
+        >
+          <div>
+            <p className="text-[12px] font-bold text-[#1E4A45]">AI Talent Pool</p>
+            <p className="text-[11px] text-[#2C5F5A] mt-0.5">Browse nanny terverifikasi · Sisa {talentPoolRemaining}× koneksi</p>
+          </div>
+          <span className="text-[#5BBFB0] font-bold text-[14px] flex-shrink-0 ml-3">→</span>
+        </a>
+      ) : (
+        <div className="flex items-center justify-between bg-white border border-[#E0D0F0] rounded-[16px] p-3.5 mb-4">
+          <div>
+            <p className="text-[12px] font-bold text-[#5A3A7A]">AI Talent Pool</p>
+            <p className="text-[11px] text-[#999AAA] mt-0.5">Browse 100+ nanny terverifikasi — khusus pelanggan</p>
+          </div>
+          <a
+            href="/dashboard/parent/subscription"
+            className="flex-shrink-0 ml-3 text-[11px] font-semibold bg-[#F3EEF8] text-[#5A3A7A] border border-[#C8B8DC] px-2.5 py-1.5 rounded-[8px] whitespace-nowrap hover:bg-[#E8DEF5] transition-colors"
+          >
+            Upgrade →
+          </a>
+        </div>
+      )}
+
       {/* Survey status */}
       {!surveyDone && (
         <div className="bg-[#5A3A7A] rounded-[20px] p-4 mb-4 relative overflow-hidden">
