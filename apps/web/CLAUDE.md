@@ -27,15 +27,26 @@
 | ORM | Prisma | latest |
 | Auth | NextAuth v5 (Auth.js beta) | beta |
 | Styling | Tailwind CSS + shadcn/ui | - |
-| Payment | Midtrans Snap | - |
+| Payment | **Mayar** (menggantikan Midtrans) | - |
 | Email | Resend | - |
 | AI | Anthropic Claude API (claude-sonnet-4-20250514) | - |
+| Media Foto | **Cloudflare R2** (bucket: bundayakin-media) | - |
+| Media Video | **Cloudflare Stream** (max 3 menit/video) | - |
 | Deploy Next.js | Vercel | apps/web |
 | Deploy PDF Service | Railway (Python) | apps/pdf-service |
 
 **Jangan suggest alternatif** kecuali ada bug blocker. Stack ini sudah final.
 
 > **Catatan arsitektur**: Next.js App Router sudah full-stack. `src/app/api/` adalah backend — jalan di server via Vercel serverless functions. Railway **hanya** untuk Python PDF service (ReportLab). Tidak ada Express/Node server terpisah.
+
+> **Keputusan produk aktif (17 Mei 2026)**:
+> - Terminologi user-facing: **"Tes Kecocokan"** (bukan "Survey Matching")
+> - **KTP tidak diminta** dari nanny — hapus dari semua form dan schema
+> - Payment gateway: **Mayar** — hapus semua referensi Midtrans
+> - Model unlock kontak: **Kuota Koneksi** (3 gratis/30 hari referral + 7 langganan), bukan pay-per-unlock
+> - Score threshold: ≥80% teal · 60–79% orange · <60% red
+> - Foto upload: Cloudflare R2 via `src/lib/cloudflare.ts`
+> - Video upload: Cloudflare Stream via `src/lib/cloudflare.ts`
 
 ---
 
@@ -214,10 +225,28 @@ Dokumen lengkap: `docs/DESIGN_SYSTEM.md`
 - Bulan 1 & 3: evaluasi penuh (10 pertanyaan)
 - Setiap 3 bulan sesudahnya: evaluasi berkala
 
-### 6.6 Payment
-- Subscription: Rp 500.000/tahun via Midtrans Snap
-- Add-on per transaksi terpisah
-- Webhook Midtrans: `/api/payment/webhook` — update status transaksi & subscription
+### 6.6 Payment — Mayar
+- Semua pembayaran via **Mayar** (bukan Midtrans)
+- Subscription: Rp 500.000/tahun
+- Add-on koneksi: Rp 100.000/nanny setelah kuota habis
+- Webhook Mayar: `/api/payment/webhook` — update status transaksi & subscription
+- Jangan gunakan Midtrans — semua referensinya sudah dihapus
+
+### 6.7 Kuota Koneksi
+- Pengguna tanpa langganan: **3 koneksi/30 hari** (Flow A referral saja)
+- Langganan Rp 500rb/tahun: **10 koneksi/bulan** (3 referral + 7 talent pool)
+- Setelah kuota habis: Rp 100.000/koneksi tambahan via Mayar
+- Kuota renew tiap 30 hari dari tanggal aktivasi (bukan awal bulan kalender)
+- Konstanta di `src/constants/quota.ts`
+
+### 6.8 Media Upload
+- **Foto** (avatar, portfolio): upload ke Cloudflare R2 via `src/lib/cloudflare.ts`
+  - Folder struktur: `users/{userId}/avatar/` dan `users/{userId}/portfolio/photos/`
+  - Public URL via `media.bundayakin.com`
+- **Video** (intro, keahlian): upload ke Cloudflare Stream via `src/lib/cloudflare.ts`
+  - Max durasi: 180 detik (3 menit) — enforce di upload endpoint
+  - Metadata wajib: `userId`, `nannyId`, `type` (INTRO/SKILL)
+  - Disimpan di tabel `NannyMedia` di database
 
 ---
 
@@ -280,10 +309,10 @@ NEXTAUTH_SECRET=           # random 32-char string
 # AI
 ANTHROPIC_API_KEY=         # dari console.anthropic.com
 
-# Payment
-MIDTRANS_SERVER_KEY=       # dari dashboard Midtrans
-MIDTRANS_CLIENT_KEY=       # dari dashboard Midtrans
-MIDTRANS_IS_PRODUCTION=    # "false" di dev, "true" di prod
+# Payment — Mayar (bukan Midtrans)
+MAYAR_API_KEY=             # dari dashboard Mayar
+MAYAR_WEBHOOK_SECRET=      # dari dashboard Mayar (untuk verifikasi webhook)
+NEXT_PUBLIC_MAYAR_PUBLIC_KEY=  # public key untuk client-side Mayar
 
 # Email
 RESEND_API_KEY=            # dari resend.com
@@ -291,6 +320,18 @@ RESEND_API_KEY=            # dari resend.com
 # PDF Service (Railway)
 PDF_SERVICE_URL=           # https://xxx.railway.app (isi setelah deploy Railway)
 PDF_SERVICE_SECRET=        # shared secret untuk auth antar service
+
+# Cloudflare R2 (foto: avatar, portfolio)
+CLOUDFLARE_ACCOUNT_ID=     # dari Cloudflare dashboard
+R2_ACCESS_KEY_ID=          # dari Manage R2 API Tokens
+R2_SECRET_ACCESS_KEY=      # dari Manage R2 API Tokens
+R2_TOKEN=                  # Cloudflare API Token (cadangan)
+R2_BUCKET_NAME=bundayakin-media
+R2_ENDPOINT=               # https://{account-id}.r2.cloudflarestorage.com
+R2_PUBLIC_URL=https://media.bundayakin.com
+
+# Cloudflare Stream (video: intro, keahlian nanny)
+CLOUDFLARE_STREAM_TOKEN=   # API Token dengan permission Account.Stream
 
 # App
 NEXT_PUBLIC_APP_URL=       # https://bundayakin.com

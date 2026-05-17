@@ -10,7 +10,7 @@ function formatDate(d: Date) {
 }
 
 const FEATURES = [
-  "Survey matching 53 pertanyaan",
+  "Tes Kecocokan 53 pertanyaan",
   "AI scoring kecocokan orang tua ↔ nanny",
   "Lihat persentase kecocokan per domain",
   "Insight area match & mismatch",

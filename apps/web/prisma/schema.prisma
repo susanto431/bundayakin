@@ -1,6 +1,7 @@
 // ============================================================
 // BUNDAYAKIN — PRISMA SCHEMA
-// Human Care Consulting · v1.0 · Mei 2026
+// Human Care Consulting · v1.1 · 17 Mei 2026
+// Perubahan v1.1: hapus KTP, UnlockedNanny→ConnectionQuota, Midtrans→Mayar, tambah NannyMedia
 // Stack: Next.js 14 + Prisma + Neon (PostgreSQL)
 // ============================================================
 
@@ -78,8 +79,20 @@ enum TransactionType {
   ADDON_PSIKOTES        // Layer 2 — Rp 300rb
   ADDON_PSIKOLOG        // Layer 3 — Rp 1.2–1.5 juta
   ADDON_TRACK_RECORD    // akses rekam jejak — Rp 50rb
+  CONNECTION_ADDON      // Rp 100rb — buka koneksi setelah kuota habis (via Mayar)
   PLACEMENT_FEE         // fee penyaluran nanny
-  NANNY_UNLOCK          // 100rb — buka profil nanny (free tier LinkedIn mode)
+}
+
+enum NannyMediaType {
+  AVATAR
+  INTRO_VIDEO       // video perkenalan (max 3 menit, CF Stream)
+  SKILL_VIDEO       // video keahlian (max 3 menit, CF Stream)
+  PORTFOLIO_PHOTO   // foto masakan & keahlian (CF R2)
+}
+
+enum ConnectionFlowType {
+  REFERRAL      // Flow A — nanny diundang parent via kode referral
+  TALENT_POOL   // Flow B — AI rekomendasikan dari pool
 }
 
 enum TransactionStatus {
@@ -235,12 +248,8 @@ model ParentProfile {
   // Track record access purchased
   trackRecordAccess TrackRecordAccess[]
 
-  // Matching counter (rolling 30-day window dari tanggal daftar)
-  matchingUsedCount Int      @default(0)
-  matchingResetAt   DateTime?
-
-  // Nanny profiles unlocked via 100k payment (free tier LinkedIn mode)
-  unlockedNannies UnlockedNanny[]
+  // Kuota Koneksi (rolling 30-day window)
+  connectionQuotas ConnectionQuota[]
 
   // Referrals given by this parent
   referralsGiven ParentReferral[]
@@ -320,10 +329,7 @@ model NannyProfile {
   city                String?
   district            String?
   address             String?            @db.Text
-  profilePhotoUrl     String?
-  idCardNumber        String?            // NIK
-  idCardPhotoUrl      String?
-  idVerification      VerificationStatus @default(UNVERIFIED)
+  profilePhotoUrl     String?            // R2 public URL
 
   // Work preferences
   nannyType           NannyType[]        // bisa multi: live-in + infal
@@ -388,13 +394,13 @@ model NannyProfile {
   // Track record
   trackRecordEntries TrackRecordEntry[]
 
+  // Media portfolio (foto & video)
+  media NannyMedia[]
+
   // Referral
   referralsGiven    Referral[] @relation("ReferrerNanny")
 
-  // Parents who unlocked this nanny's profile (LinkedIn mode)
-  unlockedByParents UnlockedNanny[]
-
-  // Match results (Sprint 2 direktori)
+  // Match results (direktori & kuota koneksi)
   matchResults MatchResult[]
 
   @@index([userId])
@@ -458,10 +464,10 @@ model Transaction {
   type               TransactionType
   status             TransactionStatus @default(PENDING)
   amountIDR          Int
-  midtransOrderId    String?           @unique
-  midtransToken      String?           @db.Text
-  midtransStatus     String?
-  paymentMethod      String?           // "gopay", "bca_va", dll
+  mayarInvoiceId     String?           @unique  // ID invoice dari Mayar
+  mayarPaymentUrl    String?           @db.Text // URL checkout Mayar
+  mayarStatus        String?                    // status dari Mayar webhook
+  paymentMethod      String?                    // "transfer", "qris", dll
   paidAt             DateTime?
   expiredAt          DateTime?
   notes              String?
@@ -470,7 +476,7 @@ model Transaction {
 
   subscription Subscription? @relation(fields: [subscriptionId], references: [id])
 
-  @@index([midtransOrderId])
+  @@index([mayarInvoiceId])
   @@index([status])
   @@index([parentProfileId])
 }
@@ -887,21 +893,55 @@ model Referral {
 }
 
 // ============================================================
-// UNLOCKED NANNY — profil nanny yang dibuka parent (100rb, free tier LinkedIn mode)
+// NANNY MEDIA — foto & video portfolio nanny
+// Foto: Cloudflare R2 (storageKey = R2 object key)
+// Video: Cloudflare Stream (storageKey = Stream UID)
 // ============================================================
 
-model UnlockedNanny {
-  id        String   @id @default(cuid())
-  parentId  String   // ParentProfile.id
-  nannyId   String   // NannyProfile.id
-  paidAt    DateTime @default(now())
-  amountIDR Int      @default(100000)
+model NannyMedia {
+  id             String         @id @default(cuid())
+  nannyProfileId String
+  type           NannyMediaType
+  storageKey     String         // R2 key (foto) atau Stream UID (video)
+  storageMB      Float?         // ukuran file dalam MB — untuk monitoring kuota
+  durationSec    Int?           // durasi video dalam detik (max 180)
+  slug           String?        // "perkenalan", "gendong-bayi", "masakan-1"
+  sortOrder      Int            @default(0)
+  isActive       Boolean        @default(true)
+  createdAt      DateTime       @default(now())
 
-  parent ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  nanny  NannyProfile  @relation(fields: [nannyId], references: [id], onDelete: Cascade)
+  nannyProfile NannyProfile @relation(fields: [nannyProfileId], references: [id], onDelete: Cascade)
 
-  @@unique([parentId, nannyId])
-  @@index([parentId])
+  @@index([nannyProfileId])
+  @@index([type])
+}
+
+// ============================================================
+// CONNECTION QUOTA — kuota koneksi parent (rolling 30-day window)
+// Gratis: 3 referral/bulan · Langganan: 3 referral + 7 talent pool
+// ============================================================
+
+model ConnectionQuota {
+  id              String   @id @default(cuid())
+  parentProfileId String
+  periodStart     DateTime // awal window 30 hari
+  periodEnd       DateTime // periodStart + 30 hari
+
+  // Penggunaan per flow
+  referralUsed    Int      @default(0)  // max 3 (gratis) atau 3 (langganan)
+  talentPoolUsed  Int      @default(0)  // max 0 (gratis) atau 7 (langganan)
+
+  // Batas berdasarkan status langganan saat period dibuat
+  referralLimit   Int      @default(3)
+  talentPoolLimit Int      @default(0)  // 0 jika tidak berlangganan
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parentProfile ParentProfile @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([parentProfileId])
+  @@index([periodEnd])
 }
 
 // ============================================================
@@ -998,9 +1038,11 @@ model MatchResult {
   dealbreakerFlags Json?
   adaDealbreaker  Boolean   @default(false)
 
-  // Status akses kontak (demo: simulasi bayar)
-  kontakTerbuka   Boolean   @default(false)
-  dibayarAt       DateTime?
+  // Status koneksi (Kuota Koneksi)
+  kontakTerbuka         Boolean            @default(false)
+  flowType              ConnectionFlowType?  // REFERRAL atau TALENT_POOL
+  quotaUsed             Boolean            @default(false)  // pakai kuota (true) atau bayar langsung (false)
+  koneksiDilakukanAt    DateTime?
 
   // Cache — tidak perlu hit Claude API tiap kali
   generatedAt     DateTime  @default(now())

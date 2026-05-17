@@ -234,20 +234,20 @@ export default async function NannyDashboardPage() {
       {!profile?.surveyCompletedAt && (
         <>
           <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
-            Psikotes kepribadian — gratis untuk Sus
+            Tes Kecocokan — belum diisi
           </p>
           <div className="bg-[#F3EEF8] border-[1.5px] border-[#E0D0F0] rounded-[14px] p-3.5 mb-3">
             <p className="text-[13px] font-bold text-[#5A3A7A] mb-1.5">Tingkatkan peluang dapat keluarga yang cocok</p>
             <ul className="text-[12px] text-[#666666] pl-4 leading-[1.8] list-disc mb-2.5">
-              <li>Sus 2× lebih mudah dicocokkan setelah mengisi psikotes</li>
+              <li>Sus 2× lebih mudah dicocokkan setelah mengisi Tes Kecocokan</li>
               <li>Dapat tips personal cara kerja sesuai karakter Sus</li>
-              <li>Badge &ldquo;Terverifikasi Psikotes&rdquo; di profil Sus</li>
+              <li>Badge &ldquo;Sudah Tes Kecocokan&rdquo; di profil Sus</li>
             </ul>
             <Link
               href="/dashboard/nanny/survey"
               className="inline-flex items-center bg-[#A97CC4] hover:bg-[#5A3A7A] text-white font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] transition-all"
             >
-              Isi psikotes gratis →
+              Isi Tes Kecocokan →
             </Link>
           </div>
         </>

@@ -1,13 +1,11 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { createSnapToken } from "@/lib/midtrans"
 import { NextResponse } from "next/server"
 
-const UNLOCK_AMOUNT = 100_000  // Rp 100.000 per nanny
-
 // POST /api/matching/unlock
-// Body: { nannyId: string }  — nannyProfile.id (bukan userId)
-// Membuat transaksi NANNY_UNLOCK dan mengembalikan snapToken Midtrans.
+// Body: { nannyProfileId: string, flowType: "REFERRAL" | "TALENT_POOL" }
+// Buka kontak nanny menggunakan Kuota Koneksi.
+// Add-on berbayar (CONNECTION_ADDON via Mayar) belum diimplementasi — menunggu verifikasi Mayar.
 export async function POST(request: Request) {
   try {
     const session = await auth()
@@ -15,34 +13,40 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
     if (session.user.role !== "PARENT") {
-      return NextResponse.json({ success: false, error: "Hanya orang tua yang bisa membuka profil nanny" }, { status: 403 })
+      return NextResponse.json({ success: false, error: "Hanya orang tua yang bisa membuka kontak nanny" }, { status: 403 })
     }
 
-    const { nannyId } = (await request.json()) as { nannyId: string }
-    if (!nannyId) {
-      return NextResponse.json({ success: false, error: "nannyId diperlukan" }, { status: 400 })
-    }
+    const body = (await request.json()) as { nannyProfileId?: string; flowType?: string }
+    const { nannyProfileId } = body
+    const flowType = body.flowType as "REFERRAL" | "TALENT_POOL"
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { id: true, name: true, email: true },
-    })
-    if (!user?.email) {
-      return NextResponse.json({ success: false, error: "Email pengguna tidak ditemukan" }, { status: 400 })
+    if (!nannyProfileId) {
+      return NextResponse.json({ success: false, error: "nannyProfileId diperlukan" }, { status: 400 })
+    }
+    if (!["REFERRAL", "TALENT_POOL"].includes(flowType)) {
+      return NextResponse.json({ success: false, error: "flowType tidak valid" }, { status: 400 })
     }
 
     const parentProfile = await prisma.parentProfile.findUnique({
-      where: { userId: user.id },
+      where: { userId: session.user.id },
       select: { id: true },
     })
     if (!parentProfile) {
       return NextResponse.json({ success: false, error: "Profil orang tua tidak ditemukan" }, { status: 404 })
     }
 
-    // Cek apakah nanny ada dan openToJob
+    // Cek apakah kontak sudah terbuka
+    const existing = await prisma.matchResult.findUnique({
+      where: { parentProfileId_nannyProfileId: { parentProfileId: parentProfile.id, nannyProfileId } },
+      select: { id: true, kontakTerbuka: true },
+    })
+    if (existing?.kontakTerbuka) {
+      return NextResponse.json({ success: true, data: { unlocked: true, alreadyOpen: true } })
+    }
+
     const nanny = await prisma.nannyProfile.findUnique({
-      where: { id: nannyId },
-      select: { id: true, fullName: true, openToJob: true },
+      where: { id: nannyProfileId },
+      select: { id: true, openToJob: true },
     })
     if (!nanny) {
       return NextResponse.json({ success: false, error: "Profil nanny tidak ditemukan" }, { status: 404 })
@@ -51,57 +55,102 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Nanny tidak sedang mencari keluarga" }, { status: 400 })
     }
 
-    // Cek apakah sudah unlock sebelumnya
-    const existing = await prisma.unlockedNanny.findUnique({
-      where: { parentId_nannyId: { parentId: parentProfile.id, nannyId } },
-    })
-    if (existing) {
-      return NextResponse.json({ success: false, error: "Profil nanny ini sudah pernah dibuka" }, { status: 400 })
-    }
+    const now = new Date()
 
-    // Cek apakah PAID tier — jika ya, tidak perlu bayar 100k
+    // Cek status langganan
     const sub = await prisma.subscription.findUnique({
       where: { parentProfileId: parentProfile.id },
       select: { status: true, endDate: true },
     })
-    const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && sub.endDate > new Date()
-    if (isPaid) {
-      // Paid tier: langsung buka tanpa bayar
-      await prisma.unlockedNanny.create({
-        data: { parentId: parentProfile.id, nannyId, amountIDR: 0 },
+    const isSubscriber = sub?.status === "ACTIVE" && sub?.endDate != null && sub.endDate > now
+
+    // Cek atau buat ConnectionQuota periode aktif
+    let quota = await prisma.connectionQuota.findFirst({
+      where: { parentProfileId: parentProfile.id, periodEnd: { gt: now } },
+      orderBy: { periodEnd: "desc" },
+    })
+    if (!quota) {
+      const periodEnd = new Date(now)
+      periodEnd.setDate(periodEnd.getDate() + 30)
+      quota = await prisma.connectionQuota.create({
+        data: {
+          parentProfileId: parentProfile.id,
+          periodStart: now,
+          periodEnd,
+          referralLimit: 3,
+          talentPoolLimit: isSubscriber ? 7 : 0,
+        },
       })
-      return NextResponse.json({ success: true, data: { unlocked: true, free: true } })
     }
 
-    const orderId = `UNLOCK-${parentProfile.id.slice(-6).toUpperCase()}-${nannyId.slice(-6).toUpperCase()}-${Date.now()}`
+    // Validasi ketersediaan kuota
+    if (flowType === "REFERRAL" && quota.referralUsed >= quota.referralLimit) {
+      return NextResponse.json(
+        { success: false, error: "Kuota referral habis untuk periode ini", code: "QUOTA_EXHAUSTED" },
+        { status: 400 }
+      )
+    }
+    if (flowType === "TALENT_POOL") {
+      if (!isSubscriber) {
+        return NextResponse.json(
+          { success: false, error: "Fitur Talent Pool memerlukan langganan aktif", code: "SUBSCRIPTION_REQUIRED" },
+          { status: 403 }
+        )
+      }
+      if (quota.talentPoolUsed >= quota.talentPoolLimit) {
+        return NextResponse.json(
+          { success: false, error: "Kuota talent pool habis untuk periode ini", code: "QUOTA_EXHAUSTED" },
+          { status: 400 }
+        )
+      }
+    }
 
-    const snapToken = await createSnapToken({
-      orderId,
-      amount: UNLOCK_AMOUNT,
-      customerName: user.name ?? "Orang tua BundaYakin",
-      customerEmail: user.email,
-      itemName: `Buka profil nanny`,
+    // Ambil skor AI jika sudah ada
+    const matchingResult = await prisma.matchingResult.findFirst({
+      where: { nannyProfileId, matchingRequest: { parentProfileId: parentProfile.id } },
+      select: { scoreOverall: true },
     })
+    const skorKeseluruhan = Math.round(matchingResult?.scoreOverall ?? 0)
 
-    await prisma.transaction.create({
-      data: {
+    // Buka kontak — create atau update MatchResult
+    await prisma.matchResult.upsert({
+      where: { parentProfileId_nannyProfileId: { parentProfileId: parentProfile.id, nannyProfileId } },
+      create: {
         parentProfileId: parentProfile.id,
-        nannyProfileId: nannyId,
-        type: "NANNY_UNLOCK",
-        status: "PENDING",
-        amountIDR: UNLOCK_AMOUNT,
-        midtransOrderId: orderId,
-        midtransToken: snapToken,
-        expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        notes: nannyId,
+        nannyProfileId,
+        skorKeseluruhan,
+        kontakTerbuka: true,
+        flowType,
+        quotaUsed: true,
+        koneksiDilakukanAt: now,
+      },
+      update: {
+        kontakTerbuka: true,
+        flowType,
+        quotaUsed: true,
+        koneksiDilakukanAt: now,
       },
     })
 
-    console.info("[UNLOCK_CREATE]", orderId, parentProfile.id, nannyId)
+    // Kurangi kuota
+    await prisma.connectionQuota.update({
+      where: { id: quota.id },
+      data:
+        flowType === "REFERRAL"
+          ? { referralUsed: quota.referralUsed + 1 }
+          : { talentPoolUsed: quota.talentPoolUsed + 1 },
+    })
 
-    return NextResponse.json({ success: true, data: { snapToken, orderId, unlocked: false } })
+    const remaining =
+      flowType === "REFERRAL"
+        ? quota.referralLimit - quota.referralUsed - 1
+        : quota.talentPoolLimit - quota.talentPoolUsed - 1
+
+    console.info("[UNLOCK]", parentProfile.id, "→", nannyProfileId, flowType, `remaining=${remaining}`)
+
+    return NextResponse.json({ success: true, data: { unlocked: true, remaining } })
   } catch (error) {
-    console.error("[UNLOCK_CREATE]", error)
-    return NextResponse.json({ success: false, error: "Gagal membuat pembayaran" }, { status: 500 })
+    console.error("[UNLOCK]", error)
+    return NextResponse.json({ success: false, error: "Gagal membuka kontak nanny" }, { status: 500 })
   }
 }

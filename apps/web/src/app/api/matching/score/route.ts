@@ -4,13 +4,10 @@ import { scoreSurveyMatch } from "@/lib/claude"
 import { NextResponse } from "next/server"
 import type { SurveyAnswers } from "@/types/survey"
 
-const MATCHING_LIMIT_FREE = 3
-const MATCHING_LIMIT_PAID = 10
-const WINDOW_MS = 30 * 24 * 60 * 60 * 1000  // 30 hari
-
 // POST /api/matching/score
 // Body: { nannyUserId: string }
-// Creates a MatchingRequest and triggers AI scoring.
+// Menjalankan AI scoring untuk sepasang parent-nanny.
+// Kuota Koneksi (buka kontak) dicek di /api/matching/unlock — bukan di sini.
 export async function POST(request: Request) {
   try {
     const session = await auth()
@@ -26,57 +23,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "nannyUserId diperlukan" }, { status: 400 })
     }
 
-    // Load parent profile + survey + subscription + counter
+    // Load parent profile + survey
     const parentProfile = await prisma.parentProfile.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
         surveyAnswers: true,
         surveyCompletedAt: true,
-        matchingUsedCount: true,
-        matchingResetAt: true,
-        createdAt: true,
-        subscription: { select: { status: true, endDate: true } },
       },
     })
     if (!parentProfile?.surveyCompletedAt) {
-      return NextResponse.json({ success: false, error: "Orang tua belum mengisi survey" }, { status: 400 })
-    }
-
-    // Determine tier
-    const sub = parentProfile.subscription
-    const isPaid =
-      sub?.status === "ACTIVE" &&
-      sub?.endDate != null &&
-      sub.endDate > new Date()
-    const limit = isPaid ? MATCHING_LIMIT_PAID : MATCHING_LIMIT_FREE
-
-    // Check/reset 30-day window
-    const now = new Date()
-    let usedCount = parentProfile.matchingUsedCount
-    const resetAt = parentProfile.matchingResetAt
-
-    if (!resetAt || resetAt <= now) {
-      // Window expired — reset. First reset anchors to registration date + 30d.
-      const nextReset = new Date(now.getTime() + WINDOW_MS)
-      await prisma.parentProfile.update({
-        where: { id: parentProfile.id },
-        data: { matchingUsedCount: 0, matchingResetAt: nextReset },
-      })
-      usedCount = 0
-    }
-
-    if (usedCount >= limit) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: isPaid
-            ? `Batas ${MATCHING_LIMIT_PAID} matching per 30 hari tercapai. Reset otomatis bulan depan.`
-            : `Batas ${MATCHING_LIMIT_FREE} matching gratis per 30 hari tercapai. Upgrade ke langganan tahunan untuk lebih banyak matching.`,
-          data: { limitReached: true, isPaid, limit, usedCount },
-        },
-        { status: 429 }
-      )
+      return NextResponse.json({ success: false, error: "Orang tua belum mengisi Tes Kecocokan" }, { status: 400 })
     }
 
     // Load nanny profile + survey
@@ -88,7 +45,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Profil nanny tidak ditemukan" }, { status: 404 })
     }
     if (!nannyProfile.surveyCompletedAt) {
-      return NextResponse.json({ success: false, error: "Nanny belum mengisi survey" }, { status: 400 })
+      return NextResponse.json({ success: false, error: "Nanny belum mengisi Tes Kecocokan" }, { status: 400 })
     }
 
     // Check for existing active matching request
@@ -172,21 +129,13 @@ export async function POST(request: Request) {
       data: { status: hasDealbreakerMismatch ? "NEGOTIATING" : "COMPLETED" },
     })
 
-    // Increment counter
-    await prisma.parentProfile.update({
-      where: { id: parentProfile.id },
-      data: { matchingUsedCount: { increment: 1 } },
-    })
-
-    console.info("[MATCHING_SCORE]", matchingRequestId, `score=${score.scoreOverall}`, `counter=${usedCount + 1}/${limit}`)
+    console.info("[MATCHING_SCORE]", matchingRequestId, `score=${score.scoreOverall}`)
 
     return NextResponse.json({
       success: true,
       data: {
         matchingRequestId,
         scoreOverall: score.scoreOverall,
-        matchingUsed: usedCount + 1,
-        matchingLimit: limit,
       },
     })
   } catch (error) {

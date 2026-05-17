@@ -95,7 +95,7 @@ export default async function MatchingResultPage({ params }: { params: { id: str
         <div className="bg-[#FEF0E7] border border-[#F5C4A0] rounded-[16px] p-4 mb-4">
           <p className="text-[13px] font-bold text-[#A35320] mb-1">Menunggu nanny isi preferensi</p>
           <p className="text-[12px] text-[#7A4018] leading-relaxed">
-            {nannyName} belum menyelesaikan survey. Laporan akan tersedia setelah keduanya selesai mengisi.
+            {nannyName} belum menyelesaikan Tes Kecocokan. Laporan akan tersedia setelah keduanya selesai mengisi.
           </p>
         </div>
       )}

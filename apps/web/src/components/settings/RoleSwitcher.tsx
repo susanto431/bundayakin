@@ -16,7 +16,7 @@ const ROLE_OPTIONS: { role: Role; label: string; desc: string; href: string }[] 
   {
     role: "NANNY",
     label: "Nanny",
-    desc: "Dashboard nanny — profil, survey, monitoring",
+    desc: "Dashboard nanny — profil, Tes Kecocokan, monitoring",
     href: "/dashboard/nanny",
   },
   {

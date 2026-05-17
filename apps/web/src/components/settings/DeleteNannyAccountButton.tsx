@@ -20,7 +20,7 @@ export function DeleteNannyAccountButton() {
     return (
       <div className="bg-[#FAEAEA] border border-[#C75D5D] rounded-[12px] p-3.5 space-y-2">
         <p className="text-[13px] font-semibold text-[#C75D5D]">Hapus akun secara permanen?</p>
-        <p className="text-[12px] text-[#666666]">Semua data profil, survey, dan riwayat akan dihapus. Tidak bisa dikembalikan.</p>
+        <p className="text-[12px] text-[#666666]">Semua data profil, Tes Kecocokan, dan riwayat akan dihapus. Tidak bisa dikembalikan.</p>
         <div className="flex gap-2 pt-1">
           <button
             onClick={handleDelete}

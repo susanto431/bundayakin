@@ -1,12 +1,12 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { createSnapToken } from "@/lib/midtrans"
+import { createMayarInvoice } from "@/lib/mayar"
 import { NextResponse } from "next/server"
 
 const SUBSCRIPTION_AMOUNT = 500_000  // Rp 500.000/tahun
 
 // POST /api/payment/create
-// Creates a pending Transaction + Subscription record and returns a Midtrans snap_token.
+// Membuat Transaction + Subscription pending, mengembalikan Mayar paymentUrl.
 export async function POST() {
   try {
     const session = await auth()
@@ -25,7 +25,6 @@ export async function POST() {
       return NextResponse.json({ success: false, error: "Email pengguna tidak ditemukan" }, { status: 400 })
     }
 
-    // Get or create ParentProfile
     let parentProfile = await prisma.parentProfile.findUnique({
       where: { userId: user.id },
       select: { id: true },
@@ -37,7 +36,6 @@ export async function POST() {
       })
     }
 
-    // Upsert Subscription (each parent has exactly one)
     const subscription = await prisma.subscription.upsert({
       where: { parentProfileId: parentProfile.id },
       create: { parentProfileId: parentProfile.id },
@@ -49,11 +47,9 @@ export async function POST() {
       return NextResponse.json({ success: false, error: "Langganan sudah aktif" }, { status: 400 })
     }
 
-    // Build a unique order ID
     const orderId = `BUNDA-${parentProfile.id.slice(-8).toUpperCase()}-${Date.now()}`
 
-    // Get Snap token from Midtrans
-    const snapToken = await createSnapToken({
+    const invoice = await createMayarInvoice({
       orderId,
       amount: SUBSCRIPTION_AMOUNT,
       customerName: user.name ?? "Orang tua BundaYakin",
@@ -61,7 +57,6 @@ export async function POST() {
       itemName: "Langganan BundaYakin 1 Tahun",
     })
 
-    // Persist Transaction with PENDING status
     await prisma.transaction.create({
       data: {
         subscriptionId: subscription.id,
@@ -69,15 +64,15 @@ export async function POST() {
         type: "SUBSCRIPTION",
         status: "PENDING",
         amountIDR: SUBSCRIPTION_AMOUNT,
-        midtransOrderId: orderId,
-        midtransToken: snapToken,
-        expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 jam
+        mayarInvoiceId: invoice.invoiceId,
+        mayarPaymentUrl: invoice.paymentUrl,
+        expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       },
     })
 
     console.info("[PAYMENT_CREATE]", orderId, parentProfile.id)
 
-    return NextResponse.json({ success: true, data: { snapToken, orderId } })
+    return NextResponse.json({ success: true, data: { paymentUrl: invoice.paymentUrl, invoiceId: invoice.invoiceId } })
   } catch (error) {
     console.error("[PAYMENT_CREATE]", error)
     return NextResponse.json({ success: false, error: "Gagal membuat pembayaran" }, { status: 500 })

@@ -3,7 +3,7 @@ import { saveSurveyToDB } from "@/lib/survey-save"
 import type { SurveyAnswers } from "@/types/survey"
 import SurveyForm from "@/components/matching/SurveyForm"
 
-export const metadata = { title: "Survey Matching — BundaYakin" }
+export const metadata = { title: "Tes Kecocokan — BundaYakin" }
 
 async function saveSurvey(answers: SurveyAnswers) {
   "use server"

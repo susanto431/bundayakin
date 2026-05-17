@@ -1,13 +1,14 @@
 import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
+import { r2 } from "@/lib/cloudflare"
 import { NextResponse } from "next/server"
-import { writeFile, mkdir } from "fs/promises"
-import path from "path"
-import crypto from "crypto"
 
 const MAX_SIZE = 5 * 1024 * 1024 // 5 MB
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"])
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads")
 
+// POST /api/upload
+// FormData: { file: File, type: "AVATAR" | "PORTFOLIO_PHOTO", slug?: string }
+// Upload foto ke Cloudflare R2 dan simpan ke NannyMedia (portfolio) atau profile (avatar)
 export async function POST(request: Request) {
   try {
     const session = await auth()
@@ -17,36 +18,88 @@ export async function POST(request: Request) {
 
     const formData = await request.formData()
     const file = formData.get("file") as File | null
+    const type = (formData.get("type") as string) ?? "AVATAR"
+    const slug = (formData.get("slug") as string) ?? "foto"
 
     if (!file) {
       return NextResponse.json({ success: false, error: "Tidak ada file yang dikirim" }, { status: 400 })
     }
-
     if (!ALLOWED_TYPES.has(file.type)) {
       return NextResponse.json(
         { success: false, error: "Format tidak didukung. Gunakan JPG, PNG, atau WebP" },
         { status: 400 }
       )
     }
-
     if (file.size > MAX_SIZE) {
-      return NextResponse.json(
-        { success: false, error: "Ukuran file maksimal 5 MB" },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: "Ukuran file maksimal 5 MB" }, { status: 400 })
     }
 
     const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg"
-    const filename = `${crypto.randomUUID()}.${ext}`
-
-    await mkdir(UPLOAD_DIR, { recursive: true })
-
     const bytes = await file.arrayBuffer()
-    await writeFile(path.join(UPLOAD_DIR, filename), Buffer.from(bytes))
+    const buffer = Buffer.from(bytes)
+    const storageMB = parseFloat((file.size / (1024 * 1024)).toFixed(3))
 
-    return NextResponse.json({ success: true, url: `/uploads/${filename}` }, { status: 201 })
+    if (type === "AVATAR") {
+      const key = `${r2.keys.avatar(session.user.id)}.${ext}`
+      const url = await r2.uploadPhoto(key, buffer, file.type)
+
+      // Update profilePhotoUrl di tabel yang sesuai
+      if (session.user.role === "NANNY") {
+        await prisma.nannyProfile.update({
+          where: { userId: session.user.id },
+          data: { profilePhotoUrl: url },
+        })
+      } else if (session.user.role === "PARENT") {
+        await prisma.parentProfile.update({
+          where: { userId: session.user.id },
+          data: { profilePhotoUrl: url },
+        })
+      }
+
+      return NextResponse.json({ success: true, url }, { status: 201 })
+    }
+
+    if (type === "PORTFOLIO_PHOTO") {
+      if (session.user.role !== "NANNY") {
+        return NextResponse.json({ success: false, error: "Hanya nanny yang bisa upload portfolio" }, { status: 403 })
+      }
+
+      const nannyProfile = await prisma.nannyProfile.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true },
+      })
+      if (!nannyProfile) {
+        return NextResponse.json({ success: false, error: "Profil nanny tidak ditemukan" }, { status: 404 })
+      }
+
+      // Cek jumlah foto — max 9
+      const photoCount = await prisma.nannyMedia.count({
+        where: { nannyProfileId: nannyProfile.id, type: "PORTFOLIO_PHOTO", isActive: true },
+      })
+      if (photoCount >= 9) {
+        return NextResponse.json({ success: false, error: "Maksimal 9 foto portfolio" }, { status: 400 })
+      }
+
+      const key = r2.keys.portfolioPhoto(session.user.id, `${slug}.${ext}`)
+      const url = await r2.uploadPhoto(key, buffer, file.type)
+
+      const media = await prisma.nannyMedia.create({
+        data: {
+          nannyProfileId: nannyProfile.id,
+          type: "PORTFOLIO_PHOTO",
+          storageKey: key,
+          storageMB,
+          slug,
+          sortOrder: photoCount,
+        },
+      })
+
+      return NextResponse.json({ success: true, url, mediaId: media.id }, { status: 201 })
+    }
+
+    return NextResponse.json({ success: false, error: "Tipe upload tidak valid" }, { status: 400 })
   } catch (error) {
     console.error("[UPLOAD_POST]", error)
-    return NextResponse.json({ success: false, error: "Gagal menyimpan file" }, { status: 500 })
+    return NextResponse.json({ success: false, error: "Gagal mengupload file" }, { status: 500 })
   }
 }

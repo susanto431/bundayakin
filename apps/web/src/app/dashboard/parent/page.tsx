@@ -10,6 +10,8 @@ export default async function ParentDashboardPage() {
   const session = await auth()
   const firstName = session?.user?.name?.split(" ")[0] ?? "Bunda"
 
+  const now = new Date()
+
   const profile = session?.user?.id
     ? await prisma.parentProfile.findUnique({
         where: { userId: session.user.id },
@@ -17,10 +19,14 @@ export default async function ParentDashboardPage() {
           id: true,
           city: true,
           surveyCompletedAt: true,
-          matchingUsedCount: true,
-          matchingResetAt: true,
           createdAt: true,
           subscription: { select: { status: true, startDate: true, endDate: true } },
+          connectionQuotas: {
+            where: { periodEnd: { gt: now } },
+            orderBy: { periodEnd: "desc" },
+            take: 1,
+            select: { referralUsed: true, referralLimit: true, talentPoolUsed: true, talentPoolLimit: true },
+          },
           children: { orderBy: { createdAt: "asc" }, take: 1, select: { id: true, name: true } },
           matchingRequests: {
             orderBy: { updatedAt: "desc" },
@@ -39,7 +45,10 @@ export default async function ParentDashboardPage() {
             take: 1,
             select: { id: true },
           },
-          unlockedNannies: { select: { nannyId: true } },
+          matchResults: {
+            where: { kontakTerbuka: true },
+            select: { nannyProfileId: true },
+          },
         },
       })
     : null
@@ -49,13 +58,11 @@ export default async function ParentDashboardPage() {
     subscription?.status === "ACTIVE" &&
     subscription?.endDate != null &&
     subscription.endDate > new Date()
-  const matchingLimit = isPaid ? 10 : 3
 
-  // Cek apakah counter masih dalam window yang berlaku
-  const now = new Date()
-  const windowActive = profile?.matchingResetAt && profile.matchingResetAt > now
-  const matchingUsed = windowActive ? (profile?.matchingUsedCount ?? 0) : 0
-  const matchingRemaining = Math.max(0, matchingLimit - matchingUsed)
+  const quota = profile?.connectionQuotas?.[0]
+  const referralRemaining = Math.max(0, (quota?.referralLimit ?? 3) - (quota?.referralUsed ?? 0))
+  const talentPoolRemaining = isPaid ? Math.max(0, (quota?.talentPoolLimit ?? 7) - (quota?.talentPoolUsed ?? 0)) : 0
+  const matchingRemaining = referralRemaining + talentPoolRemaining
 
   const activeMatch = profile?.matchingRequests?.[0]
   const nannyName = activeMatch?.nannyProfile?.fullName ?? null
@@ -97,7 +104,7 @@ export default async function ParentDashboardPage() {
   ]
 
   // Nanny openToJob untuk LinkedIn mode (sama kota jika ada, maks 5)
-  const unlockedIds = (profile?.unlockedNannies ?? []).map(u => u.nannyId)
+  const unlockedIds = (profile?.matchResults ?? []).map(r => r.nannyProfileId)
   const openToJobNannies = profile
     ? await prisma.nannyProfile.findMany({
         where: {

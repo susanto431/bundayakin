@@ -14,6 +14,7 @@ type InvitedNanny = {
 
 export default async function ParentMatchingPage() {
   const session = await auth()
+  const now = new Date()
 
   const profile = session?.user?.id
     ? await prisma.parentProfile.findUnique({
@@ -24,9 +25,13 @@ export default async function ParentMatchingPage() {
           city: true,
           district: true,
           surveyCompletedAt: true,
-          matchingUsedCount: true,
-          matchingResetAt: true,
           subscription: { select: { status: true, endDate: true } },
+          connectionQuotas: {
+            where: { periodEnd: { gt: now } },
+            orderBy: { periodEnd: "desc" },
+            take: 1,
+            select: { referralUsed: true, referralLimit: true, talentPoolUsed: true, talentPoolLimit: true },
+          },
           matchingRequests: {
             orderBy: { createdAt: "desc" },
             take: 10,
@@ -41,13 +46,12 @@ export default async function ParentMatchingPage() {
       })
     : null
 
-  const now = new Date()
   const sub = profile?.subscription
   const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && sub.endDate > now
-  const matchingLimit = isPaid ? 10 : 3
-  const windowActive = profile?.matchingResetAt && profile.matchingResetAt > now
-  const matchingUsed = windowActive ? (profile?.matchingUsedCount ?? 0) : 0
-  const matchingRemaining = Math.max(0, matchingLimit - matchingUsed)
+  const quota = profile?.connectionQuotas?.[0]
+  const referralRemaining = Math.max(0, (quota?.referralLimit ?? 3) - (quota?.referralUsed ?? 0))
+  const talentPoolRemaining = isPaid ? Math.max(0, (quota?.talentPoolLimit ?? 7) - (quota?.talentPoolUsed ?? 0)) : 0
+  const matchingRemaining = referralRemaining + talentPoolRemaining
   const isLimitReached = matchingRemaining === 0
 
   const surveyDone = !!profile?.surveyCompletedAt
@@ -65,7 +69,7 @@ export default async function ParentMatchingPage() {
   const parentEmail = session?.user?.email ?? "-"
   const parentLocation = [profile?.district, profile?.city].filter(Boolean).join(", ") || "Belum diisi"
   const helpWaMessage = encodeURIComponent(
-    `Halo tim BundaYakin 👋\n\nSaya orang tua yang sudah terdaftar di BundaYakin dan ingin minta bantuan mencarikan nanny yang sesuai.\n\n📋 Info akun saya:\n• Nama: ${parentName}\n• Kode akun: ${inviteCode}\n• Nomor HP: ${parentPhone}\n• Email: ${parentEmail}\n• Lokasi: ${parentLocation}\n• Status matching: ${matchingUsed}/${matchingLimit} sudah dipakai\n\nSaya belum punya kandidat nanny. Mohon bantuannya untuk mencarikan nanny yang cocok. Terima kasih 🙏`
+    `Halo tim BundaYakin 👋\n\nSaya orang tua yang sudah terdaftar di BundaYakin dan ingin minta bantuan mencarikan nanny yang sesuai.\n\n📋 Info akun saya:\n• Nama: ${parentName}\n• Kode akun: ${inviteCode}\n• Nomor HP: ${parentPhone}\n• Email: ${parentEmail}\n• Lokasi: ${parentLocation}\n• Sisa kuota: ${matchingRemaining} koneksi\n\nSaya belum punya kandidat nanny. Mohon bantuannya untuk mencarikan nanny yang cocok. Terima kasih 🙏`
   )
 
   const statusLabel = (s: string) => {

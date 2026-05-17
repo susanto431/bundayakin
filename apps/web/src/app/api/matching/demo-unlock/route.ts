@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     const matchResult = await prisma.matchResult.update({
       where: { parentProfileId_nannyProfileId: { parentProfileId: parentProfile.id, nannyProfileId } },
-      data: { kontakTerbuka: true, dibayarAt: new Date() },
+      data: { kontakTerbuka: true, koneksiDilakukanAt: new Date() },
     })
 
     console.info("[DEMO_UNLOCK]", parentProfile.id, nannyProfileId)
