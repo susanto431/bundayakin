@@ -68,7 +68,12 @@ function buildComparisonText(parentAnswers: SurveyAnswers, nannyAnswers: SurveyA
 
 const SYSTEM_PROMPT = `Kamu adalah sistem AI BundaYakin yang mengevaluasi kecocokan antara orang tua dan nanny.
 
-Tugas: analisis perbandingan jawaban survey, hitung skor kecocokan, berikan insight.
+Tugas: analisis perbandingan jawaban Tes Kecocokan, hitung skor kecocokan, berikan insight.
+
+TERMINOLOGI WAJIB — jangan pernah gunakan kata "survey" dalam output:
+- Sebut kuesioner ini sebagai "Tes Kecocokan"
+- Jika nanny belum menjawab: "nanny belum mengisi Tes Kecocokan" (BUKAN "belum mengisi survey")
+- Jika orang tua belum menjawab: "orang tua belum mengisi Tes Kecocokan"
 
 OUTPUT: hanya JSON valid satu baris. Tidak ada teks lain, tidak ada markdown.
 
@@ -105,7 +110,7 @@ export async function scoreSurveyMatch(
     messages: [
       {
         role: "user",
-        content: `Perbandingan jawaban survey orang tua dan nanny:\n\n${comparison}\n\nBerikan skor kecocokan dalam format JSON yang diminta.`,
+        content: `Perbandingan jawaban Tes Kecocokan orang tua dan nanny:\n\n${comparison}\n\nBerikan skor kecocokan dalam format JSON yang diminta.`,
       },
     ],
   })
