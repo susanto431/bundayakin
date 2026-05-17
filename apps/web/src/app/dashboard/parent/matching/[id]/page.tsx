@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { StartMatchingButton } from "@/components/matching/StartMatchingButton"
+import UnlockContactButton from "@/components/matching/UnlockContactButton"
 
 export const metadata = { title: "Laporan Kecocokan — BundaYakin" }
 
@@ -15,9 +16,12 @@ export default async function MatchingResultPage({ params }: { params: { id: str
     select: {
       id: true,
       status: true,
+      parentProfileId: true,
+      nannyProfileId: true,
       parentProfile: { select: { userId: true, surveyCompletedAt: true } },
       nannyProfile: {
         select: {
+          id: true,
           userId: true,
           fullName: true,
           city: true,
@@ -41,6 +45,29 @@ export default async function MatchingResultPage({ params }: { params: { id: str
   })
 
   if (!request || request.parentProfile?.userId !== session.user.id) notFound()
+
+  const now = new Date()
+  const [matchResult, quota] = await Promise.all([
+    request.nannyProfileId
+      ? prisma.matchResult.findUnique({
+          where: {
+            parentProfileId_nannyProfileId: {
+              parentProfileId: request.parentProfileId,
+              nannyProfileId: request.nannyProfileId,
+            },
+          },
+          select: { kontakTerbuka: true },
+        })
+      : Promise.resolve(null),
+    prisma.connectionQuota.findFirst({
+      where: { parentProfileId: request.parentProfileId, periodEnd: { gt: now } },
+      orderBy: { periodEnd: "desc" },
+      select: { referralUsed: true, referralLimit: true },
+    }),
+  ])
+
+  const alreadyUnlocked = matchResult?.kontakTerbuka ?? false
+  const referralRemaining = Math.max(0, (quota?.referralLimit ?? 3) - (quota?.referralUsed ?? 0))
 
   const result = request.matchingResult
   const nannyName = request.nannyProfile?.fullName ?? "Nanny"
@@ -125,6 +152,22 @@ export default async function MatchingResultPage({ params }: { params: { id: str
           <p className="text-[11px] text-[#999AAA] mt-2">
             Berdasarkan preferensi kedua pihak · {dateStr}
           </p>
+        </div>
+      )}
+
+      {/* Contact block — shown only when result exists */}
+      {result && request.nannyProfileId && (
+        <div className="mb-4">
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
+            Hubungi nanny
+          </p>
+          <UnlockContactButton
+            nannyProfileId={request.nannyProfileId}
+            matchingRequestId={params.id}
+            flowType="REFERRAL"
+            remainingQuota={referralRemaining}
+            alreadyUnlocked={alreadyUnlocked}
+          />
         </div>
       )}
 
