@@ -67,7 +67,6 @@ export default async function ParentDashboardPage() {
   const activeMatch = profile?.matchingRequests?.[0]
   const nannyName = activeMatch?.nannyProfile?.fullName ?? null
   const score = activeMatch?.matchingResult?.scoreOverall ? Math.round(activeMatch.matchingResult.scoreOverall) : null
-  const hasPendingMonitoring = !!activeMatch && activeMatch.status === "COMPLETED"
 
   const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "4829"}`
 
@@ -79,6 +78,15 @@ export default async function ParentDashboardPage() {
 
   const TIMINGS = ["WEEK_1", "WEEK_2", "MONTH_1", "MONTH_3"] as const
   const nextPending = hasActiveAssignment ? TIMINGS.find(t => !isDone(t)) ?? null : null
+
+  const hasPendingMonitoring = hasActiveAssignment && nextPending !== null
+
+  const MONITORING_LABEL: Record<string, string> = {
+    WEEK_1: "Check-in minggu ke-1",
+    WEEK_2: "Check-in minggu ke-2",
+    MONTH_1: "Pemantauan bulan ke-1",
+    MONTH_3: "Pemantauan bulan ke-3",
+  }
 
   const timelineItems = [
     {
@@ -141,14 +149,14 @@ export default async function ParentDashboardPage() {
       </div>
 
       {/* Alert pending monitoring */}
-      {hasPendingMonitoring && nannyName && (
+      {hasPendingMonitoring && nextPending && (
         <div className="bg-[#FAEAEA] border-l-4 border-[#C75D5D] rounded-r-[12px] px-3.5 py-3 mb-4">
-          <p className="text-[13px] font-bold text-[#C75D5D]">Perlu perhatian segera</p>
+          <p className="text-[13px] font-bold text-[#C75D5D]">Pemantauan perlu diisi</p>
           <p className="text-[12px] text-[#A04040] mt-1 leading-relaxed">
-            Pemantauan bulan ke-1 belum diisi. {nannyName} sudah mengisi dari sisinya.
+            {MONITORING_LABEL[nextPending]} belum Bunda isi. Jangan sampai terlewat.
           </p>
           <Link
-            href="/dashboard/parent/monitoring"
+            href={`/dashboard/parent/monitoring?timing=${nextPending}`}
             className="mt-2 inline-flex items-center bg-[#FAEAEA] border border-[#C75D5D] text-[#C75D5D] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] hover:bg-[#C75D5D] hover:text-white transition-all"
           >
             Isi sekarang

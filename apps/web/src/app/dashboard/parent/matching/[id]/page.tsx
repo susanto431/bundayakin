@@ -89,16 +89,16 @@ export default async function MatchingResultPage({ params }: { params: { id: str
 
   function scoreColor(s: number | null) {
     if (s === null) return "#5BBFB0"
-    return s >= 70 ? "#5BBFB0" : "#E07B39"
+    return s >= 80 ? "#5BBFB0" : s >= 60 ? "#E07B39" : "#C75D5D"
   }
 
   function scoreTextColor(s: number | null) {
     if (s === null) return "text-[#5A3A7A]"
-    return s >= 70 ? "text-[#5A3A7A]" : "text-[#E07B39]"
+    return s >= 80 ? "text-[#5A3A7A]" : s >= 60 ? "text-[#E07B39]" : "text-[#C75D5D]"
   }
 
   const verdictLabel = score !== null
-    ? score >= 80 ? "Sangat Cocok" : score >= 65 ? "Cocok" : "Cukup Cocok"
+    ? score >= 80 ? "Sangat Cocok" : score >= 60 ? "Cocok" : "Perlu Pertimbangan"
     : "Menunggu"
 
   const negotiationPoints: string[] = result?.negotiationPoints ?? []
@@ -275,12 +275,19 @@ export default async function MatchingResultPage({ params }: { params: { id: str
       {/* CTAs */}
       {result && (
         <div className="space-y-2">
-          <Link
-            href={`/dashboard/parent/matching/${params.id}/placement`}
-            className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
-          >
-            Terima nanny ini →
-          </Link>
+          {request.status === "COMPLETED" && (
+            <Link
+              href={`/dashboard/parent/matching/${params.id}/placement`}
+              className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
+            >
+              Terima nanny ini →
+            </Link>
+          )}
+          {(request.status === "ACCEPTED" || request.status === "NEGOTIATING") && (
+            <div className="w-full flex items-center justify-center bg-[#E5F6F4] border border-[#A8DDD8] text-[#2C5F5A] font-semibold text-[13px] min-h-[48px] rounded-[10px]">
+              {request.status === "ACCEPTED" ? "Nanny sudah diterima ✓" : "Sedang dalam negosiasi"}
+            </div>
+          )}
           <Link
             href="/dashboard/parent/matching"
             className="w-full flex items-center justify-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[13px] min-h-[48px] rounded-[10px] hover:bg-[#F3EEF8] transition-all"
