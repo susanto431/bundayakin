@@ -4,7 +4,7 @@ import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 
-const TOTAL_STEPS = 3
+const TOTAL_STEPS = 5
 
 const NANNY_TYPES = [
   { value: "LIVE_IN", label: "Menginap (live-in)", desc: "Tinggal di rumah keluarga" },
@@ -40,7 +40,7 @@ type Form = {
   expectedSalaryMin: string
   expectedSalaryMax: string
   bio: string
-  // Step 3 (psikotes — opsional)
+  // Step 5 (psikotes — opsional)
   wantsPsikotes: boolean | null
 }
 
@@ -58,6 +58,20 @@ export default function NannySetupProfilPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  // Step 3 — Video Perkenalan
+  const [videoUid, setVideoUid] = useState<string | null>(null)
+  const [videoThumbnailUrl, setVideoThumbnailUrl] = useState<string | null>(null)
+  const [videoUploading, setVideoUploading] = useState(false)
+  const [videoUploadPhase, setVideoUploadPhase] = useState<"prepare" | "upload" | "confirm" | null>(null)
+  const [videoUploadProgress, setVideoUploadProgress] = useState(0)
+  const videoRef = useRef<HTMLInputElement>(null)
+
+  // Step 4 — Foto Portfolio
+  const [portfolioPhotos, setPortfolioPhotos] = useState<(string | null)[]>([null, null, null])
+  const [portfolioUploading, setPortfolioUploading] = useState<number | null>(null)
+  const [activePhotoSlot, setActivePhotoSlot] = useState<number | null>(null)
+  const photoFileRef = useRef<HTMLInputElement>(null)
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm(p => ({ ...p, [e.target.name]: e.target.value }))
@@ -92,6 +106,98 @@ export default function NannySetupProfilPage() {
     } finally {
       setUploading(false)
     }
+  }
+
+  async function handleVideoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setVideoUploading(true)
+    setVideoUploadPhase("prepare")
+    setVideoUploadProgress(0)
+    setError(null)
+    try {
+      const res1 = await fetch("/api/upload/video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "INTRO_VIDEO", slug: "perkenalan" }),
+      })
+      const data1 = (await res1.json()) as { success: boolean; data?: { uploadUrl: string; uid: string }; error?: string }
+      if (!data1.success || !data1.data) {
+        setError(data1.error ?? "Gagal mendapatkan URL upload")
+        return
+      }
+      const { uploadUrl, uid } = data1.data
+
+      setVideoUploadPhase("upload")
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.upload.onprogress = (ev) => {
+          if (ev.lengthComputable) setVideoUploadProgress(Math.round((ev.loaded / ev.total) * 100))
+        }
+        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error("Upload gagal")))
+        xhr.onerror = () => reject(new Error("Upload gagal"))
+        xhr.open("PUT", uploadUrl)
+        xhr.send(file)
+      })
+
+      setVideoUploadPhase("confirm")
+      const res3 = await fetch("/api/upload/video/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, type: "INTRO_VIDEO", slug: "perkenalan" }),
+      })
+      const data3 = (await res3.json()) as { success: boolean; data?: { uid: string; thumbnailUrl: string }; error?: string }
+      if (!data3.success || !data3.data) {
+        setError(data3.error ?? "Gagal konfirmasi upload")
+        return
+      }
+      setVideoUid(data3.data.uid)
+      setVideoThumbnailUrl(data3.data.thumbnailUrl)
+    } catch {
+      setError("Gagal mengunggah video")
+    } finally {
+      setVideoUploading(false)
+      setVideoUploadPhase(null)
+    }
+  }
+
+  async function handlePortfolioPhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    const slot = activePhotoSlot
+    if (!file || slot === null) return
+    setPortfolioUploading(slot)
+    setError(null)
+    try {
+      const fd = new FormData()
+      fd.append("file", file)
+      fd.append("type", "PORTFOLIO_PHOTO")
+      fd.append("slug", `foto-${slot + 1}`)
+      const res = await fetch("/api/upload", { method: "POST", body: fd })
+      const data = (await res.json()) as { success: boolean; url?: string; error?: string }
+      if (!data.success || !data.url) {
+        setError(data.error ?? "Gagal upload foto")
+        return
+      }
+      setPortfolioPhotos(prev => {
+        const next = [...prev]
+        next[slot] = data.url!
+        return next
+      })
+    } catch {
+      setError("Tidak dapat mengunggah foto")
+    } finally {
+      setPortfolioUploading(null)
+      setActivePhotoSlot(null)
+      if (photoFileRef.current) photoFileRef.current.value = ""
+    }
+  }
+
+  function removePortfolioPhoto(slot: number) {
+    setPortfolioPhotos(prev => {
+      const next = [...prev]
+      next[slot] = null
+      return next
+    })
   }
 
   function validateStep(): string | null {
@@ -332,8 +438,206 @@ export default function NannySetupProfilPage() {
             </div>
           )}
 
-          {/* ── STEP 3: Psikotes (opsional) ── */}
+          {/* ── STEP 3: Video Perkenalan ── */}
           {step === 3 && (
+            <div className="p-6">
+              <h2 className="text-[18px] font-bold text-[#5A3A7A] mb-1">Video Perkenalan</h2>
+              <p className="text-[13px] text-[#999AAA] mb-6">Opsional · Maks 3 menit</p>
+
+              {error && (
+                <div className="bg-[#FAEAEA] border-l-4 border-[#C75D5D] rounded-[8px] px-4 py-3 text-sm text-[#C75D5D] mb-4">{error}</div>
+              )}
+
+              <input
+                ref={videoRef}
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime"
+                className="hidden"
+                onChange={handleVideoUpload}
+              />
+
+              {/* Status: belum ada video */}
+              {!videoUid && !videoUploading && (
+                <div className="mb-5">
+                  <div
+                    className="border-2 border-dashed border-[#C8B8DC] rounded-[16px] p-8 flex flex-col items-center gap-3 mb-4 cursor-pointer hover:border-[#A97CC4] hover:bg-[#F3EEF8] transition-all"
+                    onClick={() => videoRef.current?.click()}
+                  >
+                    <div className="w-14 h-14 bg-[#F3EEF8] rounded-full flex items-center justify-center">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A97CC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="23 7 16 12 23 17 23 7" />
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-[#5A3A7A]">Pilih atau rekam video</p>
+                      <p className="text-[11px] text-[#999AAA] mt-0.5">MP4, WebM, MOV · maks 3 menit</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => videoRef.current?.click()}
+                    className="w-full bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold py-3.5 rounded-[12px] min-h-[52px] text-sm transition-all"
+                  >
+                    Rekam / Upload Video
+                  </button>
+                </div>
+              )}
+
+              {/* Status: sedang upload */}
+              {videoUploading && (
+                <div className="mb-5 border border-[#E0D0F0] rounded-[16px] p-6 flex flex-col items-center gap-4">
+                  {videoUploadPhase === "upload" ? (
+                    <>
+                      <div className="w-full">
+                        <div className="flex justify-between mb-2">
+                          <p className="text-sm font-semibold text-[#5A3A7A]">Mengunggah video…</p>
+                          <p className="text-sm font-semibold text-[#5BBFB0]">{videoUploadProgress}%</p>
+                        </div>
+                        <div className="h-2 bg-[#E0D0F0] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#5BBFB0] rounded-full transition-all duration-200"
+                            style={{ width: `${videoUploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <svg className="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5BBFB0" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                      </svg>
+                      <p className="text-sm text-[#5A3A7A] font-semibold">
+                        {videoUploadPhase === "prepare" ? "Mempersiapkan upload…" : "Menyelesaikan…"}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Status: video berhasil diupload */}
+              {videoUid && !videoUploading && (
+                <div className="mb-5">
+                  {videoThumbnailUrl && (
+                    <div className="relative w-full aspect-video rounded-[12px] overflow-hidden mb-3 bg-[#1a1a2e]">
+                      <Image
+                        src={videoThumbnailUrl}
+                        alt="Thumbnail video"
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 bg-[#E5F6F4] border border-[#A8DDD8] rounded-[10px] px-4 py-3 mb-3">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5BBFB0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                    <p className="text-sm font-semibold text-[#1E4A45]">Video berhasil diupload</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setVideoUid(null); setVideoThumbnailUrl(null); if (videoRef.current) videoRef.current.value = ""; videoRef.current?.click() }}
+                    className="w-full border border-[#E0D0F0] text-[#5A3A7A] hover:border-[#C8B8DC] font-semibold py-3 rounded-[12px] min-h-[48px] text-sm transition-all"
+                  >
+                    Ganti Video
+                  </button>
+                </div>
+              )}
+
+              {!videoUploading && (
+                <button
+                  type="button"
+                  onClick={next}
+                  className="w-full text-[#999AAA] text-sm py-2 hover:text-[#5A3A7A] transition-colors text-center"
+                >
+                  Lewati, upload nanti →
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* ── STEP 4: Foto Portfolio ── */}
+          {step === 4 && (
+            <div className="p-6">
+              <h2 className="text-[18px] font-bold text-[#5A3A7A] mb-1">Foto Portfolio</h2>
+              <p className="text-[13px] text-[#999AAA] mb-6">Opsional · Maks 3 foto keahlian Sus</p>
+
+              {error && (
+                <div className="bg-[#FAEAEA] border-l-4 border-[#C75D5D] rounded-[8px] px-4 py-3 text-sm text-[#C75D5D] mb-4">{error}</div>
+              )}
+
+              <input
+                ref={photoFileRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handlePortfolioPhotoUpload}
+              />
+
+              <div className="grid grid-cols-3 gap-3 mb-5">
+                {portfolioPhotos.map((url, i) => (
+                  <div key={i} className="relative aspect-square rounded-[12px] overflow-hidden">
+                    {url ? (
+                      <>
+                        <Image src={url} alt={`Foto ${i + 1}`} fill className="object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removePortfolioPhoto(i)}
+                          className="absolute top-1 right-1 w-6 h-6 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all"
+                          aria-label="Hapus foto"
+                        >
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round">
+                            <path d="M18 6 6 18M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </>
+                    ) : portfolioUploading === i ? (
+                      <div className="w-full h-full bg-[#F3EEF8] flex items-center justify-center">
+                        <svg className="animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5BBFB0" strokeWidth="2.5" strokeLinecap="round">
+                          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                        </svg>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={portfolioUploading !== null}
+                        onClick={() => { setActivePhotoSlot(i); photoFileRef.current?.click() }}
+                        className="w-full h-full border-2 border-dashed border-[#C8B8DC] rounded-[12px] flex flex-col items-center justify-center gap-1 hover:border-[#A97CC4] hover:bg-[#F3EEF8] disabled:opacity-50 transition-all cursor-pointer"
+                      >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8B8DC" strokeWidth="2" strokeLinecap="round">
+                          <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        <span className="text-[10px] text-[#999AAA]">Foto {i + 1}</span>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-[11px] text-[#999AAA] text-center mb-4">
+                JPG, PNG atau WebP · maks 5 MB per foto
+              </p>
+
+              <button
+                type="button"
+                onClick={next}
+                disabled={portfolioUploading !== null}
+                className="w-full text-[#999AAA] text-sm py-2 hover:text-[#5A3A7A] disabled:opacity-50 transition-colors text-center"
+              >
+                Lewati, upload nanti →
+              </button>
+            </div>
+          )}
+
+          {/* ── STEP 5: Psikotes (opsional) ── */}
+          {step === 5 && (
             <div className="p-6">
               <h2 className="text-[18px] font-bold text-[#5A3A7A] mb-1">Psikotes BundaYakin</h2>
               <p className="text-[13px] text-[#999AAA] mb-4">Opsional · Gratis untuk Sus</p>
@@ -392,8 +696,8 @@ export default function NannySetupProfilPage() {
             </div>
           )}
 
-          {/* Navigation buttons (step 1–2 only) */}
-          {step < 3 && (
+          {/* Navigation buttons (step 1–4 only) */}
+          {step < 5 && step !== 3 && step !== 4 && (
             <div className="px-6 pb-6 pt-2 border-t border-[#F3EEF8] flex gap-3">
               {step > 1 && (
                 <button type="button" onClick={back}
@@ -403,12 +707,34 @@ export default function NannySetupProfilPage() {
               )}
               <button type="button" onClick={next}
                 className="flex-1 bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold py-3 rounded-[12px] min-h-[48px] text-sm transition-all">
-                {step === 2 ? "Lanjut ke Langkah Terakhir" : "Lanjut"}
+                {step === 4 ? "Lanjut ke Langkah Terakhir" : "Lanjut"}
               </button>
             </div>
           )}
 
-          {step === 3 && step > 1 && (
+          {/* Navigation untuk step 3 dan 4 (tombol Kembali di bawah) */}
+          {(step === 3 || step === 4) && (
+            <div className="px-6 pb-4 border-t border-[#F3EEF8] pt-3 flex gap-3">
+              <button type="button" onClick={back}
+                className="flex-1 border border-[#E0D0F0] text-[#5A3A7A] font-semibold py-3 rounded-[12px] min-h-[48px] text-sm hover:border-[#C8B8DC] transition-all">
+                Kembali
+              </button>
+              {step === 3 && videoUid && !videoUploading && (
+                <button type="button" onClick={next}
+                  className="flex-1 bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold py-3 rounded-[12px] min-h-[48px] text-sm transition-all">
+                  Lanjut
+                </button>
+              )}
+              {step === 4 && portfolioPhotos.some(p => p !== null) && portfolioUploading === null && (
+                <button type="button" onClick={next}
+                  className="flex-1 bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold py-3 rounded-[12px] min-h-[48px] text-sm transition-all">
+                  Lanjut ke Langkah Terakhir
+                </button>
+              )}
+            </div>
+          )}
+
+          {step === 5 && step > 1 && (
             <div className="px-6 pb-2">
               <button type="button" onClick={back}
                 className="w-full text-[#999AAA] text-xs py-2 hover:text-[#5A3A7A] transition-colors">
