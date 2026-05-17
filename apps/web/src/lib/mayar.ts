@@ -4,6 +4,8 @@
 // Menggantikan Midtrans Snap sejak 17 Mei 2026
 // ============================================================
 
+import { createHmac } from "crypto"
+
 const API_KEY = process.env.MAYAR_API_KEY ?? ""
 const MAYAR_BASE = "https://api.mayar.id/hl/v1"
 
@@ -90,9 +92,7 @@ export function verifyMayarWebhook(
   signature: string
 ): boolean {
   const webhookSecret = process.env.MAYAR_WEBHOOK_SECRET ?? ""
-  const crypto = require("crypto") as typeof import("crypto")
-  const expected = crypto
-    .createHmac("sha256", webhookSecret)
+  const expected = createHmac("sha256", webhookSecret)
     .update(payload)
     .digest("hex")
   return expected === signature
