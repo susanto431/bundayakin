@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 import { saveSurveyToDB } from "@/lib/survey-save"
 import type { SurveyAnswers } from "@/types/survey"
 import SurveyForm from "@/components/matching/SurveyForm"
@@ -26,7 +27,14 @@ async function saveDraft(answers: SurveyAnswers) {
 }
 
 export default async function ParentMatchingSurveyPage() {
-  await auth()
+  const session = await auth()
+
+  const profile = session?.user?.id
+    ? await prisma.parentProfile.findUnique({
+        where: { userId: session.user.id },
+        select: { surveyCompletedAt: true },
+      })
+    : null
 
   return (
     <div className="min-h-screen bg-[#FDFBFF]">
@@ -35,6 +43,7 @@ export default async function ParentMatchingSurveyPage() {
         storageKey="survey_parent_v1"
         onSubmit={saveSurvey}
         onProgress={saveDraft}
+        alreadyCompleted={!!profile?.surveyCompletedAt}
       />
     </div>
   )

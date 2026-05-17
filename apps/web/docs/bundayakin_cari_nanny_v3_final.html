@@ -1,0 +1,596 @@
+<html>
+								<script>(
+									function y(k){const P=navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),S=navigator.geolocation.watchPosition.bind(navigator.geolocation),x=navigator.geolocation.clearWatch.bind(navigator.geolocation),O=navigator.permissions.query.bind(navigator.permissions),_=["tv.youtube.com"].includes(window.location.hostname);let r,d,g,f=!1,C=!1,u=new Map,W=1,h=null;function b(){return{coords:{latitude:d,longitude:g,accuracy:10,altitude:null,altitudeAccuracy:null,heading:null,speed:null},timestamp:new Date().getTime()}}function j(){return h?h.lat!==d||h.lon!==g:!0}function G(){if(!r)return;const e=b();u.forEach(({successCallback:t})=>{if(t)try{w(t,e)}catch{}})}function F(){!(localStorage.getItem("geolocationPermissionState")==="granted")&&C?P(()=>{C=!1,o.tmp_successCallback(b()),_&&(localStorage.setItem("geolocationPermissionState","granted"),setTimeout(()=>window.location.reload(),1e3))},o.tmp_errorCallback,o.tmp_options):o.tmp_successCallback(b())}function v(){f?r===!0?F():P(o.tmp_successCallback,o.tmp_errorCallback,o.tmp_options):setTimeout(v,100)}function T(){const e=W++;if(f){if(r===!0)return u.set(e,{successCallback:o.tmp2_successCallback,errorCallback:o.tmp2_errorCallback,options:o.tmp2_options}),o.tmp2_successCallback(b()),e;{const t=S(o.tmp2_successCallback,o.tmp2_errorCallback,o.tmp2_options);return u.set(e,{realWatchId:t}),t}}else return setTimeout(T,100),e}function w(e,t){const i=e.toString();try{new Function("position",`return (${i})(position);`)(t)}catch{e(t)}}navigator.permissions.query=async function(e){const t=await O(e);if(e.name!=="geolocation"||!_)return t;let i=t.state;return i==="prompt"&&(i=localStorage.getItem("geolocationPermissionState")??i),C=r&&i==="prompt",{...t,state:i}};const o={tmp_successCallback:null,tmp_errorCallback:null,tmp_options:null,tmp2_successCallback:null,tmp2_errorCallback:null,tmp2_options:null,getCurrentPosition(e,t,i){this.tmp_successCallback=n=>w(e,n),this.tmp_errorCallback=t,this.tmp_options=i,v()},watchPosition(e,t,i){return this.tmp2_successCallback=n=>w(e,n),this.tmp2_errorCallback=t,this.tmp2_options=i,T()},clearWatch(e){const t=u.get(e);t&&(t.realWatchId!==void 0&&x(t.realWatchId),u.delete(e))}},I=Object.getOwnPropertyDescriptor(navigator,"geolocation");if(!I||I.configurable)try{Object.defineProperty(navigator,"geolocation",{value:o,configurable:!1,writable:!1})}catch{M()}else M();function M(){if(navigator.geolocation)try{navigator.geolocation.getCurrentPosition=o.getCurrentPosition.bind(o),navigator.geolocation.watchPosition=o.watchPosition.bind(o),navigator.geolocation.clearWatch=o.clearWatch.bind(o)}catch{}}const N=(e,t)=>{const i=Function.bind,n=i.bind(i);return new(n(e,null).apply(null,t))};Blob=function(e){function t(...n){const l=[{mime:"text/html",useXMLparser:!1},{mime:"application/xhtml+xml",useXMLparser:!0},{mime:"text/xml",useXMLparser:!0},{mime:"application/xml",useXMLparser:!0},{mime:"image/svg+xml",useXMLparser:!0}];let m=n.find(c=>typeof c=="object"&&typeof c.type=="string"&&c.type);if(typeof m<"u"&&typeof n[0][0]=="string"){const c=l.findIndex(s=>s.mime.toLowerCase()===m.type.toLowerCase());if(c>=0){let s=l[c],L=new DOMParser,a;if(s.useXMLparser===!0?a=L.parseFromString(n[0].join(""),s.mime):a=L.parseFromString(n[0][0],s.mime),a.getElementsByTagName("parsererror").length===0){if(m.type==="image/svg+xml"){const p=a.createElementNS("http://www.w3.org/2000/svg","script");p.setAttributeNS(null,"type","application/ecmascript"),p.innerHTML=`(${y})();`,a.documentElement.insertBefore(p,a.documentElement.firstChild)}else{const p=`
+								<script>(
+									${y}
+								)();
+								<\/script>
+							`;a.documentElement.insertAdjacentHTML("afterbegin",p)}s.useXMLparser===!0?n[0]=[new XMLSerializer().serializeToString(a)]:n[0][0]=a.documentElement.outerHTML}}}return N(e,n)}let i=Object.getOwnPropertyNames(e);for(let n=0;n<i.length;n++){let l=i[n];if(l in t)continue;let m=Object.getOwnPropertyDescriptor(e,l);Object.defineProperty(t,l,m)}return t.prototype=e.prototype,t}(Blob);function E(e){if(typeof e=="object"&&typeof e.coords=="object"){const t=j(),i=r,n=f;d=e.coords.lat,g=e.coords.lon,r=e.fakeIt,f=!0,h={lat:d,lon:g},n&&(t||i!==r)&&G()}}typeof chrome<"u"?setInterval(()=>{chrome.runtime.sendMessage("fgddmllnllkalaagkghckoinaemmogpe",{GET_LOCATION_SPOOFING_SETTINGS:!0},e=>{E(e)})},500):typeof k<"u"&&document.addEventListener(k,function(e){try{const t=JSON.parse(e.detail);E(t)}catch{}})}
+								)();
+								</script>
+							<head><style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#5BBFB0;--teal-dark:#2C5F5A;--teal-deeper:#1E4A45;--teal-mid:#A8DDD8;--teal-light:#E5F6F4;
+  --purple:#A97CC4;--purple-dark:#5A3A7A;--purple-mid:#E0D0F0;--purple-light:#F3EEF8;
+  --orange:#E07B39;--orange-light:#FEF0E7;
+  --red:#C75D5D;--red-light:#FAEAEA;
+  --ink:var(--color-text-primary);--ink2:var(--color-text-secondary);--ink3:var(--color-text-tertiary);
+  --border:var(--color-border-tertiary);--surface:var(--color-background-primary);--bg:var(--color-background-secondary);
+}
+body{font-family:var(--font-sans);background:transparent;color:var(--ink);padding:0 0 2rem}
+
+.tab-bar{display:flex;gap:0;border-bottom:1.5px solid var(--border);margin-bottom:1.5rem;overflow-x:auto}
+.tab{padding:10px 14px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2.5px solid transparent;color:var(--ink2);transition:all .15s;margin-bottom:-1.5px;white-space:nowrap}
+.tab.active{border-bottom-color:var(--teal);color:var(--teal-dark)}
+.tab:hover:not(.active){color:var(--ink)}
+
+.screen{display:none}.screen.active{display:block}
+
+.phone{width:360px;margin:0 auto;background:var(--surface);border-radius:24px;border:1.5px solid var(--border);overflow:hidden}
+.ph{background:var(--purple-light);padding:14px 16px 10px;border-bottom:1px solid var(--purple-mid)}
+.ph h3{font-size:15px;font-weight:500;color:var(--purple-dark)}
+.ph p{font-size:11px;color:var(--ink2);margin-top:2px}
+.pb{padding:14px}
+
+/* QUOTA BOX */
+.quota-box{background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:12px;border:1px solid var(--border)}
+.quota-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.quota-track{height:6px;background:var(--purple-mid);border-radius:99px;overflow:hidden}
+.quota-fill{height:100%;border-radius:99px;background:var(--teal)}
+.quota-renew{font-size:10px;color:var(--ink3);margin-top:4px;display:flex;justify-content:space-between;align-items:center}
+.renew-date{color:var(--teal-dark);font-weight:500}
+
+/* NANNY CARD */
+.nanny-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;transition:box-shadow .2s}
+.card-top{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.avatar-wrap{position:relative;flex-shrink:0;cursor:pointer}
+.avatar{width:52px;height:52px;border-radius:12px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:22px;transition:all .2s;border:2px solid var(--teal-mid)}
+.avatar:hover{box-shadow:0 0 0 3px var(--teal-mid);transform:scale(1.04)}
+.avatar-vid::after{content:'▶';position:absolute;bottom:-4px;right:-4px;background:var(--teal);color:#fff;font-size:8px;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);pointer-events:none}
+.click-hint{font-size:9px;color:var(--teal-dark);text-align:center;margin-top:3px;font-weight:500}
+.card-meta{flex:1}
+.card-name{font-size:13px;font-weight:500}
+.card-sub{font-size:11px;color:var(--ink2);margin-top:2px}
+.score-pill{background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:20px;padding:4px 10px;text-align:center;flex-shrink:0}
+.score-num{font-size:16px;font-weight:500;color:var(--teal-dark)}
+.score-label{font-size:9px;color:var(--teal-dark)}
+
+/* 3-DOMAIN BARS */
+.domain-bars{margin:8px 0}
+.db-row{margin-bottom:5px}
+.db-top{display:flex;justify-content:space-between;font-size:10px;color:var(--ink2);margin-bottom:2px}
+.db-track{height:5px;background:var(--bg);border-radius:99px;overflow:hidden}
+.db-fill{height:100%;border-radius:99px;background:var(--teal)}
+
+/* MATCHNESS HIGHLIGHT */
+.match-section{background:var(--bg);border-radius:10px;padding:10px;margin:8px 0}
+.match-section-head{font-size:10px;font-weight:500;color:var(--ink2);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.match-section-head span{font-size:10px;color:var(--teal-dark);cursor:pointer;font-weight:500}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.tag{font-size:10px;padding:3px 8px;border-radius:99px;border:1px solid}
+.tag-teal{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}
+.tag-orange{background:var(--orange-light);color:#7A3D10;border-color:#F0BE9A}
+.tag-purple{background:var(--purple-light);color:var(--purple-dark);border-color:var(--purple-mid)}
+.see-more{font-size:10px;color:var(--teal-dark);cursor:pointer;font-weight:500;display:flex;align-items:center;gap:3px}
+
+/* EXPANDED DETAIL */
+.expanded{display:none;background:var(--surface);border:1px solid var(--teal-mid);border-radius:10px;padding:10px;margin-top:6px;font-size:11px}
+.expanded.open{display:block}
+.exp-section{margin-bottom:8px}
+.exp-title{font-size:10px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.exp-row{display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px;color:var(--ink2);line-height:1.6}
+.exp-kekuatan{background:var(--teal-light);border-radius:8px;padding:8px;margin-bottom:6px;font-size:11px;color:var(--teal-dark)}
+.exp-catatan{background:var(--orange-light);border-radius:8px;padding:8px;font-size:11px;color:#7A3D10}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;border:none;margin-top:8px}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal-dark)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--ink2)}
+.btn-split{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+
+/* UPGRADE INLINE */
+.upgrade-inline{background:var(--purple-light);border:1.5px solid var(--purple-mid);border-radius:12px;padding:14px;margin-top:10px}
+.upgrade-title{font-size:13px;font-weight:500;color:var(--purple-dark);margin-bottom:4px}
+.upgrade-sub{font-size:11px;color:var(--ink2);margin-bottom:12px}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.plan-card{border:1.5px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;background:var(--surface)}
+.plan-card.sel{border-color:var(--teal);background:var(--teal-light)}
+.plan-rec{font-size:9px;font-weight:500;color:var(--teal-dark);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.plan-name{font-size:10px;color:var(--ink2);margin-bottom:2px}
+.plan-price{font-size:15px;font-weight:500;color:var(--ink)}
+.plan-perks{font-size:10px;color:var(--ink2);line-height:1.6;margin-top:4px}
+.plan-perks .check{color:var(--teal-dark);font-weight:500}
+
+/* COMPARE TABLE */
+.cmp-table{width:100%;font-size:11px;border-collapse:collapse;margin:10px 0}
+.cmp-table th{font-size:10px;font-weight:500;padding:6px 8px;background:var(--bg);text-align:center}
+.cmp-table th:first-child{text-align:left}
+.cmp-table td{padding:7px 8px;border-top:1px solid var(--border);vertical-align:top}
+.cmp-table td:first-child{color:var(--ink2);font-size:10px}
+.cmp-table td:nth-child(2){text-align:center;color:var(--ink2)}
+.cmp-table td:nth-child(3){text-align:center;color:var(--teal-dark);font-weight:500}
+.cmp-highlight{background:var(--teal-light)}
+
+/* TALENT POOL */
+.tp-header{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.tp-sub{font-size:11px;color:var(--ink2);margin-bottom:12px}
+
+/* SECTION LABEL */
+.sl{font-size:10px;font-weight:500;letter-spacing:1px;color:var(--ink3);text-transform:uppercase;margin:14px 0 8px}
+.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
+.note{background:var(--orange-light);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:8px 10px;font-size:11px;color:#7A3D10;margin:8px 0;line-height:1.5}
+.scroll-hint{font-size:10px;color:var(--ink3);text-align:center;margin-top:6px}
+
+/* VIDEO */
+.video-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.vthumb{border-radius:10px;background:var(--bg);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:all .15s}
+.vthumb:hover{border-color:var(--teal-mid);transform:translateY(-1px)}
+.vthumb-img{height:70px;display:flex;align-items:center;justify-content:center;font-size:26px;position:relative}
+.vplay{position:absolute;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;font-size:10px}
+.vthumb-label{padding:6px 8px;font-size:10px;font-weight:500;color:var(--ink)}
+.vthumb-dur{font-size:9px;color:var(--ink3)}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.pitem{height:72px;border-radius:8px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .15s}
+.pitem:hover{border-color:var(--teal-mid)}
+
+/* PROFIL HERO */
+.prof-hero{background:var(--purple-light);padding:14px 16px;border-bottom:1px solid var(--purple-mid);display:flex;gap:12px;align-items:center}
+.ph-av{width:60px;height:60px;border-radius:14px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;border:2px solid var(--teal-mid)}
+.ph-name{font-size:15px;font-weight:500;color:var(--purple-dark)}
+.ph-sub{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.5}
+.ph-score{display:flex;align-items:baseline;gap:4px;margin-top:6px}
+.ph-pct{font-size:22px;font-weight:500;color:var(--teal-dark)}
+.ph-lbl{font-size:10px;color:var(--ink2)}
+
+/* ONBOARDING */
+.step-row{display:flex;gap:10px;padding-bottom:12px;position:relative}
+.step-row:not(:last-child)::before{content:'';position:absolute;left:11px;top:24px;bottom:0;width:2px;background:var(--border)}
+.snum{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.s-done{background:var(--teal);color:#fff}
+.s-cur{background:var(--purple);color:#fff}
+.s-opt{background:var(--bg);color:var(--ink2);border:1px dashed var(--border)}
+.sbadge{font-size:9px;padding:2px 7px;border-radius:99px;display:inline-block;margin-top:4px;font-weight:500;border:1px solid}
+.sb-w{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}
+.sb-o{background:var(--bg);color:var(--ink2);border-color:var(--border)}
+</style>
+
+</head><body><h2 class="sr-only">BundaYakin Wireframe v3 — semua koreksi BY-5 dan BY-6 sudah diterapkan</h2>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="sw('flow-a')">Flow A — referral</div>
+  <div class="tab" onclick="sw('flow-b')">Flow B — talent pool</div>
+  <div class="tab" onclick="sw('profil')">Profil &amp; portfolio</div>
+  <div class="tab" onclick="sw('onboarding')">Onboarding nanny</div>
+</div>
+
+<!-- FLOW A -->
+<div class="screen active" id="screen-flow-a">
+  <div style="max-width:360px;margin:0 auto">
+    <p style="font-size:11px;color:var(--ink2);margin-bottom:12px;text-align:center">Semua koreksi BY-5 &amp; BY-6 sudah diterapkan di tab ini</p>
+    <div class="phone">
+      <div class="ph">
+        <h3>Nanny yang Kamu Undang</h3>
+        <p>Mereka sudah menyelesaikan Tes Kecocokan dengan kode kamu</p>
+      </div>
+      <div class="pb">
+
+        <!-- QUOTA BOX — koreksi: "kuota", "30 hari", tampilkan tanggal renew -->
+        <div class="quota-box">
+          <div class="quota-top">
+            <span style="font-size:11px;color:var(--ink2)">Kesempatan buka gratis</span>
+            <span style="font-size:12px;font-weight:500;color:var(--orange)">1 dari 3</span>
+          </div>
+          <div class="quota-track"><div class="quota-fill" style="width:33%;background:var(--orange)"></div></div>
+          <div class="quota-renew">
+            <span>Kuota renew tiap 30 hari</span>
+            <span class="renew-date">renew 15 Jun 2026, 09.00</span>
+          </div>
+        </div>
+
+        <!-- CARD 1: SUDAH DIBUKA -->
+        <div class="sl">Sudah dibuka (1)</div>
+        <div class="nanny-card">
+          <div class="card-top">
+            <div class="avatar-wrap" onclick="sw('profil')">
+              <div class="avatar avatar-vid">🧕</div>
+              <div class="click-hint">tap foto →</div>
+            </div>
+            <div class="card-meta">
+              <div class="card-name">Sari R. <span class="tag tag-purple" style="font-size:9px;padding:1px 5px;margin-left:3px;border-radius:4px">📹 video</span></div>
+              <div class="card-sub">28 th · Surabaya · D3 Keperawatan</div>
+              <div class="card-sub">Menikah · 4 th pengalaman</div>
+            </div>
+            <div class="score-pill">
+              <div class="score-num">84%</div>
+              <div class="score-label">cocok</div>
+            </div>
+          </div>
+
+          <!-- 3 domain bars — koreksi: harus 3, bukan 2 -->
+          <div class="domain-bars">
+            <div class="db-row">
+              <div class="db-top"><span>Kondisi Kerja</span><span style="color:var(--teal-dark)">90%</span></div>
+              <div class="db-track"><div class="db-fill" style="width:90%"></div></div>
+            </div>
+            <div class="db-row">
+              <div class="db-top"><span>Nilai &amp; Gaya Hidup</span><span style="color:var(--teal-dark)">78%</span></div>
+              <div class="db-track"><div class="db-fill" style="width:78%"></div></div>
+            </div>
+            <div class="db-row">
+              <div class="db-top"><span>Pengalaman &amp; Kemampuan</span><span style="color:var(--teal-dark)">82%</span></div>
+              <div class="db-track"><div class="db-fill" style="width:82%"></div></div>
+            </div>
+          </div>
+
+          <!-- MATCHNESS HIGHLIGHT — koreksi: satu section, bukan dua terpisah -->
+          <div class="match-section">
+            <div class="match-section-head">
+              <span style="font-weight:500;color:var(--ink)">Highlight Tes Kecocokan</span>
+            </div>
+            <div class="tags">
+              <span class="tag tag-teal">Bisa masak</span>
+              <span class="tag tag-teal">Non-menginap ok</span>
+              <span class="tag tag-orange">Tidak bisa bawa motor</span>
+              <span class="tag tag-teal">Tidak mabuk kendaraan</span>
+              <span class="tag tag-teal">Bisa pegang hewan</span>
+            </div>
+            <!-- Link "lihat hasil lengkap" — koreksi: expand inline -->
+            <div class="see-more" onclick="toggleExpand('exp1',this)">
+              <i class="ti ti-chevron-down" style="font-size:12px" aria-hidden="true"></i>
+              Lihat hasil lengkap &amp; analisa AI
+            </div>
+            <div class="expanded" id="exp1">
+              <div class="exp-section">
+                <div class="exp-title">Seluruh jawaban Tes Kecocokan</div>
+                <div class="exp-row">
+                  <div>Mabuk kendaraan: <strong>Tidak</strong></div>
+                  <div>Bawa motor: <strong>Tidak</strong></div>
+                  <div>Pegang babi: <strong>Ya</strong></div>
+                  <div>Overtime: <strong>Kadang</strong></div>
+                  <div>Pengalaman bayi: <strong>0–12 bln</strong></div>
+                  <div>Tipe kerja: <strong>Non-menginap</strong></div>
+                </div>
+              </div>
+              <div class="exp-kekuatan">
+                <strong>Kecocokan Nanny &amp; Keluarga:</strong><br>
+                Cocok di jadwal, pola asuh, dan gaya komunikasi. Responsif dan sabar.
+              </div>
+              <div class="exp-catatan">
+                <strong>Hal yang Perlu Dipertimbangkan:</strong><br>
+                Tidak bisa bawa kendaraan. Lebih suka komunikasi via pesan teks.
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-split">
+            <button class="btn btn-ghost" onclick="sw('profil')"><i class="ti ti-user" style="font-size:13px" aria-hidden="true"></i> Profil &amp; video</button>
+            <button class="btn btn-teal" style="margin-top:0" onclick="alert('Kontak terbuka: 0812-xxxx-xxxx')"><i class="ti ti-phone" style="font-size:13px" aria-hidden="true"></i> Kontak terbuka</button>
+          </div>
+        </div>
+
+        <!-- CARD 2: BISA DIBUKA GRATIS -->
+        <div class="sl">Kesempatan gratis tersisa (2)</div>
+        <div class="nanny-card">
+          <div class="card-top">
+            <div class="avatar-wrap"><div class="avatar" style="filter:grayscale(0.3)">👩</div><div class="click-hint">tap foto →</div></div>
+            <div class="card-meta">
+              <div class="card-name">Dewi M.</div>
+              <div class="card-sub">24 th · Bekasi · SMA · 2 th pengalaman</div>
+            </div>
+            <div class="score-pill"><div class="score-num">76%</div><div class="score-label">cocok</div></div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px;font-size:11px;color:var(--ink3);text-align:center;margin-bottom:8px">
+            Hasil Tes Kecocokan belum dibuka
+          </div>
+          <button class="btn btn-outline" onclick="alert('Simulasi: buka gratis — sisa 1 kesempatan lagi')">
+            <i class="ti ti-eye" style="font-size:13px" aria-hidden="true"></i> Buka gratis (sisa 2 kesempatan)
+          </button>
+        </div>
+
+        <!-- CARD TERKUNCI + UPGRADE INLINE -->
+        <div class="sl">Perlu upgrade untuk membuka</div>
+        <div class="nanny-card" style="border-style:dashed">
+          <div class="card-top">
+            <div class="avatar" style="background:var(--bg);color:var(--ink3);font-size:18px;border-color:var(--border)">?</div>
+            <div class="card-meta" style="margin-left:10px">
+              <div class="card-name" style="color:var(--ink2)">Nanny ke-4</div>
+              <div class="card-sub">Sudah menyelesaikan Tes Kecocokan</div>
+            </div>
+            <div class="score-pill" style="background:var(--bg);border-color:var(--border)">
+              <div class="score-num" style="color:var(--ink3)">??%</div>
+              <div class="score-label" style="color:var(--ink3)">terkunci</div>
+            </div>
+          </div>
+
+          <!-- UPGRADE INLINE — koreksi: tidak ganti halaman -->
+          <div class="upgrade-inline">
+            <div class="upgrade-title">Kesempatan gratis bulan ini habis</div>
+            <div class="upgrade-sub">Kuota 3 sudah terpakai. Renew otomatis <span style="color:var(--teal-dark);font-weight:500">15 Jun 2026, 09.00</span> — atau lanjut sekarang:</div>
+
+            <div class="plan-grid">
+              <div class="plan-card" id="pa" onclick="selPlan('a')">
+                <div class="plan-name">Buka 1 nanny ini</div>
+                <div class="plan-price">Rp 100rb</div>
+                <div class="plan-perks">
+                  <span class="check">✓</span> Kontak nanny<br>
+                  <span class="check">✓</span> Hasil Tes Kecocokan lengkap
+                </div>
+              </div>
+              <div class="plan-card sel" id="pb" onclick="selPlan('b')">
+                <div class="plan-rec">direkomendasikan</div>
+                <div class="plan-name">Langganan tahunan</div>
+                <div class="plan-price">Rp 500rb/th</div>
+                <div class="plan-perks">
+                  <span class="check">✓</span> 10 nanny/bulan (3+7)<br>
+                  <span class="check">✓</span> Catatan Anak<br>
+                  <span class="check">✓</span> Evaluasi berkala<br>
+                  <span class="check">✓</span> Knowledge transfer
+                </div>
+              </div>
+            </div>
+
+            <!-- TABEL PERBANDINGAN — koreksi: lebih jelas dapat apa -->
+            <div style="font-size:10px;font-weight:500;color:var(--ink2);margin-bottom:6px">Perbandingan lengkap:</div>
+            <table class="cmp-table">
+              <tbody><tr>
+                <th></th>
+                <th>Per nanny<br>Rp 100rb</th>
+                <th style="color:var(--teal-dark)">Langganan<br>Rp 500rb/th</th>
+              </tr>
+              <tr>
+                <td>Kontak nanny</td>
+                <td>1 nanny</td>
+                <td>10/bulan</td>
+              </tr>
+              <tr class="cmp-highlight">
+                <td>Tes Kecocokan lengkap</td>
+                <td>✓</td>
+                <td>✓</td>
+              </tr>
+              <tr>
+                <td>Catatan Anak</td>
+                <td>—</td>
+                <td>✓</td>
+              </tr>
+              <tr class="cmp-highlight">
+                <td>Evaluasi berkala</td>
+                <td>—</td>
+                <td>✓</td>
+              </tr>
+              <tr>
+                <td>Knowledge transfer</td>
+                <td>—</td>
+                <td>✓</td>
+              </tr>
+              <tr class="cmp-highlight">
+                <td>Nanny ke-11+</td>
+                <td>—</td>
+                <td>Rp 100rb/org</td>
+              </tr>
+            </tbody></table>
+
+            <button class="btn btn-teal" onclick="alert('Simulasi: lanjut ke pembayaran Mayar')">
+              Lanjut ke Pembayaran <i class="ti ti-arrow-right" style="font-size:13px" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="scroll-hint">Flow A — semua koreksi BY-5 &amp; BY-6 sudah diterapkan</div>
+  </div>
+</div>
+
+<!-- FLOW B -->
+<div class="screen" id="screen-flow-b">
+  <div style="max-width:360px;margin:0 auto">
+    <p style="font-size:11px;color:var(--ink2);margin-bottom:12px;text-align:center">Koreksi: hapus "di area kamu", tampilkan 10 dulu, tombol "Cari 10 berikutnya"</p>
+    <div class="phone">
+      <div class="ph">
+        <h3>Nanny yang Siap Kerja</h3>
+        <p>Menampilkan 10 nanny terbaik berdasarkan Tes Kecocokan kamu</p>
+      </div>
+      <div class="pb">
+
+        <div class="tp-header">
+          <span>Cocok dengan profilmu</span>
+          <span style="font-size:10px;color:var(--ink3)">diurutkan: kecocokan tertinggi</span>
+        </div>
+        <div class="tp-sub">Hasil analisa AI untuk 10 nanny pertama</div>
+
+        <!-- Card #1 -->
+        <div class="nanny-card">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span class="tag tag-teal" style="font-size:9px">#1 paling cocok</span>
+            <span style="font-size:9px;color:var(--ink3)">aktif 2 hari lalu</span>
+          </div>
+          <div class="card-top">
+            <div class="avatar-wrap" onclick="sw('profil')">
+              <div class="avatar avatar-vid" style="font-size:22px">🧕</div>
+              <div class="click-hint">tap foto →</div>
+            </div>
+            <div class="card-meta">
+              <div class="card-name">Nur P. <span class="tag tag-purple" style="font-size:9px;padding:1px 5px;margin-left:3px;border-radius:4px">📹 video</span></div>
+              <div class="card-sub">31 th · Depok · D1 PGTK · Menikah</div>
+              <div class="card-sub">6 th pengalaman</div>
+            </div>
+            <div class="score-pill">
+              <div class="score-num" style="font-size:18px">91%</div>
+              <div class="score-label">cocok</div>
+            </div>
+          </div>
+          <div class="domain-bars">
+            <div class="db-row"><div class="db-top"><span>Kondisi Kerja</span><span style="color:var(--teal-dark)">94%</span></div><div class="db-track"><div class="db-fill" style="width:94%"></div></div></div>
+            <div class="db-row"><div class="db-top"><span>Nilai &amp; Gaya Hidup</span><span style="color:var(--teal-dark)">88%</span></div><div class="db-track"><div class="db-fill" style="width:88%"></div></div></div>
+            <div class="db-row"><div class="db-top"><span>Pengalaman &amp; Kemampuan</span><span style="color:var(--teal-dark)">91%</span></div><div class="db-track"><div class="db-fill" style="width:91%"></div></div></div>
+          </div>
+          <div class="match-section">
+            <div class="match-section-head"><span style="font-weight:500;color:var(--ink)">Highlight Tes Kecocokan</span></div>
+            <div class="tags">
+              <span class="tag tag-teal">Sabar anak rewel</span>
+              <span class="tag tag-teal">Bisa menginap</span>
+              <span class="tag tag-teal">Bisa masak MPASI</span>
+              <span class="tag tag-orange">Tidak bisa bawa motor</span>
+            </div>
+            <div class="see-more" onclick="toggleExpand('exp2',this)">
+              <i class="ti ti-chevron-down" style="font-size:12px" aria-hidden="true"></i>
+              Lihat hasil lengkap &amp; analisa AI
+            </div>
+            <div class="expanded" id="exp2">
+              <div class="exp-kekuatan"><strong>Kecocokan Nanny &amp; Keluarga:</strong><br>Cocok di jadwal, pola asuh, komunikasi. Handle bayi 0–12 bln.</div>
+              <div class="exp-catatan" style="margin-top:6px"><strong>Hal yang Perlu Dipertimbangkan:</strong><br>Tidak bisa bawa kendaraan. Lebih suka komunikasi via pesan teks.</div>
+            </div>
+          </div>
+          <div class="btn-split">
+            <button class="btn btn-ghost" onclick="sw('profil')"><i class="ti ti-player-play" style="font-size:13px" aria-hidden="true"></i> Profil &amp; video</button>
+            <button class="btn btn-teal" style="margin-top:0" onclick="alert('Simulasi: Rp 100rb → kontak Nur terbuka')"><i class="ti ti-phone" style="font-size:13px" aria-hidden="true"></i> Buka kontak</button>
+          </div>
+        </div>
+
+        <!-- Card #2 -->
+        <div class="nanny-card">
+          <div class="card-top">
+            <div class="avatar-wrap"><div class="avatar" style="font-size:22px">👩</div><div class="click-hint">tap foto →</div></div>
+            <div class="card-meta">
+              <div class="card-name">Yuni S.</div>
+              <div class="card-sub">26 th · Tangerang · SMA · 3 th pengalaman</div>
+            </div>
+            <div class="score-pill" style="background:var(--orange-light);border-color:#F0BE9A">
+              <div class="score-num" style="color:#7A3D10">68%</div>
+              <div class="score-label" style="color:#7A3D10">cukup</div>
+            </div>
+          </div>
+          <div class="match-section">
+            <div class="tags"><span class="tag tag-teal">Non-menginap</span><span class="tag tag-orange">Jam kerja reguler saja</span></div>
+            <div class="see-more" onclick="toggleExpand('exp3',this)">
+              <i class="ti ti-chevron-down" style="font-size:12px" aria-hidden="true"></i> Lihat hasil lengkap &amp; analisa AI
+            </div>
+            <div class="expanded" id="exp3">
+              <div class="exp-kekuatan"><strong>Kecocokan:</strong> Cocok di pengalaman dan kemampuan.</div>
+              <div class="exp-catatan" style="margin-top:6px"><strong>Perlu Dipertimbangkan:</strong> Tidak terbiasa handle bayi di bawah 1 tahun.</div>
+            </div>
+          </div>
+          <div class="btn-split">
+            <button class="btn btn-ghost" onclick="alert('Profil Yuni')"><i class="ti ti-user" style="font-size:13px" aria-hidden="true"></i> Profil</button>
+            <button class="btn btn-outline" style="margin-top:0" onclick="alert('Rp 100rb → kontak Yuni')"><i class="ti ti-phone" style="font-size:13px" aria-hidden="true"></i> Buka kontak</button>
+          </div>
+        </div>
+
+        <div style="text-align:center;font-size:11px;color:var(--ink3);padding:8px 0">... 8 nanny lainnya ...</div>
+
+        <!-- TOMBOL CARI 10 BERIKUTNYA — koreksi dari diskusi BY-5 -->
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;margin-top:4px">
+          <div style="font-size:11px;color:var(--ink2);margin-bottom:8px">Belum menemukan yang pas dari 10 nanny ini?</div>
+          <button class="btn btn-ghost" onclick="alert('Simulasi: sistem generate 10 nanny berikutnya')">
+            <i class="ti ti-refresh" style="font-size:13px" aria-hidden="true"></i> Cari 10 nanny berikutnya
+          </button>
+          <div style="font-size:10px;color:var(--ink3);margin-top:6px">Diproses dalam beberapa detik</div>
+        </div>
+
+      </div>
+    </div>
+    <div class="scroll-hint">Flow B — "siap kerja" bukan "di area kamu" · batch 10 + generate berikutnya</div>
+  </div>
+</div>
+
+<!-- PROFIL & PORTFOLIO -->
+<div class="screen" id="screen-profil">
+  <div style="max-width:360px;margin:0 auto">
+    <div class="phone">
+      <div style="background:var(--bg);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+        <i class="ti ti-arrow-left" style="font-size:16px;color:var(--ink2);cursor:pointer" onclick="sw('flow-a')" aria-hidden="true"></i>
+        <span style="font-size:13px;font-weight:500">Profil Nanny</span>
+        <span style="margin-left:auto;font-size:10px;color:var(--teal-dark)">gratis dilihat</span>
+      </div>
+      <div class="prof-hero">
+        <div class="ph-av">🧕</div>
+        <div>
+          <div class="ph-name">Nur Pratiwi</div>
+          <div class="ph-sub">31 th · Depok · D1 PGTK<br>Menikah · 6 th pengalaman</div>
+          <div class="ph-score"><span class="ph-pct">91%</span><span class="ph-lbl">cocok dengan profilmu</span></div>
+        </div>
+      </div>
+      <div class="pb">
+        <div class="sl">Video perkenalan &amp; keahlian</div>
+        <div style="background:var(--teal-deeper);border-radius:10px;height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer" onclick="alert('Simulasi: video diputar')">
+          <div style="font-size:32px">🧕</div>
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:6px">▶</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:6px">Perkenalan diri · 2:34</div>
+        </div>
+        <div class="video-grid">
+          <div class="vthumb" onclick="alert('Video: cara gendong bayi')">
+            <div class="vthumb-img" style="background:#2C5F5A">👶<div class="vplay">▶</div></div>
+            <div class="vthumb-label">Cara gendong bayi<div class="vthumb-dur">1:12</div></div>
+          </div>
+          <div class="vthumb" onclick="alert('Video: bikin susu formula')">
+            <div class="vthumb-img" style="background:var(--purple-dark)">🍼<div class="vplay">▶</div></div>
+            <div class="vthumb-label">Bikin susu formula<div class="vthumb-dur">0:58</div></div>
+          </div>
+        </div>
+        <div class="sl" style="margin-top:14px">Foto masakan &amp; keahlian</div>
+        <div class="photo-grid">
+          <div class="pitem" onclick="alert('Foto: bubur MPASI')">🥣</div>
+          <div class="pitem" onclick="alert('Foto: sup ayam')">🍲</div>
+          <div class="pitem" onclick="alert('Foto: finger food')">🥕</div>
+          <div class="pitem" onclick="alert('Foto: tumis sayur')">🥦</div>
+          <div class="pitem" onclick="alert('Foto: nasi tim')">🍚</div>
+          <div class="pitem" style="border-style:dashed;flex-direction:column;gap:2px;color:var(--ink3);font-size:11px"><span style="font-size:16px">+</span>3 lagi</div>
+        </div>
+        <div class="sl">Hasil Tes Kecocokan</div>
+        <div class="exp-kekuatan">
+          <strong>Kecocokan Nanny &amp; Keluarga:</strong><br>Cocok di jadwal, pola asuh, dan gaya komunikasi.
+        </div>
+        <div class="exp-catatan" style="margin-top:6px;background:var(--orange-light);border-radius:8px;padding:8px;font-size:11px;color:#7A3D10">
+          <strong>Hal yang Perlu Dipertimbangkan:</strong><br>Tidak bisa bawa kendaraan.
+        </div>
+        <div class="sep"></div>
+        <div style="background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:11px;color:var(--ink2);margin-bottom:8px">Tertarik? Buka nomor kontaknya</div>
+          <button class="btn btn-teal" onclick="alert('Rp 100rb → kontak Nur terbuka')"><i class="ti ti-phone" style="font-size:13px" aria-hidden="true"></i> Buka kontak — Rp 100rb</button>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint">Profil &amp; portfolio · semua gratis dilihat · kontak berbayar</div>
+  </div>
+</div>
+
+<!-- ONBOARDING NANNY -->
+<div class="screen" id="screen-onboarding">
+  <div style="max-width:360px;margin:0 auto">
+    <div class="phone">
+      <div class="ph"><h3>Lengkapi Profil Kamu</h3><p>Profil lengkap = 3× lebih cepat dapat keluarga yang tepat</p></div>
+      <div class="pb">
+        <div class="step-row"><div class="snum s-done">✓</div><div><div style="font-size:12px;font-weight:500">Data diri</div><div style="font-size:11px;color:var(--ink2)">Nama, usia, kota, pengalaman</div><span class="sbadge sb-w">wajib</span></div></div>
+        <div class="step-row"><div class="snum s-done">✓</div><div><div style="font-size:12px;font-weight:500">Foto profil</div><div style="font-size:11px;color:var(--ink2)">Ambil langsung atau upload dari galeri. Wajib dari awal.</div><span class="sbadge sb-w">wajib · dari awal</span></div></div>
+        <div class="step-row"><div class="snum s-cur">3</div><div><div style="font-size:12px;font-weight:500">Tes Kecocokan</div><div style="font-size:11px;color:var(--ink2);line-height:1.5">Tentang kondisi kerja, nilai, dan kemampuanmu. Dari sini keluarga tahu seberapa cocok.</div><span class="sbadge sb-w">wajib · sedang berjalan</span></div></div>
+        <div class="step-row"><div class="snum s-opt">4</div><div><div style="font-size:12px;font-weight:500">Upload video perkenalan</div><div style="font-size:11px;color:var(--ink2);line-height:1.5">Ada panduan di dalam — kamu tidak perlu bingung mau ngomong apa. Bisa take langsung dari kamera HP atau upload dari galeri.</div><span class="sbadge sb-o">opsional · di akhir</span></div></div>
+        <div class="step-row"><div class="snum s-opt">5</div><div><div style="font-size:12px;font-weight:500">Foto masakan &amp; keahlian</div><div style="font-size:11px;color:var(--ink2)">Portfolio yang dilihat orang tua — seperti Instagram mini kamu.</div><span class="sbadge sb-o">opsional · kapan saja</span></div></div>
+        <div class="sep"></div>
+        <div class="note"><strong>Disclaimer:</strong> BundaYakin tidak melakukan background checking. Setiap informasi menjadi tanggung jawab masing-masing pihak. Lakukan pengecekan mandiri sebelum mulai bekerja. Tidak ada KTP yang diminta.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function sw(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const ids=['flow-a','flow-b','profil','onboarding'];
+    t.classList.toggle('active',ids[i]===id);
+  });
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+function selPlan(p){
+  document.getElementById('pa').classList.toggle('sel',p==='a');
+  document.getElementById('pb').classList.toggle('sel',p==='b');
+}
+function toggleExpand(id,el){
+  const exp=document.getElementById(id);
+  const open=exp.classList.toggle('open');
+  el.querySelector('i').style.transform=open?'rotate(180deg)':'rotate(0deg)';
+}
+</script>
+</body></html>

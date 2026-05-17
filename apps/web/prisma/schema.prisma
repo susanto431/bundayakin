@@ -35,6 +35,9 @@ enum MatchingStatus {
   PROCESSING      // AI sedang scoring
   COMPLETED       // hasil matching sudah ada
   NEGOTIATING     // ada dealbreaker, sedang dinegosiasi
+  ACCEPTED        // orang tua terima nanny
+  REJECTED        // orang tua tolak / auto-reject setelah deadline
+  EXPIRED         // masa eksklusif habis, nanny masuk talent pool
 }
 
 enum NannyType {
@@ -492,9 +495,22 @@ model MatchingRequest {
   layer           AssessmentLayer @default(LAYER_1)
   status          MatchingStatus  @default(PENDING)
 
+  // Bagaimana koneksi ini terjadi
+  connectionFlow  ConnectionFlowType? // REFERRAL (via kode) | TALENT_POOL
+
   // Survey completion flags
   parentSurveyDone  Boolean @default(false)
   nannySurveyDone   Boolean @default(false)
+
+  // Periode eksklusif — nanny terikat ke orang tua ini selama X hari
+  // Setelah exclusiveUntil lewat tanpa keputusan → auto-EXPIRED → nanny masuk talent pool
+  exclusiveUntil  DateTime? // 7 hari dari createdAt (null = tidak ada periode eksklusif)
+  extensionUsed   Boolean   @default(false) // apakah perpanjangan 3 hari sudah dipakai
+  extensionUntil  DateTime? // diisi saat perpanjangan diaktifkan (exclusiveUntil + 3 hari)
+
+  // Keputusan orang tua
+  parentDecision  String?   // "ACCEPTED" | "REJECTED"
+  decisionAt      DateTime? // kapan keputusan dibuat
 
   // Metadata
   nannyTypeRequested NannyType?

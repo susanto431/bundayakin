@@ -75,11 +75,15 @@ export async function POST(req: NextRequest) {
                 select: { id: true },
               })
               if (parentProfile) {
+                const exclusiveUntil = new Date()
+                exclusiveUntil.setDate(exclusiveUntil.getDate() + 7)
                 await prisma.matchingRequest.create({
                   data: {
                     parentProfileId: parentProfile.id,
                     nannyProfileId: nannyProfile.id,
                     status: "PENDING",
+                    connectionFlow: "REFERRAL",
+                    exclusiveUntil,
                   },
                 })
                 console.info("[REGISTER] MatchingRequest created via familyCode", familyCode)

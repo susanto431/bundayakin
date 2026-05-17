@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Feature Breakdown — BundaYakin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#5BBFB0;--teal-dark:#2C5F5A;--teal-deeper:#1E4A45;--teal-mid:#A8DDD8;--teal-light:#E5F6F4;
+  --purple:#A97CC4;--purple-dark:#5A3A7A;--purple-mid:#E0D0F0;--purple-light:#F3EEF8;
+  --orange:#E07B39;--orange-light:#FEF0E7;--orange-border:#F5C4A0;
+  --red:#C75D5D;--red-light:#FAEAEA;--red-border:#F0B8B8;
+  --blue:#5B7EC9;--blue-light:#EEF2FC;--blue-border:#B5C8EF;
+  --ink:#5A3A7A;--ink2:#666666;--ink3:#999AAA;
+  --border:#E0D0F0;--surface:#FFFFFF;--bg:#F3EEF8;
+  --sidebar-w:240px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:#333;line-height:1.6}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);position:fixed;top:0;left:0;height:100vh;background:var(--purple-dark);overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+.main{margin-left:var(--sidebar-w);flex:1;padding:2rem 2.5rem;max-width:960px}
+
+/* ── SIDEBAR ── */
+.sidebar-logo{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo .wordmark{font-family:'DM Serif Display',serif;font-style:italic;font-size:1.35rem;color:#fff}
+.sidebar-logo .tagline{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;letter-spacing:.5px}
+.sidebar-nav{padding:.75rem 0;flex:1}
+.nav-section{padding:.5rem 1.25rem .25rem;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:.5rem}
+.nav-link{display:block;padding:.45rem 1.25rem;font-size:12px;color:rgba(255,255,255,.7);text-decoration:none;transition:all .15s;border-left:3px solid transparent}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.07);border-left-color:var(--teal)}
+.nav-link.active{color:#fff;background:rgba(91,191,176,.15);border-left-color:var(--teal);font-weight:600}
+.nav-link .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.dot-parent{background:var(--teal)}
+.dot-nanny{background:var(--purple)}
+.dot-admin{background:var(--orange)}
+.dot-shared{background:var(--blue)}
+
+/* ── HEADER ── */
+.page-header{margin-bottom:2rem}
+.page-header .kicker{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal-dark);margin-bottom:.5rem}
+.page-header h1{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--purple-dark);line-height:1.2}
+.page-header .subtitle{color:var(--ink2);margin-top:.5rem;font-size:.9rem}
+.decisions-box{background:var(--purple-dark);border-radius:16px;padding:1.25rem 1.5rem;margin-top:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem}
+.dec-item{display:flex;align-items:flex-start;gap:.5rem;font-size:12px;color:rgba(255,255,255,.8)}
+.dec-item::before{content:'✓';background:var(--teal);color:#fff;width:16px;height:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px}
+.dec-item strong{color:#fff}
+
+/* ── SECTION ── */
+section{margin-bottom:3rem;scroll-margin-top:1.5rem}
+.section-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:2px solid var(--border)}
+.section-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.icon-parent{background:var(--teal-light)}
+.icon-nanny{background:var(--purple-light)}
+.icon-admin{background:var(--orange-light)}
+.icon-shared{background:var(--blue-light)}
+.section-header h2{font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--purple-dark)}
+.section-header .role-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;letter-spacing:.5px}
+.badge-parent{background:var(--teal-light);color:var(--teal-dark);border:1px solid var(--teal-mid)}
+.badge-nanny{background:var(--purple-light);color:var(--purple-dark);border:1px solid var(--purple-mid)}
+.badge-admin{background:var(--orange-light);color:#7A3D10;border:1px solid var(--orange-border)}
+
+/* ── ROLE OVERVIEW TABLE ── */
+.role-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(90,58,122,.07)}
+.role-table th{padding:.75rem 1rem;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--purple-dark);color:rgba(255,255,255,.7)}
+.role-table td{padding:.85rem 1rem;font-size:13px;border-bottom:1px solid var(--border)}
+.role-table tr:last-child td{border-bottom:none}
+.role-table tr:hover td{background:var(--bg)}
+.role-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px}
+.role-tag.parent{background:var(--teal-light);color:var(--teal-dark)}
+.role-tag.nanny{background:var(--purple-light);color:var(--purple-dark)}
+.role-tag.admin{background:var(--orange-light);color:#7A3D10}
+.route-code{font-family:monospace;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--ink)}
+
+/* ── STATUS BADGES ── */
+.status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;border:1px solid}
+.status::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.status-aktif{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}.status-aktif::before{background:var(--teal)}
+.status-api{background:var(--blue-light);color:var(--blue);border-color:var(--blue-border)}.status-api::before{background:var(--blue)}
+.status-dev{background:var(--orange-light);color:#7A3D10;border-color:var(--orange-border)}.status-dev::before{background:var(--orange)}
+.status-pending{background:var(--red-light);color:var(--red);border-color:var(--red-border)}.status-pending::before{background:var(--red)}
+
+/* ── FEATURE LIST ── */
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem}
+.feat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;transition:box-shadow .15s}
+.feat-card:hover{box-shadow:0 2px 8px rgba(90,58,122,.08)}
+.feat-card .feat-num{font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:.5px;margin-bottom:.35rem}
+.feat-card .feat-name{font-size:13px;font-weight:600;color:var(--purple-dark);margin-bottom:.4rem;line-height:1.3}
+.feat-card .feat-price{font-size:11px;color:var(--ink2);margin-top:.35rem}
+
+/* ── JOURNEY ── */
+.journey-block{margin-bottom:1.75rem}
+.journey-title{font-size:13px;font-weight:700;color:var(--purple-dark);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.journey-title .jnum{background:var(--purple-dark);color:#fff;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.steps{position:relative;padding-left:1.5rem}
+.steps::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--purple-mid)}
+.step{position:relative;margin-bottom:.85rem}
+.step-dot{position:absolute;left:-1.5rem;top:4px;width:14px;height:14px;border-radius:50%;border:2px solid var(--surface);flex-shrink:0;z-index:1}
+.step-dot-teal{background:var(--teal)}
+.step-dot-purple{background:var(--purple-dark)}
+.step-dot-orange{background:var(--orange)}
+.step-dot-blue{background:var(--blue)}
+.step-dot-gray{background:var(--ink3)}
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem}
+.step-card.highlight{border-color:var(--teal-mid);background:var(--teal-light)}
+.step-card.warn{border-color:var(--orange-border);background:var(--orange-light)}
+.step-card.info{border-color:var(--blue-border);background:var(--blue-light)}
+.step-label{font-size:12px;font-weight:700;color:var(--purple-dark);margin-bottom:.2rem}
+.step-desc{font-size:11px;color:var(--ink2);line-height:1.5}
+.step-api{font-family:monospace;font-size:10px;color:var(--teal-dark);background:rgba(91,191,176,.1);padding:2px 6px;border-radius:4px;margin-top:.3rem;display:inline-block}
+.step-note{font-size:10px;color:var(--orange);font-weight:600;margin-top:.3rem}
+.step-branch{display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap}
+.branch-pill{font-size:10px;padding:2px 8px;border-radius:6px;border:1px solid;font-weight:500}
+.branch-yes{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}
+.branch-no{background:var(--red-light);color:var(--red);border-color:var(--red-border)}
+.branch-info{background:var(--blue-light);color:var(--blue);border-color:var(--blue-border)}
+
+/* ── QUOTA MODEL ── */
+.quota-model{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1.5rem}
+.quota-model-head{background:var(--purple-dark);padding:.85rem 1.25rem;display:flex;align-items:center;gap:.5rem}
+.quota-model-head h4{color:#fff;font-size:13px;font-weight:600}
+.quota-rows{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.quota-cell{padding:.85rem 1rem;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.quota-cell:last-child{border-right:none}
+.quota-cell:nth-last-child(-n+3){border-bottom:none}
+.quota-cell .ql{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:.3rem}
+.quota-cell .qv{font-size:14px;font-weight:700;color:var(--purple-dark)}
+.quota-cell .qs{font-size:10px;color:var(--ink2);margin-top:.2rem}
+
+/* ── STATE DIAGRAM ── */
+.state-diagram{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.75rem 0;padding:1rem 1.25rem;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.state-node{font-size:11px;font-weight:600;padding:5px 12px;border-radius:8px;white-space:nowrap}
+.state-arrow{color:var(--ink3);font-size:14px;font-weight:300}
+.sn-gray{background:var(--bg);color:var(--ink);border:1px solid var(--border)}
+.sn-blue{background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-border)}
+.sn-teal{background:var(--teal-light);color:var(--teal-dark);border:1px solid var(--teal-mid)}
+.sn-orange{background:var(--orange-light);color:#7A3D10;border:1px solid var(--orange-border)}
+.sn-red{background:var(--red-light);color:var(--red);border:1px solid var(--red-border)}
+
+/* ── MATRIX TABLE ── */
+.matrix{width:100%;border-collapse:collapse;background:var(--surface);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(90,58,122,.07);font-size:12px}
+.matrix th{padding:.6rem .85rem;text-align:center;background:var(--purple-dark);color:rgba(255,255,255,.8);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.matrix th:first-child{text-align:left}
+.matrix td{padding:.6rem .85rem;border-bottom:1px solid var(--border);text-align:center;color:var(--ink2)}
+.matrix td:first-child{text-align:left;color:var(--purple-dark);font-weight:500}
+.matrix tr:last-child td{border-bottom:none}
+.matrix tr:hover td{background:var(--bg)}
+.check{color:var(--teal);font-size:14px}
+.cross{color:var(--ink3)}
+.partial{color:var(--orange);font-size:11px;font-weight:500}
+
+/* ── CALLOUT ── */
+.callout{border-radius:12px;padding:1rem 1.25rem;margin:.75rem 0;display:flex;gap:.75rem;align-items:flex-start}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.callout-body .callout-title{font-size:12px;font-weight:700;margin-bottom:.2rem}
+.callout-body p{font-size:12px;line-height:1.5}
+.callout-warn{background:var(--orange-light);border:1px solid var(--orange-border)}
+.callout-warn .callout-title{color:#7A3D10}
+.callout-warn p{color:#8B4515}
+.callout-info{background:var(--blue-light);border:1px solid var(--blue-border)}
+.callout-info .callout-title{color:var(--blue)}
+.callout-info p{color:#3A5A9A}
+.callout-success{background:var(--teal-light);border:1px solid var(--teal-mid)}
+.callout-success .callout-title{color:var(--teal-dark)}
+.callout-success p{color:var(--teal-dark)}
+
+/* ── LAYER TABLE ── */
+.layer-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:1rem}
+.layer-table th{padding:.6rem 1rem;text-align:left;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--bg);color:var(--ink2)}
+.layer-table td{padding:.75rem 1rem;font-size:12px;border-top:1px solid var(--border)}
+.layer-table tr td:first-child{font-weight:600;color:var(--purple-dark)}
+
+/* ── MISC ── */
+.divider{border:none;border-top:1.5px solid var(--border);margin:2rem 0}
+.sub-section{margin-bottom:1.5rem}
+.sub-section h3{font-size:14px;font-weight:700;color:var(--purple-dark);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.sub-section h3::before{content:'';display:block;width:3px;height:16px;background:var(--teal);border-radius:2px}
+.tag-row{display:flex;gap:.4rem;flex-wrap:wrap;margin:.5rem 0}
+.tag{font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid;font-weight:500}
+.tag-teal{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}
+.tag-purple{background:var(--purple-light);color:var(--purple-dark);border-color:var(--purple-mid)}
+.tag-orange{background:var(--orange-light);color:#7A3D10;border-color:var(--orange-border)}
+.footer-note{font-size:11px;color:var(--ink3);margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);line-height:1.7}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="wordmark">BundaYakin</div>
+    <div class="tagline">FEATURE BREAKDOWN · MEI 2026</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Gambaran Umum</div>
+    <a class="nav-link" href="#overview">Role Overview</a>
+    <a class="nav-link" href="#tech">Stack Keputusan</a>
+
+    <div class="nav-section">Role: Parent</div>
+    <a class="nav-link" href="#parent-features"><span class="dot dot-parent"></span>Daftar Fitur</a>
+    <a class="nav-link" href="#parent-j1"><span class="dot dot-parent"></span>J1 · Registrasi</a>
+    <a class="nav-link" href="#parent-j2"><span class="dot dot-parent"></span>J2 · Cari Nanny</a>
+    <a class="nav-link" href="#parent-j3"><span class="dot dot-parent"></span>J3 · Placement</a>
+    <a class="nav-link" href="#parent-j4"><span class="dot dot-parent"></span>J4 · Monitoring</a>
+    <a class="nav-link" href="#parent-j5"><span class="dot dot-parent"></span>J5 · Ganti Nanny</a>
+    <a class="nav-link" href="#parent-j6"><span class="dot dot-parent"></span>J6 · Kuota Koneksi</a>
+    <a class="nav-link" href="#parent-j7"><span class="dot dot-parent"></span>J7 · Referral</a>
+
+    <div class="nav-section">Role: Nanny</div>
+    <a class="nav-link" href="#nanny-features"><span class="dot dot-nanny"></span>Daftar Fitur</a>
+    <a class="nav-link" href="#nanny-j1"><span class="dot dot-nanny"></span>J1 · Setup Profil</a>
+    <a class="nav-link" href="#nanny-j2"><span class="dot dot-nanny"></span>J2 · Tes Kecocokan</a>
+    <a class="nav-link" href="#nanny-j3"><span class="dot dot-nanny"></span>J3 · Hasil Matching</a>
+    <a class="nav-link" href="#nanny-j4"><span class="dot dot-nanny"></span>J4 · Aktif Bekerja</a>
+    <a class="nav-link" href="#nanny-j5"><span class="dot dot-nanny"></span>J5 · Open to Job</a>
+    <a class="nav-link" href="#nanny-j6"><span class="dot dot-nanny"></span>J6 · Referral</a>
+
+    <div class="nav-section">Role: Admin</div>
+    <a class="nav-link" href="#admin-features"><span class="dot dot-admin"></span>Daftar Fitur</a>
+    <a class="nav-link" href="#admin-j1"><span class="dot dot-admin"></span>J1 · Switch Role</a>
+    <a class="nav-link" href="#admin-j2"><span class="dot dot-admin"></span>J2 · Analytics</a>
+
+    <div class="nav-section">Lintas Role</div>
+    <a class="nav-link" href="#shared"><span class="dot dot-shared"></span>Auth & Settings</a>
+    <a class="nav-link" href="#states"><span class="dot dot-shared"></span>State Diagram</a>
+    <a class="nav-link" href="#matrix"><span class="dot dot-shared"></span>Matriks Fitur</a>
+  </nav>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="kicker">Dokumentasi Produk</div>
+  <h1>Feature Breakdown</h1>
+  <p class="subtitle">Semua fitur per role, user journey, dan status implementasi per 17 Mei 2026.</p>
+  <div class="decisions-box">
+    <div class="dec-item"><strong>Terminologi:</strong> "Survey Matching" → "Tes Kecocokan" di semua UI user-facing</div>
+    <div class="dec-item"><strong>KTP:</strong> Tidak diminta dari nanny — tidak ada background checking</div>
+    <div class="dec-item"><strong>Payment:</strong> Mayar (menggantikan Midtrans) — menunggu verifikasi akun</div>
+    <div class="dec-item"><strong>Kuota Koneksi:</strong> 3 gratis/30 hari referral · +7 dengan langganan</div>
+    <div class="dec-item"><strong>Score:</strong> ≥80% teal · 60–79% orange · &lt;60% red</div>
+    <div class="dec-item"><strong>Media:</strong> Foto → Cloudflare R2 · Video → Cloudflare Stream</div>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="tag-row" style="margin-bottom:2rem">
+  <span style="font-size:11px;color:var(--ink2);margin-right:.25rem">Status:</span>
+  <span class="status status-aktif">Aktif</span>
+  <span class="status status-api">API siap · UI pending</span>
+  <span class="status status-dev">Dalam pengembangan</span>
+  <span class="status status-pending">Pending verifikasi</span>
+</div>
+
+<hr class="divider" />
+
+<!-- ── ROLE OVERVIEW ── -->
+<section id="overview">
+  <div class="section-header">
+    <div class="section-icon icon-shared">👥</div>
+    <h2>Gambaran Umum Role</h2>
+  </div>
+  <table class="role-table">
+    <thead>
+      <tr><th>Role</th><th>Akses</th><th>Monetisasi</th><th>Route</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="role-tag parent">PARENT</span></td>
+        <td>Dashboard orang tua, matching, monitoring, evaluasi</td>
+        <td>Rp 500.000/tahun + add-on</td>
+        <td><span class="route-code">/dashboard/parent/*</span></td>
+      </tr>
+      <tr>
+        <td><span class="role-tag nanny">NANNY</span></td>
+        <td>Dashboard nanny, profil, Tes Kecocokan, monitoring</td>
+        <td>Gratis selamanya</td>
+        <td><span class="route-code">/dashboard/nanny/*</span></td>
+      </tr>
+      <tr>
+        <td><span class="role-tag admin">ADMIN</span></td>
+        <td>Internal HCC, switch role untuk testing</td>
+        <td>—</td>
+        <td><span class="route-code">/dashboard/admin/*</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── TECH STACK ── -->
+<section id="tech">
+  <div class="section-header">
+    <div class="section-icon icon-shared">⚙️</div>
+    <h2>Stack &amp; Keputusan Teknis</h2>
+  </div>
+  <table class="layer-table">
+    <thead><tr><th>Layer</th><th>Teknologi</th><th>Keterangan</th></tr></thead>
+    <tbody>
+      <tr><td>Framework</td><td>Next.js 14 App Router</td><td>Full-stack — <code>src/app/api/</code> = serverless Vercel</td></tr>
+      <tr><td>Database</td><td>Neon (PostgreSQL serverless)</td><td>ORM Prisma — push via <code>npx prisma db push</code></td></tr>
+      <tr><td>Auth</td><td>NextAuth v5 (Auth.js beta)</td><td>Role: PARENT · NANNY · ADMIN</td></tr>
+      <tr><td>Payment</td><td>Mayar</td><td>Menggantikan Midtrans — HMAC-SHA256 webhook</td></tr>
+      <tr><td>Foto</td><td>Cloudflare R2</td><td>Bucket: <code>bundayakin-media</code> · domain: <code>media.bundayakin.com</code></td></tr>
+      <tr><td>Video</td><td>Cloudflare Stream</td><td>Max 3 menit/video · direct upload dari browser</td></tr>
+      <tr><td>AI Scoring</td><td>Anthropic Claude API</td><td>Model: <code>claude-sonnet-4-20250514</code> · max_tokens: 2000</td></tr>
+      <tr><td>Email</td><td>Resend</td><td>Transactional email</td></tr>
+      <tr><td>Deploy</td><td>Vercel (web) · Railway (PDF)</td><td>Push ke <code>main</code> = auto deploy</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<hr class="divider" />
+
+<!-- ════════════════════════════════════ PARENT ════════════════════════════════════ -->
+<section id="parent">
+  <div class="section-header">
+    <div class="section-icon icon-parent">👩</div>
+    <h2>Role: PARENT</h2>
+    <span class="role-badge badge-parent">Orang Tua</span>
+  </div>
+
+  <!-- Feature List -->
+  <div id="parent-features" class="sub-section">
+    <h3>Daftar Fitur</h3>
+    <div class="feature-grid">
+      <div class="feat-card"><div class="feat-num">P-1</div><div class="feat-name">Registrasi &amp; Login</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">P-2</div><div class="feat-name">Profil Orang Tua</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">P-3</div><div class="feat-name">Profil Anak</div><span class="status status-aktif">Aktif</span><div class="feat-price">Dalam langganan</div></div>
+      <div class="feat-card"><div class="feat-num">P-4</div><div class="feat-name">Langganan Tahunan (via Mayar)</div><span class="status status-pending">Pending verifikasi Mayar</span><div class="feat-price">Rp 500.000/tahun</div></div>
+      <div class="feat-card"><div class="feat-num">P-5</div><div class="feat-name">Tes Kecocokan Layer 1</div><span class="status status-aktif">Aktif</span><div class="feat-price">Dalam langganan</div></div>
+      <div class="feat-card"><div class="feat-num">P-6</div><div class="feat-name">Direktori Nanny (Browse)</div><span class="status status-aktif">Aktif</span><div class="feat-price">Dalam langganan</div></div>
+      <div class="feat-card"><div class="feat-num">P-7</div><div class="feat-name">Hasil Matching AI</div><span class="status status-aktif">Aktif</span><div class="feat-price">Dalam langganan</div></div>
+      <div class="feat-card"><div class="feat-num">P-8</div><div class="feat-name">Kuota Koneksi (buka kontak nanny)</div><span class="status status-aktif">Aktif</span><div class="feat-price">3/bln gratis · +7 langganan · Rp 100rb/extra</div></div>
+      <div class="feat-card"><div class="feat-num">P-9</div><div class="feat-name">Placement (Mulai Kerja Sama)</div><span class="status status-aktif">Aktif</span><div class="feat-price">Dalam langganan</div></div>
+      <div class="feat-card"><div class="feat-num">P-10</div><div class="feat-name">Check-in Mingguan (Week 1 &amp; 2)</div><span class="status status-aktif">Aktif</span><div class="feat-price">Dalam langganan</div></div>
+      <div class="feat-card"><div class="feat-num">P-11</div><div class="feat-name">Evaluasi Bulanan (Bln 1, 3, dst)</div><span class="status status-aktif">Aktif</span><div class="feat-price">Dalam langganan</div></div>
+      <div class="feat-card"><div class="feat-num">P-12</div><div class="feat-name">Laporan Evaluasi PDF</div><span class="status status-aktif">Aktif</span><div class="feat-price">Dalam langganan</div></div>
+      <div class="feat-card"><div class="feat-num">P-13</div><div class="feat-name">Tes Psikologi AI Layer 2</div><span class="status status-dev">Dalam pengembangan</span><div class="feat-price">+Rp 300.000/kandidat</div></div>
+      <div class="feat-card"><div class="feat-num">P-14</div><div class="feat-name">Review Psikolog Layer 3</div><span class="status status-dev">Dalam pengembangan</span><div class="feat-price">+Rp 1.200.000–1.500.000</div></div>
+      <div class="feat-card"><div class="feat-num">P-15</div><div class="feat-name">Akses Rekam Jejak Nanny</div><span class="status status-aktif">Aktif</span><div class="feat-price">+Rp 50.000/nanny</div></div>
+      <div class="feat-card"><div class="feat-num">P-16</div><div class="feat-name">Program Referral</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis (dapat bonus)</div></div>
+    </div>
+
+    <!-- Sistem Layer -->
+    <h3 style="margin-top:1.25rem">Sistem Matching 3 Layer</h3>
+    <table class="layer-table" style="margin-top:.75rem">
+      <thead><tr><th>Layer</th><th>Nama</th><th>Harga</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>Layer 1</td><td>Tes Kecocokan AI</td><td>Gratis (dalam langganan)</td><td>% kecocokan, area match/mismatch, tips</td></tr>
+        <tr><td>Layer 2</td><td>+ Psikotes AI</td><td>+Rp 300.000</td><td>Detail per aspek, gap analysis</td></tr>
+        <tr><td>Layer 3</td><td>+ Review Psikolog HCC</td><td>+Rp 1.200.000–1.500.000</td><td>Catatan psikolog, rekomendasi tertulis</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Journey 1 -->
+  <div id="parent-j1" class="journey-block">
+    <div class="journey-title"><span class="jnum">1</span> Registrasi &amp; Onboarding Pertama</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Landing Page</div><div class="step-desc">Klik "Daftar Sebagai Orang Tua"</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Register — /auth/register/parent/</div><div class="step-desc">Isi: nama, email, password</div><div class="step-api">POST /api/auth/register { role: PARENT }</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Dashboard Orang Tua — /dashboard/parent/</div><div class="step-desc">Login otomatis, banner "Lengkapi profil Anda dulu"</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Isi Profil</div><div class="step-desc">Nama lengkap, nomor HP, alamat, kota/provinsi, foto profil</div><div class="step-api">PATCH /api/parent/profile</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Tambah Profil Anak</div><div class="step-desc">Nama, tanggal lahir, kelompok usia, catatan medis, alergi, jadwal harian, daftar boleh/tidak boleh</div><div class="step-api">POST /api/parent/children</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-orange"></div>
+        <div class="step-card warn"><div class="step-label">Langganan — /dashboard/parent/subscription/</div>
+        <div class="step-desc">Rp 500.000/tahun → redirect ke halaman pembayaran Mayar → bayar (transfer/QRIS/e-wallet) → Webhook HMAC-SHA256 → Subscription ACTIVE</div>
+        <div class="step-api">POST /api/payment/create → paymentUrl Mayar</div>
+        <div class="step-api">POST /api/payment/webhook (Mayar → server)</div>
+        <div class="step-note">⚠ MayarButton sedang dikembangkan — menunggu verifikasi akun Mayar</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 2 -->
+  <div id="parent-j2" class="journey-block">
+    <div class="journey-title"><span class="jnum">2</span> Cari Nanny &amp; Mulai Matching</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Direktori Nanny — /dashboard/parent/cari-nanny/direktori/</div><div class="step-desc">Filter: kota, tipe nanny. Tampil kartu nanny: foto, usia, pengalaman, kota</div><div class="step-api">GET /api/nanny/directory?city=...&type=...</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Lihat Detail Nanny (Drawer)</div><div class="step-desc">Profil lengkap, skor matching (jika sudah dihitung), tombol "Mulai Matching" atau "Pakai kuota"</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Tes Kecocokan — /dashboard/parent/matching/survey/</div><div class="step-desc">53 pertanyaan · 9 subdomain (A1–C4) · pilihan ganda + skala + free text · dapat tandai DEALBREAKER</div><div class="step-api">POST /api/survey/save</div>
+        <div class="step-branch">
+          <span class="branch-info">≥80% → teal "sangat cocok"</span>
+          <span class="branch-yes">60–79% → orange "cukup cocok"</span>
+          <span class="branch-no">&lt;60% → red "perlu dipertimbangkan"</span>
+        </div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card"><div class="step-label">Kalkulasi Skor AI — Otomatis</div><div class="step-desc">Jawaban parent + nanny dibandingan → Claude API (claude-sonnet-4-20250514) → JSON: skor per domain, kekuatan, mismatch, tips → disimpan di MatchingResult (cache permanen)</div><div class="step-api">POST /api/matching/score</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Hasil Matching — /dashboard/parent/matching/[id]/</div><div class="step-desc">Skor keseluruhan 0–100, per domain A/B/C, area kekuatan &amp; mismatch, tips, negosiasi dealbreaker</div>
+        <div class="step-branch">
+          <span class="branch-yes">Cocok → Journey 3: Placement</span>
+          <span class="branch-no">Tidak cocok → kembali ke direktori</span>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 3 -->
+  <div id="parent-j3" class="journey-block">
+    <div class="journey-title"><span class="jnum">3</span> Placement (Mulai Kerja Sama Resmi)</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Halaman Placement — /dashboard/parent/matching/[id]/placement/</div><div class="step-desc">Isi: tanggal mulai, tipe nanny (live-in/live-out/infal/temporary), gaji disepakati</div><div class="step-api">POST /api/matching/placement → NannyAssignment dibuat</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Dashboard — Banner Aktif</div><div class="step-desc">"Nanny [Nama] mulai bekerja sejak [tanggal]" · jadwal monitoring otomatis aktif</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 4 -->
+  <div id="parent-j4" class="journey-block">
+    <div class="journey-title"><span class="jnum">4</span> Monitoring &amp; Evaluasi Berkala</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Week 1 — 7 Hari Setelah Mulai</div><div class="step-desc">5 pertanyaan singkat: kondisi umum, komunikasi, kenyamanan</div><div class="step-api">POST /api/parent/monitoring { type: WEEK_1 }</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Week 2 — Check-in Kedua</div><div class="step-desc">Proses sama seperti Week 1</div><div class="step-api">POST /api/parent/monitoring { type: WEEK_2 }</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Bulan 1 — Evaluasi Penuh</div><div class="step-desc">10+ pertanyaan: ketepatan waktu, kebersihan, komunikasi, adaptasi, hubungan dengan anak · keputusan: Lanjut / Pertimbangkan Lagi</div><div class="step-api">POST /api/parent/monitoring { type: MONTH_1 }</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card"><div class="step-label">Ringkasan Evaluasi — /monitoring/summary/</div><div class="step-desc">Skor per aspek, tren dari waktu ke waktu, rekomendasi AI, unduh PDF laporan (opsional)</div>
+        <div class="step-branch">
+          <span class="branch-yes">Lanjut → jadwal Bulan 3 otomatis</span>
+          <span class="branch-no">Ganti → Journey 5: Knowledge Transfer</span>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 5 -->
+  <div id="parent-j5" class="journey-block">
+    <div class="journey-title"><span class="jnum">5</span> Ganti Nanny &amp; Knowledge Transfer</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Evaluasi — Keputusan: Ganti Nanny</div><div class="step-desc">Sistem kompilasi otomatis: ringkasan evaluasi nanny lama, catatan anak, tips yang berhasil, area yang perlu perhatian</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Kembali ke Cari Nanny</div><div class="step-desc">Profil anak sudah ada → skip pengisian ulang · Tes Kecocokan parent tersimpan → bisa reuse atau diperbarui · Knowledge Transfer report tersedia untuk nanny baru</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 6 — Kuota Koneksi -->
+  <div id="parent-j6" class="journey-block">
+    <div class="journey-title"><span class="jnum">6</span> Kuota Koneksi — Buka Kontak Nanny</div>
+
+    <div class="quota-model">
+      <div class="quota-model-head">
+        <h4>Model Kuota Koneksi (menggantikan pay-per-unlock lama)</h4>
+      </div>
+      <div class="quota-rows">
+        <div class="quota-cell"><div class="ql">Gratis</div><div class="qv">3 koneksi</div><div class="qs">per 30 hari — Flow A referral saja</div></div>
+        <div class="quota-cell"><div class="ql">Langganan Rp 500rb/th</div><div class="qv">10 koneksi</div><div class="qs">3 referral + 7 talent pool per bulan</div></div>
+        <div class="quota-cell"><div class="ql">Kuota habis</div><div class="qv">Rp 100.000</div><div class="qs">per koneksi tambahan via Mayar</div></div>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Flow A — Nanny yang Kamu Undang (Referral)</div><div class="step-desc">Nanny yang isi Tes Kecocokan via kode referral parent · label: "Pakai kuota (sisa X)"</div>
+        <div class="step-branch">
+          <span class="branch-yes">Kuota tersisa → POST /api/matching/unlock → kontak terbuka</span>
+          <span class="branch-no">Kuota habis → pilih: Rp 100rb/nanny ini ATAU langganan Rp 500rb</span>
+        </div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Flow B — Talent Pool (AI rekomendasikan)</div><div class="step-desc">Sistem pilihkan 10 nanny terbaik berdasarkan Tes Kecocokan · batch 10 sekaligus, ada "Cari 10 nanny berikutnya" · hanya untuk subscriber (7 slot/bulan)</div>
+        <div class="step-note">⚠ UI Flow A & Flow B masih dalam pengembangan</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 7 -->
+  <div id="parent-j7" class="journey-block">
+    <div class="journey-title"><span class="jnum">7</span> Referral Orang Tua</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Kode Referral Unik</div><div class="step-desc">Tampil di dashboard dan menu referral · bagikan via WA atau copy</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card"><div class="step-label">Tracking Referral</div><div class="step-desc">PENDING → REGISTERED → DEAL → PAID · Bonus dikreditkan ke akun parent setelah DEAL terjadi</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ════════════════════════════════════ NANNY ════════════════════════════════════ -->
+<section id="nanny">
+  <div class="section-header">
+    <div class="section-icon icon-nanny">🧑‍🍼</div>
+    <h2>Role: NANNY</h2>
+    <span class="role-badge badge-nanny">Nanny</span>
+  </div>
+
+  <!-- Feature List -->
+  <div id="nanny-features" class="sub-section">
+    <h3>Daftar Fitur</h3>
+    <div class="feature-grid">
+      <div class="feat-card"><div class="feat-num">N-1</div><div class="feat-name">Registrasi &amp; Login</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-2</div><div class="feat-name">Setup Profil Lengkap (tanpa KTP)</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-2b</div><div class="feat-name">Video Perkenalan &amp; Keahlian (CF Stream)</div><span class="status status-api">API siap · UI pending</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-2c</div><div class="feat-name">Foto Portfolio Masakan &amp; Keahlian (CF R2)</div><span class="status status-api">API siap · UI pending</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-3</div><div class="feat-name">CV Digital</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-4</div><div class="feat-name">Toggle "Open to Job"</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-5</div><div class="feat-name">Tes Kecocokan</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-6</div><div class="feat-name">Lihat Hasil Matching</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-7</div><div class="feat-name">Lihat Profil Anak (saat aktif)</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-8</div><div class="feat-name">Check-in Mingguan</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-9</div><div class="feat-name">Evaluasi Berkala</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-10</div><div class="feat-name">Unduh Laporan Evaluasi</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-11</div><div class="feat-name">Rekam Jejak Digital</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis</div></div>
+      <div class="feat-card"><div class="feat-num">N-12</div><div class="feat-name">Program Referral Nanny</div><span class="status status-aktif">Aktif</span><div class="feat-price">Gratis (dapat bonus)</div></div>
+    </div>
+
+    <div class="callout callout-success" style="margin-top:.75rem">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">KTP Tidak Diminta</div>
+        <p>Platform BundaYakin tidak meminta KTP dan tidak melakukan background checking. Verifikasi identitas bukan tanggung jawab platform.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Journey 1 -->
+  <div id="nanny-j1" class="journey-block">
+    <div class="journey-title"><span class="jnum">1</span> Registrasi &amp; Setup Profil (5 Langkah)</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Register — /auth/register/nanny/</div><div class="step-desc">Isi: nama, email, password</div><div class="step-api">POST /api/auth/register { role: NANNY }</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Langkah 1 · Data Diri (wajib)</div><div class="step-desc">Usia, pendidikan terakhir, kota domisili, foto profil (wajib), bio singkat<br><strong>⚠ KTP tidak diminta</strong></div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Langkah 2 · Preferensi Kerja (wajib)</div><div class="step-desc">Tipe nanny, kelompok usia anak, kisaran gaji, lingkup tugas</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Langkah 3 · Tes Kecocokan (wajib)</div><div class="step-desc">53 pertanyaan — dari sini keluarga tahu seberapa cocok dengan nanny</div><div class="step-api">POST /api/survey/save</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-gray"></div>
+        <div class="step-card"><div class="step-label">Langkah 4 · Video Perkenalan (opsional)</div><div class="step-desc">Max 3 menit via Cloudflare Stream · panduan topik tersedia · bisa dari kamera HP atau galeri</div><div class="step-api">POST /api/upload/video → uploadUrl CF Stream</div><div class="step-note">⚠ UI upload dalam pengembangan</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-gray"></div>
+        <div class="step-card"><div class="step-label">Langkah 5 · Foto Portfolio (opsional, kapan saja)</div><div class="step-desc">Max 9 foto · JPG/PNG/WebP · max 5 MB/foto · tampil seperti "Instagram mini" di profil</div><div class="step-api">POST /api/upload { type: PORTFOLIO_PHOTO }</div><div class="step-note">⚠ UI upload dalam pengembangan</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 2 -->
+  <div id="nanny-j2" class="journey-block">
+    <div class="journey-title"><span class="jnum">2</span> Tes Kecocokan</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Tes Kecocokan Nanny — /dashboard/nanny/survey/</div><div class="step-desc">53 pertanyaan · sama struktur dengan orang tua, kalimat berbeda · simpan progress di localStorage · dapat tandai DEALBREAKER</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card"><div class="step-label">Submit</div><div class="step-desc">Jawaban tersimpan di SurveyResponse · profil muncul di direktori (jika Open to Job = ON)</div><div class="step-api">POST /api/survey/save</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-gray"></div>
+        <div class="step-card"><div class="step-label">Menunggu Orang Tua</div><div class="step-desc">Tampil: "Tes Kecocokan kamu sudah siap digunakan untuk matching"</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 3 -->
+  <div id="nanny-j3" class="journey-block">
+    <div class="journey-title"><span class="jnum">3</span> Menerima &amp; Melihat Hasil Matching</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Notifikasi Masuk</div><div class="step-desc">"Ada orang tua yang ingin matching dengan kamu"</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Cek Status Tes Kecocokan</div><div class="step-desc">Jika Tes Kecocokan belum diisi → prompt untuk isi Tes Kecocokan</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Lihat Detail Hasil Matching</div><div class="step-desc">Skor keseluruhan + per domain · area kekuatan bersama · area mismatch + poin negosiasi · tips dari AI · jika ada dealbreaker: "Ada hal yang perlu dibicarakan dulu"</div><div class="step-api">GET /api/matching/results</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 4 -->
+  <div id="nanny-j4" class="journey-block">
+    <div class="journey-title"><span class="jnum">4</span> Aktif Bekerja &amp; Monitoring</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">NannyAssignment Dibuat oleh Parent</div><div class="step-desc">Notifikasi: "[Nama Parent] konfirmasi kamu mulai bekerja [tanggal]"</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Lihat Profil Anak — /dashboard/nanny/children/</div><div class="step-desc">Nama, usia, catatan medis &amp; alergi, jadwal harian, daftar boleh/tidak boleh</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Check-in Berkala (Week 1, 2 · Bulan 1, 3)</div><div class="step-desc">5–10 pertanyaan dari sisi nanny: kondisi kerja, komunikasi, kenyamanan, fasilitas, keputusan lanjut</div><div class="step-api">POST /api/nanny/monitoring { type: WEEK_1|MONTH_1 }</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 5 -->
+  <div id="nanny-j5" class="journey-block">
+    <div class="journey-title"><span class="jnum">5</span> Toggle "Open to Job"</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Profil Nanny — /dashboard/nanny/profile/</div>
+        <div class="step-branch">
+          <span class="branch-yes">ON → profil muncul di direktori · kontak tersembunyi sampai parent buka kuota</span>
+          <span class="branch-no">OFF → profil privat (sudah bekerja / tidak tersedia)</span>
+        </div>
+        <div class="step-api">PATCH /api/nanny/open-to-job</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey 6 -->
+  <div id="nanny-j6" class="journey-block">
+    <div class="journey-title"><span class="jnum">6</span> Program Referral Nanny</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Kode Referral Unik — /dashboard/nanny/referral/</div><div class="step-desc">Bagikan ke nanny lain (teman, saudara)</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Tracking &amp; Bonus</div>
+        <div class="step-desc">
+          REGISTERED · HIRED → <strong>Rp 75.000</strong> · RETAINED (1 bulan penuh) → <strong>+Rp 75.000</strong><br>
+          Total bonus per referral berhasil: <strong>Rp 150.000</strong>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ════════════════════════════════════ ADMIN ════════════════════════════════════ -->
+<section id="admin">
+  <div class="section-header">
+    <div class="section-icon icon-admin">🔧</div>
+    <h2>Role: ADMIN</h2>
+    <span class="role-badge badge-admin">Internal HCC</span>
+  </div>
+
+  <div id="admin-features" class="sub-section">
+    <h3>Daftar Fitur</h3>
+    <div class="feature-grid">
+      <div class="feat-card"><div class="feat-num">A-1</div><div class="feat-name">Login sebagai Admin</div><span class="status status-aktif">Aktif</span></div>
+      <div class="feat-card"><div class="feat-num">A-2</div><div class="feat-name">Switch Role untuk Testing</div><span class="status status-aktif">Aktif</span></div>
+      <div class="feat-card"><div class="feat-num">A-3</div><div class="feat-name">Overview Matching Analytics</div><span class="status status-aktif">Aktif</span></div>
+      <div class="feat-card"><div class="feat-num">A-4</div><div class="feat-name">Dashboard Operasional</div><span class="status status-dev">Dalam pengembangan</span></div>
+      <div class="feat-card"><div class="feat-num">A-5</div><div class="feat-name">Manajemen Pengguna</div><span class="status status-dev">Dalam pengembangan</span></div>
+      <div class="feat-card"><div class="feat-num">A-6</div><div class="feat-name">Manajemen Konten Tes Kecocokan</div><span class="status status-dev">Dalam pengembangan</span></div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <div id="admin-j1" class="journey-block">
+    <div class="journey-title"><span class="jnum">1</span> Login &amp; Switch Role</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-orange"></div>
+        <div class="step-card warn"><div class="step-label">Login Admin</div><div class="step-desc">Masuk dengan akun admin HCC · Session role = ADMIN · canSwitchRoles = true</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Dashboard Admin — /dashboard/admin/</div><div class="step-desc">Pilih "Lihat sebagai Parent / Nanny" · session.role berubah sementara · tombol "Kembali ke Admin" restore role</div><div class="step-api">POST /api/user/switch-role { targetRole }</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-j2" class="journey-block">
+    <div class="journey-title"><span class="jnum">2</span> Matching Analytics Overview</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-teal"></div>
+        <div class="step-card highlight"><div class="step-label">Analytics Dashboard — /dashboard/admin/matching-overview/</div><div class="step-desc">
+          • Jumlah matching request (minggu ini / bulan ini)<br>
+          • Distribusi skor (histogram)<br>
+          • Tingkat penyelesaian Tes Kecocokan<br>
+          • Jumlah placement aktif<br>
+          • Flag dealbreaker yang sering muncul
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ════════════════════════════════════ SHARED ════════════════════════════════════ -->
+<section id="shared">
+  <div class="section-header">
+    <div class="section-icon icon-shared">🔗</div>
+    <h2>Shared Flows — Lintas Role</h2>
+  </div>
+
+  <div class="sub-section">
+    <h3>Autentikasi (Semua Role)</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-purple"></div>
+        <div class="step-card"><div class="step-label">Lupa Password — /auth/forgot-password/</div><div class="step-desc">Masukkan nomor HP → OTP via WhatsApp → Verifikasi OTP → Reset password baru (min 8 karakter)</div><div class="step-api">POST /api/auth/send-otp · /api/auth/verify-otp · /api/auth/reset-password</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-section">
+    <h3>Settings (Semua Role)</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot step-dot-blue"></div>
+        <div class="step-card info"><div class="step-label">Ganti Email / Password — /dashboard/[role]/settings/</div><div class="step-desc">Ganti email: verifikasi email lama → konfirmasi email baru · Ganti password: isi lama + baru</div><div class="step-api">PATCH /api/user/email · POST /api/auth/change-password</div></div>
+      </div>
+      <div class="step">
+        <div class="step-dot step-dot-orange"></div>
+        <div class="step-card warn"><div class="step-label">Hapus Akun</div><div class="step-desc">Konfirmasi intent → data dihapus/dianonimkan → session dihapus → redirect ke landing</div><div class="step-api">DELETE /api/nanny/profile · DELETE /api/parent/profile</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ════════════════════════════════════ STATES ════════════════════════════════════ -->
+<section id="states">
+  <div class="section-header">
+    <div class="section-icon icon-shared">🔄</div>
+    <h2>State Diagram</h2>
+  </div>
+
+  <div class="sub-section">
+    <h3>MatchingRequest States</h3>
+    <div class="state-diagram">
+      <span class="state-node sn-gray">PENDING</span>
+      <span class="state-arrow">→</span>
+      <span class="state-node sn-blue">PARENT_SURVEY_DONE</span>
+      <span class="state-arrow">→</span>
+      <span class="state-node sn-orange">PROCESSING</span>
+      <span class="state-arrow">→</span>
+      <span class="state-node sn-teal">COMPLETED</span>
+      <span class="state-arrow">→</span>
+      <span class="state-node sn-orange">NEGOTIATING</span>
+    </div>
+    <div class="callout callout-info" style="margin-top:.5rem">
+      <div class="callout-icon">ℹ️</div>
+      <div class="callout-body"><p>PROCESSING dipicu saat kedua pihak sudah submit Tes Kecocokan · Claude API kalkulasi skor · jika ada dealbreaker → state NEGOTIATING (bukan penolakan otomatis)</p></div>
+    </div>
+  </div>
+
+  <div class="sub-section">
+    <h3>Subscription States</h3>
+    <div class="state-diagram">
+      <span class="state-node sn-gray">INACTIVE</span>
+      <span class="state-arrow">→ bayar Mayar →</span>
+      <span class="state-node sn-teal">ACTIVE</span>
+      <span class="state-arrow">→ expired →</span>
+      <span class="state-node sn-orange">EXPIRED</span>
+    </div>
+  </div>
+
+  <div class="sub-section">
+    <h3>Evaluation States</h3>
+    <div class="state-diagram">
+      <span class="state-node sn-gray">PENDING</span>
+      <span class="state-arrow">→ parent isi →</span>
+      <span class="state-node sn-blue">PARENT_DONE</span>
+      <span class="state-arrow">→ nanny isi →</span>
+      <span class="state-node sn-teal">COMPLETED</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ════════════════════════════════════ MATRIX ════════════════════════════════════ -->
+<section id="matrix">
+  <div class="section-header">
+    <div class="section-icon icon-shared">📊</div>
+    <h2>Matriks Fitur × Role</h2>
+  </div>
+  <table class="matrix">
+    <thead>
+      <tr><th>Fitur</th><th>PARENT</th><th>NANNY</th><th>ADMIN</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Registrasi</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Login</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Lupa Password (OTP WA)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Edit Profil</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Kelola Profil Anak</td><td><span class="check">✓</span></td><td><span class="partial">baca saja</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Langganan Tahunan</td><td><span class="check">✓</span></td><td><span class="cross">—</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Tes Kecocokan</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Lihat Hasil Matching</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="partial">via switch</span></td></tr>
+      <tr><td>Browse Direktori Nanny</td><td><span class="check">✓</span></td><td><span class="cross">—</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Toggle Open to Job</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Buka Kontak Nanny (Kuota)</td><td><span class="check">✓</span></td><td><span class="cross">—</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Placement (Mulai Kerja Sama)</td><td><span class="check">✓</span></td><td><span class="cross">—</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Check-in Mingguan</td><td><span class="partial">kirim</span></td><td><span class="partial">kirim</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Evaluasi Berkala</td><td><span class="partial">kirim</span></td><td><span class="partial">kirim</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Lihat Rekam Jejak Nanny</td><td><span class="partial">bayar +50rb</span></td><td><span class="partial">profil sendiri</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Layer 2 Psikotes AI</td><td><span class="partial">bayar +300rb</span></td><td><span class="partial">lihat hasil</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Layer 3 Review Psikolog</td><td><span class="partial">bayar +1.2jt</span></td><td><span class="partial">lihat hasil</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Upload Video (CF Stream)</td><td><span class="cross">—</span></td><td><span class="partial">API siap</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Upload Foto Portfolio (CF R2)</td><td><span class="cross">—</span></td><td><span class="partial">API siap</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Unduh PDF Laporan</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Program Referral</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Knowledge Transfer</td><td><span class="check">✓</span></td><td><span class="partial">baca saja</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Notifikasi</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td></tr>
+      <tr><td>Switch Role (testing)</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Matching Analytics</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Ganti Email / Password</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Hapus Akun</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="footer-note">
+  Sumber kebenaran: <code>prisma/schema.prisma</code> · <code>src/app/dashboard/</code> · <code>src/app/api/</code><br>
+  Terakhir diperbarui: 17 Mei 2026 — Mayar pending verifikasi (~20 Mei 2026) · API upload foto/video siap · UI Flow A, Flow B, MayarButton masih dalam pengembangan.
+</div>
+
+</main>
+</div>
+
+<script>
+// Active nav link on scroll
+const sections = document.querySelectorAll('section, [id]')
+const links = document.querySelectorAll('.nav-link')
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'))
+      const link = document.querySelector(`.nav-link[href="#${e.target.id}"]`)
+      if (link) link.classList.add('active')
+    }
+  })
+}, { rootMargin: '-20% 0px -70% 0px' })
+document.querySelectorAll('[id]').forEach(el => observer.observe(el))
+</script>
+</body>
+</html>

@@ -14,6 +14,7 @@ type Props = {
   storageKey: string
   onSubmit?: (answers: SurveyAnswers) => Promise<void>
   onProgress?: (answers: SurveyAnswers) => void
+  alreadyCompleted?: boolean
 }
 
 type CustomQ = { text: string; isDealbreaker: boolean }
@@ -47,19 +48,25 @@ function showFreeText(side: QuestionSide, value: string | undefined): boolean {
   return side.freeTextTriggers ? side.freeTextTriggers.includes(value) : false
 }
 
-export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: Props) {
+export default function SurveyForm({ role, storageKey, onSubmit, onProgress, alreadyCompleted }: Props) {
   const router = useRouter()
   const posthog = usePostHog()
   const [answers, setAnswers] = useState<SurveyAnswers>({})
   const [customQ, setCustomQ] = useState<Record<string, CustomQ>>({})
   const [currentAspectIdx, setCurrentAspectIdx] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(alreadyCompleted ?? false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [savedDraft, setSavedDraft] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
+    // Jika server sudah konfirmasi selesai, bersihkan draft localStorage agar user berikutnya tidak terpengaruh
+    if (alreadyCompleted) {
+      localStorage.removeItem(storageKey)
+      setLoaded(true)
+      return
+    }
     try {
       const saved = localStorage.getItem(storageKey)
       if (saved) {
@@ -67,11 +74,11 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
         if (parsed.answers) setAnswers(parsed.answers)
         if (parsed.customQ) setCustomQ(parsed.customQ)
         if (typeof parsed.currentAspectIdx === "number") setCurrentAspectIdx(parsed.currentAspectIdx)
-        if (parsed.isSubmitted) setIsSubmitted(true)
+        // isSubmitted TIDAK dibaca dari localStorage — server (alreadyCompleted) adalah sumber kebenaran
       }
     } catch {}
     setLoaded(true)
-  }, [storageKey])
+  }, [storageKey, alreadyCompleted])
 
   const persist = useCallback(
     (a: SurveyAnswers, cq: Record<string, CustomQ>, idx: number) => {
@@ -217,10 +224,8 @@ export default function SurveyForm({ role, storageKey, onSubmit, onProgress }: P
     try {
       if (onSubmit) await onSubmit(answers)
       setIsSubmitted(true)
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({ answers, customQ, currentAspectIdx, isSubmitted: true, submittedAt: new Date().toISOString() })
-      )
+      // Bersihkan draft — server sudah menyimpan, localStorage tidak perlu lagi
+      localStorage.removeItem(storageKey)
     } catch (err) {
       console.error("[SurveyForm] submit error", err)
       posthog.capture("survey_submit_error", { role })

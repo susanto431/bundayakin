@@ -20,10 +20,11 @@ export default function NannyInviteForm({ inviteCode }: { inviteCode: string }) 
   function handleSend() {
     if (!canSend) return
     const intlPhone = toInternationalPhone(phone)
+    const registerUrl = `https://bundayakin.com/auth/register/nanny?ref=${inviteCode}`
     const msg = encodeURIComponent(
-      `Halo ${name.trim()}, saya mengundang Anda untuk bergabung di BundaYakin. ` +
-      `Gunakan kode undangan *${inviteCode}* saat mendaftar agar kita langsung terhubung. ` +
-      `Daftar di: https://bundayakin.com/auth/register/nanny`
+      `Halo ${name.trim()}, saya mengundang Anda untuk bergabung di BundaYakin dan langsung terhubung dengan saya.\n\n` +
+      `Klik link ini untuk daftar — kode undangan sudah otomatis terisi:\n${registerUrl}\n\n` +
+      `Atau daftar manual dengan kode: *${inviteCode}*`
     )
     const url = `https://api.whatsapp.com/send?phone=${intlPhone}&text=${msg}`
     window.open(url, "_blank", "noopener,noreferrer")
@@ -78,7 +79,7 @@ export default function NannyInviteForm({ inviteCode }: { inviteCode: string }) 
         <div className="flex gap-2 justify-center">
           <a
             href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-              `Gunakan kode undangan *${inviteCode}* saat daftar di BundaYakin: https://bundayakin.com/auth/register/nanny`
+              `Daftar di BundaYakin — kode undangan sudah otomatis terisi:\nhttps://bundayakin.com/auth/register/nanny?ref=${inviteCode}\n\nAtau masukkan manual: *${inviteCode}*`
             )}`}
             target="_blank" rel="noreferrer"
             className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] transition-all"

@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 import { saveSurveyToDB } from "@/lib/survey-save"
 import type { SurveyAnswers } from "@/types/survey"
 import SurveyForm from "@/components/matching/SurveyForm"
@@ -26,7 +27,14 @@ async function saveDraft(answers: SurveyAnswers) {
 }
 
 export default async function NannySurveyPage() {
-  await auth()
+  const session = await auth()
+
+  const profile = session?.user?.id
+    ? await prisma.nannyProfile.findUnique({
+        where: { userId: session.user.id },
+        select: { surveyCompletedAt: true },
+      })
+    : null
 
   return (
     <div className="min-h-screen bg-[#FDFBFF]">
@@ -54,6 +62,7 @@ export default async function NannySurveyPage() {
         storageKey="survey_nanny_v1"
         onSubmit={saveSurvey}
         onProgress={saveDraft}
+        alreadyCompleted={!!profile?.surveyCompletedAt}
       />
     </div>
   )
