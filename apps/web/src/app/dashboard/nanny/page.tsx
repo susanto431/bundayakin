@@ -36,6 +36,7 @@ export default async function NannyDashboardPage() {
             orderBy: { startDate: "desc" },
             take: 1,
             select: {
+              id: true,
               startDate: true,
               parentProfile: {
                 select: {
@@ -46,6 +47,12 @@ export default async function NannyDashboardPage() {
                     select: { name: true, ageGroup: true },
                   },
                 },
+              },
+              checkins: {
+                where: { nannyDoneAt: null },
+                orderBy: { scheduledAt: "asc" },
+                take: 1,
+                select: { timing: true },
               },
             },
           },
@@ -58,10 +65,12 @@ export default async function NannyDashboardPage() {
           evaluations: {
             where: {
               status: { in: ["PENDING", "PARENT_DONE"] },
+              nannyDoneAt: null,
             },
             orderBy: { scheduledAt: "asc" },
             take: 1,
             select: {
+              assignmentId: true,
               timing: true,
               status: true,
               parentProfile: { select: { fullName: true } },
@@ -114,9 +123,15 @@ export default async function NannyDashboardPage() {
     0
   )
 
-  // Pending evaluation
+  // Pending monitoring — checkin (WEEK_1/WEEK_2) takes precedence over evaluation
   const pendingEval = profile?.evaluations?.[0] ?? null
-  const evalLabel = pendingEval ? (TIMING_LABEL[pendingEval.timing] ?? pendingEval.timing) : null
+  const pendingCheckin = assignment?.checkins?.[0] ?? null
+  const pendingTiming = pendingCheckin?.timing ?? pendingEval?.timing ?? null
+  const pendingMonitoringAssignmentId = pendingCheckin
+    ? (assignment?.id ?? null)
+    : (pendingEval?.assignmentId ?? null)
+  const hasPendingMonitoring = !!(pendingTiming && pendingMonitoringAssignmentId)
+  const evalLabel = pendingTiming ? (TIMING_LABEL[pendingTiming] ?? pendingTiming) : null
   const evalFamilyName = pendingEval?.parentProfile?.fullName?.split(" ")[0] ?? familyName ?? "keluarga"
 
   function formatRupiah(amount: number) {
@@ -212,7 +227,7 @@ export default async function NannyDashboardPage() {
       )}
 
       {/* Pending monitoring */}
-      {pendingEval && (
+      {hasPendingMonitoring && (
         <>
           <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Pemantauan perlu diisi</p>
           <div className="bg-[#F3EEF8] border border-[#E0D0F0] rounded-[16px] p-3.5 mb-3">
@@ -221,7 +236,7 @@ export default async function NannyDashboardPage() {
               Keluarga {evalFamilyName} juga sedang mengisi. Hasilnya kami kompilasikan.
             </p>
             <Link
-              href="/dashboard/nanny/monitoring"
+              href={`/dashboard/nanny/monitoring?assignmentId=${pendingMonitoringAssignmentId}&timing=${pendingTiming}`}
               className="mt-2.5 inline-flex items-center bg-[#A97CC4] hover:bg-[#5A3A7A] text-white font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] transition-all"
             >
               Isi sekarang

@@ -1,58 +1,51 @@
-"use client"
+import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
+import { notFound } from "next/navigation"
+import MonitoringForm from "./MonitoringForm"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+export const metadata = { title: "Pemantauan — BundaYakin" }
 
-const QUESTIONS = [
-  {
-    id: "q1",
-    text: "Penilaian keseluruhan kondisi kerja bulan ini",
-    options: ["Sangat memuaskan", "Memuaskan", "Cukup", "Perlu perbaikan"],
-  },
-  {
-    id: "q2",
-    text: "Hubungan dengan anggota keluarga berjalan baik?",
-    options: ["Sangat baik", "Baik", "Cukup", "Ada kendala"],
-  },
-  {
-    id: "q3",
-    text: "Rencana Sus ke depan?",
-    options: ["Lanjut bekerja di sini", "Lanjut tapi ada catatan", "Masih dipertimbangkan", "Ingin pindah"],
-  },
-]
+const TIMING_LABEL: Record<string, string> = {
+  WEEK_1: "Check-in Minggu ke-1",
+  WEEK_2: "Check-in Minggu ke-2",
+  MONTH_1: "Pemantauan Bulan ke-1",
+  MONTH_3: "Pemantauan Bulan ke-3",
+  QUARTERLY: "Evaluasi Berkala",
+}
 
-export default function NannyMonitoringPage() {
-  const router = useRouter()
-  const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [notes, setNotes] = useState("")
-  const [loading, setLoading] = useState(false)
+export default async function NannyMonitoringPage({
+  searchParams,
+}: {
+  searchParams: { assignmentId?: string; timing?: string }
+}) {
+  const { assignmentId, timing } = searchParams
 
-  const pillPu = (selected: boolean) =>
-    `px-4 py-2 min-h-[44px] rounded-full border-[1.5px] text-[13px] font-medium transition-all cursor-pointer ${
-      selected
-        ? "bg-[#F3EEF8] text-[#5A3A7A] border-[#A97CC4] font-semibold"
-        : "bg-white text-[#666666] border-[#C8B8DC] hover:border-[#A97CC4]"
-    }`
+  if (!assignmentId || !timing) notFound()
 
-  async function handleSubmit() {
-    setLoading(true)
-    try {
-      await fetch("/api/report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers, notes, type: "nanny_monthly", role: "NANNY" }),
-      })
-    } catch {
-      // non-blocking
-    }
-    router.push("/dashboard/nanny")
-  }
+  const session = await auth()
+  if (!session?.user?.id) notFound()
+
+  const profile = await prisma.nannyProfile.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true },
+  })
+  if (!profile) notFound()
+
+  const assignment = await prisma.nannyAssignment.findFirst({
+    where: { id: assignmentId, nannyProfileId: profile.id },
+    select: { parentProfile: { select: { fullName: true } } },
+  })
+  if (!assignment) notFound()
+
+  const familyName = assignment.parentProfile?.fullName?.split(" ")[0] ?? "keluarga"
+  const timingLabel = TIMING_LABEL[timing] ?? timing
+  const isCheckin = timing === "WEEK_1" || timing === "WEEK_2"
 
   return (
     <div className="max-w-[480px] mx-auto px-4 pt-5 pb-28">
 
       <div className="border-b border-[#E0D0F0] pb-3 mb-4">
-        <h1 className="text-[16px] font-bold text-[#5A3A7A]">Pemantauan Bulan ke-1</h1>
+        <h1 className="text-[16px] font-bold text-[#5A3A7A]">{timingLabel}</h1>
         <p className="text-[12px] text-[#999AAA] mt-0.5">Dari sisi Sus · keluarga juga sedang mengisi</p>
       </div>
 
@@ -63,52 +56,12 @@ export default function NannyMonitoringPage() {
         </p>
       </div>
 
-      <div className="space-y-4 mb-4">
-        {QUESTIONS.map((q, i) => (
-          <div key={q.id}>
-            <p className="text-[13px] font-semibold text-[#5A3A7A] mb-2">{i + 1}. {q.text}</p>
-            <div className="flex flex-wrap gap-2">
-              {q.options.map(opt => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setAnswers(prev => ({ ...prev, [q.id]: opt }))}
-                  className={pillPu(answers[q.id] === opt)}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-
-        <div>
-          <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">
-            Catatan bebas <span className="font-normal text-[#999AAA]">(opsional)</span>
-          </label>
-          <textarea
-            value={notes}
-            onChange={e => setNotes(e.target.value)}
-            placeholder="Ada hal lain yang ingin Sus sampaikan..."
-            rows={3}
-            className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[72px] focus:border-[#A97CC4] focus:ring-2 focus:ring-[#A97CC4]/15 placeholder:text-[#999AAA] outline-none transition-all resize-none leading-relaxed"
-          />
-        </div>
-
-        <div className="bg-[#F3EEF8] rounded-[10px] px-3 py-2.5">
-          <p className="text-[12px] text-[#999AAA]">
-            Keluarga Ria Putri juga sedang mengisi. Hasil dikirim ke Sus lewat WA setelah keduanya selesai.
-          </p>
-        </div>
-      </div>
-
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="w-full flex items-center justify-center bg-[#A97CC4] hover:bg-[#5A3A7A] disabled:opacity-50 text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
-      >
-        {loading ? "Mengirim..." : "Kirim pemantauan"}
-      </button>
+      <MonitoringForm
+        assignmentId={assignmentId}
+        timing={timing}
+        familyName={familyName}
+        isCheckin={isCheckin}
+      />
 
     </div>
   )
