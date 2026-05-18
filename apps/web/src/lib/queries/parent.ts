@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache"
 import { prisma } from "@/lib/prisma"
+import type { EvaluationTiming } from "@prisma/client"
 
 // --- Dashboard home (/dashboard/parent) ---
 export function getParentDashboard(userId: string) {
@@ -233,7 +234,7 @@ export function getParentMonitoring(userId: string) {
 }
 
 // --- Monitoring summary (/dashboard/parent/monitoring/summary) ---
-export function getParentMonitoringSummary(userId: string, timing: string) {
+export function getParentMonitoringSummary(userId: string, timing: EvaluationTiming) {
   return unstable_cache(
     async () =>
       prisma.parentProfile.findUnique({
