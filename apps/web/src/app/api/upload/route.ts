@@ -101,6 +101,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, url, mediaId: media.id }, { status: 201 })
     }
 
+    // Foto untuk entri portofolio (NannyPortfolioMedia) — upload ke R2, return URL+key saja
+    // Tidak disimpan ke NannyMedia; akan disimpan saat POST /api/nanny/portfolio
+    if (type === "PORTFOLIO_ENTRY_PHOTO") {
+      if (session.user.role !== "NANNY") {
+        return NextResponse.json({ success: false, error: "Hanya nanny yang bisa upload foto portofolio" }, { status: 403 })
+      }
+      const key = r2.keys.portfolioPhoto(session.user.id, `entry-${Date.now()}-${slug}.${ext}`)
+      const url = await r2.uploadPhoto(key, buffer, file.type)
+      return NextResponse.json({ success: true, url, storageKey: key }, { status: 201 })
+    }
+
     return NextResponse.json({ success: false, error: "Tipe upload tidak valid" }, { status: 400 })
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)

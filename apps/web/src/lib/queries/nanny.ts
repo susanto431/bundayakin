@@ -143,10 +143,32 @@ export function getNannyMedia(userId: string) {
         select: {
           id: true,
           profilePhotoUrl: true,
+          fullName: true,
+          city: true,
+          yearsOfExperience: true,
+          bio: true,
           media: {
             where: { isActive: true },
             orderBy: { sortOrder: "asc" },
             select: { id: true, type: true, storageKey: true, slug: true, sortOrder: true },
+          },
+          portfolios: {
+            orderBy: { sortOrder: "asc" },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              startMonth: true,
+              startYear: true,
+              endMonth: true,
+              endYear: true,
+              isOngoing: true,
+              sortOrder: true,
+              media: {
+                orderBy: { sortOrder: "asc" },
+                select: { id: true, url: true, storageKey: true },
+              },
+            },
           },
         },
       }),

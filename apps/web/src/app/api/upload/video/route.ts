@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Tipe video tidak valid" }, { status: 400 })
     }
 
-    // Max 1 INTRO_VIDEO, max 3 SKILL_VIDEO
+    // Max 1 INTRO_VIDEO, max 10 SKILL_VIDEO
     const existingCount = await prisma.nannyMedia.count({
       where: { nannyProfileId: nannyProfile.id, type, isActive: true },
     })
@@ -48,8 +48,8 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
-    if (type === "SKILL_VIDEO" && existingCount >= 3) {
-      return NextResponse.json({ success: false, error: "Maksimal 3 video keahlian" }, { status: 400 })
+    if (type === "SKILL_VIDEO" && existingCount >= 10) {
+      return NextResponse.json({ success: false, error: "Maksimal 10 video keahlian" }, { status: 400 })
     }
 
     const { uploadUrl, uid } = await cfStream.getUploadUrl({

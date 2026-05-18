@@ -400,6 +400,9 @@ model NannyProfile {
   // Media portfolio (foto & video)
   media NannyMedia[]
 
+  // Portfolio pengalaman kerja (entri teks + foto)
+  portfolios NannyPortfolio[]
+
   // Referral
   referralsGiven    Referral[] @relation("ReferrerNanny")
 
@@ -930,6 +933,43 @@ model NannyMedia {
 
   @@index([nannyProfileId])
   @@index([type])
+}
+
+// ============================================================
+// NANNY PORTFOLIO — entri pengalaman kerja (teks + foto opsional)
+// ============================================================
+
+model NannyPortfolio {
+  id             String   @id @default(cuid())
+  nannyProfileId String
+  title          String
+  description    String?  @db.VarChar(500)
+  startMonth     Int
+  startYear      Int
+  endMonth       Int?
+  endYear        Int?
+  isOngoing      Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  nannyProfile NannyProfile          @relation(fields: [nannyProfileId], references: [id], onDelete: Cascade)
+  media        NannyPortfolioMedia[]
+
+  @@index([nannyProfileId])
+}
+
+model NannyPortfolioMedia {
+  id          String   @id @default(cuid())
+  portfolioId String
+  storageKey  String   // R2 key
+  url         String   // R2 public URL
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  portfolio NannyPortfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId])
 }
 
 // ============================================================

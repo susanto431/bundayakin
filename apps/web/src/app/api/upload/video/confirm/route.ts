@@ -48,8 +48,8 @@ export async function POST(request: Request) {
       if (type === "INTRO_VIDEO" && count >= 1) {
         throw new Error("LIMIT|Sudah ada video perkenalan. Hapus dulu sebelum upload baru.")
       }
-      if (type === "SKILL_VIDEO" && count >= 3) {
-        throw new Error("LIMIT|Maksimal 3 video keahlian")
+      if (type === "SKILL_VIDEO" && count >= 10) {
+        throw new Error("LIMIT|Maksimal 10 video keahlian")
       }
       return tx.nannyMedia.create({
         data: {
