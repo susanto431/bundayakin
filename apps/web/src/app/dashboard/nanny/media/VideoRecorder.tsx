@@ -156,7 +156,7 @@ export default function VideoRecorder({ onCapture, onCancel }: Props) {
   const timerColor = seconds >= 150 ? "text-red-400" : "text-white"
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col">
+    <div className="fixed inset-0 z-[60] bg-black flex flex-col">
       {/* Live preview — shown during starting/preview/recording */}
       <video
         ref={liveRef}
