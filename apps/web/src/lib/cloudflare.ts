@@ -78,6 +78,9 @@ export const cfStream = {
     slug: string
     maxDurationSeconds?: number
   }): Promise<{ uploadUrl: string; uid: string }> {
+    if (!ACCOUNT_ID) throw new Error("CLOUDFLARE_ACCOUNT_ID belum dikonfigurasi")
+    if (!STREAM_TOKEN) throw new Error("CLOUDFLARE_STREAM_TOKEN belum dikonfigurasi")
+
     const res = await fetch(`${STREAM_BASE}/direct_upload`, {
       method: "POST",
       headers: {
@@ -96,10 +99,15 @@ export const cfStream = {
     })
 
     if (!res.ok) {
-      throw new Error(`Cloudflare Stream upload URL gagal: ${res.status}`)
+      const errBody = await res.text().catch(() => "")
+      throw new Error(`Cloudflare Stream API ${res.status}: ${errBody}`)
     }
 
     const data = await res.json()
+    if (!data.result?.uploadURL || !data.result?.uid) {
+      throw new Error(`Cloudflare Stream response tidak valid: ${JSON.stringify(data)}`)
+    }
+
     return {
       uploadUrl: data.result.uploadURL,
       uid: data.result.uid,
