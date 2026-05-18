@@ -42,6 +42,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Periode mulai wajib diisi" }, { status: 400 })
     }
 
+    const entryTitle = body.title.trim()
+    const entryStartMonth = body.startMonth as number
+    const entryStartYear = body.startYear as number
+    const entryEndMonth = body.isOngoing ? null : (body.endMonth ?? null)
+    const entryEndYear = body.isOngoing ? null : (body.endYear ?? null)
+    const entryIsOngoing = body.isOngoing ?? false
+    const entryDescription = body.description?.trim() || null
     const photos = (body.photos ?? []).slice(0, 3) // max 3 foto per entri
 
     const entry = await prisma.$transaction(async (tx) => {
@@ -50,13 +57,13 @@ export async function POST(request: Request) {
       return tx.nannyPortfolio.create({
         data: {
           nannyProfileId: nannyProfile.id,
-          title: body.title.trim(),
-          description: body.description?.trim() || null,
-          startMonth: body.startMonth,
-          startYear: body.startYear,
-          endMonth: body.isOngoing ? null : (body.endMonth ?? null),
-          endYear: body.isOngoing ? null : (body.endYear ?? null),
-          isOngoing: body.isOngoing ?? false,
+          title: entryTitle,
+          description: entryDescription,
+          startMonth: entryStartMonth,
+          startYear: entryStartYear,
+          endMonth: entryEndMonth,
+          endYear: entryEndYear,
+          isOngoing: entryIsOngoing,
           sortOrder: count,
           media: {
             create: photos.map((p, i) => ({ url: p.url, storageKey: p.storageKey, sortOrder: i })),
