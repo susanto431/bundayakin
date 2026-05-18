@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import { CopyButton } from "@/components/settings/CopyButton"
 
 export const metadata = { title: "Dashboard Nanny — BundaYakin" }
 
@@ -20,6 +21,7 @@ export default async function NannyDashboardPage() {
         where: { userId: session.user.id },
         select: {
           fullName: true,
+          gender: true,
           city: true,
           surveyCompletedAt: true,
           matchingRequests: {
@@ -80,7 +82,8 @@ export default async function NannyDashboardPage() {
       })
     : null
 
-  const fullName = profile?.fullName ?? session?.user?.name ?? "Sus"
+  const fullName = profile?.fullName ?? session?.user?.name ?? ""
+  const honorific = profile?.gender === "Laki-laki" ? "Kak" : "Sus"
   const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "?????"}`
 
   // Matching score
@@ -145,7 +148,7 @@ export default async function NannyDashboardPage() {
       <div className="flex justify-between items-center mb-4">
         <div>
           <p className="text-[11px] text-[#999AAA]">Halo,</p>
-          <p className="font-[var(--font-dm-serif)] text-[20px] text-[#5A3A7A]">Sus {fullName}</p>
+          <p className="font-[var(--font-dm-serif)] text-[20px] text-[#5A3A7A]">{honorific} {fullName}</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -240,7 +243,7 @@ export default async function NannyDashboardPage() {
         <>
           <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Pemantauan perlu diisi</p>
           <div className="bg-[#F3EEF8] border border-[#E0D0F0] rounded-[16px] p-3.5 mb-3">
-            <p className="text-[13px] font-bold text-[#5A3A7A]">{evalLabel} — dari sisi Sus</p>
+            <p className="text-[13px] font-bold text-[#5A3A7A]">{evalLabel} — dari sisi {honorific}</p>
             <p className="text-[12px] text-[#5A3A7A] mt-0.5 leading-relaxed">
               Keluarga {evalFamilyName} juga sedang mengisi. Hasilnya kami kompilasikan.
             </p>
@@ -263,9 +266,9 @@ export default async function NannyDashboardPage() {
           <div className="bg-[#F3EEF8] border-[1.5px] border-[#E0D0F0] rounded-[14px] p-3.5 mb-3">
             <p className="text-[13px] font-bold text-[#5A3A7A] mb-1.5">Tingkatkan peluang dapat keluarga yang cocok</p>
             <ul className="text-[12px] text-[#666666] pl-4 leading-[1.8] list-disc mb-2.5">
-              <li>Sus 2× lebih mudah dicocokkan setelah mengisi Tes Kecocokan</li>
-              <li>Dapat tips personal cara kerja sesuai karakter Sus</li>
-              <li>Badge &ldquo;Sudah Tes Kecocokan&rdquo; di profil Sus</li>
+              <li>{honorific} 2× lebih mudah dicocokkan setelah mengisi Tes Kecocokan</li>
+              <li>Dapat tips personal cara kerja sesuai karakter {honorific}</li>
+              <li>Badge &ldquo;Sudah Tes Kecocokan&rdquo; di profil {honorific}</li>
             </ul>
             <Link
               href="/dashboard/nanny/survey"
@@ -293,6 +296,7 @@ export default async function NannyDashboardPage() {
           >
             Kirim via WA
           </a>
+          <CopyButton text={referralCode} />
         </div>
       </div>
 

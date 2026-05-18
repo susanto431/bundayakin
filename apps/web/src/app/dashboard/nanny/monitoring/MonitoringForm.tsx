@@ -55,10 +55,11 @@ type Props = {
   assignmentId: string
   timing: string
   familyName: string
+  honorific: string
   isCheckin: boolean
 }
 
-export default function MonitoringForm({ assignmentId, timing, familyName, isCheckin }: Props) {
+export default function MonitoringForm({ assignmentId, timing, familyName, honorific, isCheckin }: Props) {
   const router = useRouter()
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [nannyContinue, setNannyContinue] = useState<boolean | null>(null)
@@ -141,7 +142,7 @@ export default function MonitoringForm({ assignmentId, timing, familyName, isChe
         <textarea
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          placeholder="Ada hal lain yang ingin Sus sampaikan..."
+          placeholder={`Ada hal lain yang ingin ${honorific} sampaikan...`}
           rows={3}
           className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[72px] focus:border-[#A97CC4] focus:ring-2 focus:ring-[#A97CC4]/15 placeholder:text-[#999AAA] outline-none transition-all resize-none leading-relaxed"
         />
@@ -149,7 +150,7 @@ export default function MonitoringForm({ assignmentId, timing, familyName, isChe
 
       <div className="bg-[#F3EEF8] rounded-[10px] px-3 py-2.5">
         <p className="text-[12px] text-[#999AAA]">
-          Keluarga {familyName} juga sedang mengisi. Hasil dikirim ke Sus lewat WA setelah keduanya selesai.
+          Keluarga {familyName} juga sedang mengisi. Hasil dikirim ke {honorific} lewat WA setelah keduanya selesai.
         </p>
       </div>
 

@@ -27,7 +27,7 @@ export default async function NannyMonitoringPage({
 
   const profile = await prisma.nannyProfile.findUnique({
     where: { userId: session.user.id },
-    select: { id: true },
+    select: { id: true, gender: true },
   })
   if (!profile) notFound()
 
@@ -38,6 +38,7 @@ export default async function NannyMonitoringPage({
   if (!assignment) notFound()
 
   const familyName = assignment.parentProfile?.fullName?.split(" ")[0] ?? "keluarga"
+  const honorific = profile.gender === "Laki-laki" ? "Kak" : "Sus"
   const timingLabel = TIMING_LABEL[timing] ?? timing
   const isCheckin = timing === "WEEK_1" || timing === "WEEK_2"
 
@@ -46,7 +47,7 @@ export default async function NannyMonitoringPage({
 
       <div className="border-b border-[#E0D0F0] pb-3 mb-4">
         <h1 className="text-[16px] font-bold text-[#5A3A7A]">{timingLabel}</h1>
-        <p className="text-[12px] text-[#999AAA] mt-0.5">Dari sisi Sus · keluarga juga sedang mengisi</p>
+        <p className="text-[12px] text-[#999AAA] mt-0.5">Dari sisi {honorific} · keluarga juga sedang mengisi</p>
       </div>
 
       <div className="bg-[#F3EEF8] border border-[#E0D0F0] rounded-[16px] p-3.5 mb-4">
@@ -60,6 +61,7 @@ export default async function NannyMonitoringPage({
         assignmentId={assignmentId}
         timing={timing}
         familyName={familyName}
+        honorific={honorific}
         isCheckin={isCheckin}
       />
 
