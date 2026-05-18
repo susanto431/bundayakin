@@ -91,7 +91,7 @@ async function uploadWithTus(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const upload = new tus.Upload(file, {
-      uploadUrl,
+      endpoint: uploadUrl,
       retryDelays: [0, 1000, 3000, 5000, 10000],
       metadata: { filename: file.name, filetype: file.type },
       onProgress(bytesUploaded, bytesTotal) {
