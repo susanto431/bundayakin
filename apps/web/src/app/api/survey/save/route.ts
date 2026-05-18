@@ -21,6 +21,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Data tidak lengkap" }, { status: 400 })
     }
 
+    if (role !== session.user.role) {
+      return NextResponse.json({ success: false, error: "Role tidak sesuai" }, { status: 403 })
+    }
+
     const result = await saveSurveyToDB({ userId: session.user.id, role, answers, isDraft })
 
     console.info(

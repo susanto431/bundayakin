@@ -70,6 +70,23 @@ export default async function ParentSettingsPage() {
 
       {/* Subscription */}
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Langganan</p>
+      {!session?.user?.email && (
+        <div className="bg-[#FEF0E7] border border-[#F5C4A0] rounded-[12px] px-3 py-2.5 mb-3 flex items-start gap-2">
+          <span className="text-[#E07B39] text-[14px] leading-none mt-0.5">⚠</span>
+          <div>
+            <p className="text-[12px] font-semibold text-[#A35320]">Email belum diisi</p>
+            <p className="text-[11px] text-[#7A4018] mt-0.5 leading-relaxed">
+              Diperlukan untuk konfirmasi pembayaran langganan.
+            </p>
+            <Link
+              href="/dashboard/parent/profile"
+              className="text-[11px] font-semibold text-[#E07B39] hover:underline"
+            >
+              Tambahkan sekarang →
+            </Link>
+          </div>
+        </div>
+      )}
       {isActive ? (
         <div className="bg-[#E5F6F4] border border-[#A8DDD8] rounded-[16px] p-3.5 mb-4">
           <div className="flex justify-between items-start">
