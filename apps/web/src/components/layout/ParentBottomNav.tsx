@@ -9,24 +9,28 @@ const navItems = [
     label: "Beranda",
     exact: true,
     icon: "⊙",
+    activePaths: [] as string[],
   },
   {
     href: "/dashboard/parent/matching",
     label: "Cari Nanny",
     exact: false,
     icon: "⊕",
+    activePaths: ["/dashboard/parent/cari-nanny"],
   },
   {
     href: "/dashboard/parent/children",
     label: "Catatan Anak",
     exact: false,
     icon: "⊞",
+    activePaths: [] as string[],
   },
   {
     href: "/dashboard/parent/settings",
     label: "Akun",
     exact: false,
     icon: "⊛",
+    activePaths: [] as string[],
   },
 ]
 
@@ -39,7 +43,7 @@ export default function ParentBottomNav() {
         {navItems.map(item => {
           const isActive = item.exact
             ? pathname === item.href
-            : pathname.startsWith(item.href)
+            : pathname.startsWith(item.href) || item.activePaths.some(p => pathname.startsWith(p))
 
           return (
             <Link
