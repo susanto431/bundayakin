@@ -147,11 +147,20 @@ export default async function NannyDashboardPage() {
           <p className="text-[11px] text-[#999AAA]">Halo,</p>
           <p className="font-[var(--font-dm-serif)] text-[20px] text-[#5A3A7A]">Sus {fullName}</p>
         </div>
-        {isWorking && (
-          <span className="text-[11px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-2.5 py-1 rounded-full">
-            Aktif bekerja
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/nanny/notifications"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-[#F3EEF8] border border-[#E0D0F0] text-[16px] hover:border-[#A97CC4] transition-colors"
+            aria-label="Notifikasi"
+          >
+            🔔
+          </Link>
+          {isWorking && (
+            <span className="text-[11px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-2.5 py-1 rounded-full">
+              Aktif bekerja
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Stat cards */}

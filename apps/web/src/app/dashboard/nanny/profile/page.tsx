@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import Link from "next/link"
 import NannyProfileForm from "@/components/profile/NannyProfileForm"
 import EmailSection from "@/components/profile/EmailSection"
 
@@ -86,6 +87,24 @@ export default async function NannyProfilePage() {
 
       {/* Email */}
       <EmailSection initialEmail={session?.user?.email ?? ""} />
+
+      {/* Quick links */}
+      <div className="flex gap-2 mb-5">
+        <Link
+          href="/dashboard/nanny/media"
+          className="flex-1 bg-[#F3EEF8] border border-[#E0D0F0] rounded-[12px] p-3 text-center hover:border-[#A97CC4] transition-colors"
+        >
+          <p className="text-[12px] font-bold text-[#5A3A7A]">Foto &amp; Video</p>
+          <p className="text-[10px] text-[#999AAA] mt-0.5">Kelola media profil</p>
+        </Link>
+        <Link
+          href="/dashboard/nanny/setup-profil"
+          className="flex-1 bg-[#F3EEF8] border border-[#E0D0F0] rounded-[12px] p-3 text-center hover:border-[#A97CC4] transition-colors"
+        >
+          <p className="text-[12px] font-bold text-[#5A3A7A]">Panduan Profil</p>
+          <p className="text-[10px] text-[#999AAA] mt-0.5">Isi langkah demi langkah</p>
+        </Link>
+      </div>
 
       {/* Form */}
       <div className="bg-white border border-[#E0D0F0] rounded-[16px] p-5">
