@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { saveSurveyToDB } from "@/lib/survey-save"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 import type { SurveyAnswers } from "@/types/survey"
 
@@ -26,6 +27,9 @@ export async function POST(request: Request) {
     }
 
     const result = await saveSurveyToDB({ userId: session.user.id, role, answers, isDraft })
+    if (!isDraft) {
+      revalidateTag(role === "NANNY" ? `nanny-${session.user.id}` : `parent-${session.user.id}`)
+    }
 
     console.info(
       "[SURVEY_SAVE]",

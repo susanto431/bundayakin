@@ -1,5 +1,6 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentSubscription } from "@/lib/queries/parent"
+import { d } from "@/lib/date"
 import MidtransButton from "@/components/payment/MidtransButton"
 import CancelSubscriptionButton from "@/components/payment/CancelSubscriptionButton"
 
@@ -19,25 +20,18 @@ const FEATURES = [
 ]
 
 export default async function SubscriptionPage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   let subStatus: string = "INACTIVE"
   let endDate: Date | null = null
   let startDate: Date | null = null
 
   if (session?.user?.id) {
-    const parentProfile = await prisma.parentProfile.findUnique({
-      where: { userId: session.user.id },
-      select: {
-        subscription: {
-          select: { status: true, startDate: true, endDate: true },
-        },
-      },
-    })
+    const parentProfile = await getParentSubscription(session.user.id)
     if (parentProfile?.subscription) {
       subStatus = parentProfile.subscription.status
-      startDate = parentProfile.subscription.startDate
-      endDate = parentProfile.subscription.endDate
+      startDate = d(parentProfile.subscription.startDate)
+      endDate = d(parentProfile.subscription.endDate)
     }
   }
 

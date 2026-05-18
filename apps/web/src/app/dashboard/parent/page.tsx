@@ -1,5 +1,6 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentDashboard } from "@/lib/queries/parent"
+import { d } from "@/lib/date"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
 import LinkedInModeSection from "@/components/matching/LinkedInModeSection"
@@ -7,57 +8,18 @@ import LinkedInModeSection from "@/components/matching/LinkedInModeSection"
 export const metadata = { title: "Beranda — BundaYakin" }
 
 export default async function ParentDashboardPage() {
-  const session = await auth()
+  const session = await cachedAuth()
   const firstName = session?.user?.name?.split(" ")[0] ?? "Bunda"
 
-  const now = new Date()
-
-  const profile = session?.user?.id
-    ? await prisma.parentProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          id: true,
-          city: true,
-          surveyCompletedAt: true,
-          createdAt: true,
-          subscription: { select: { status: true, startDate: true, endDate: true } },
-          connectionQuotas: {
-            where: { periodEnd: { gt: now } },
-            orderBy: { periodEnd: "desc" },
-            take: 1,
-            select: { referralUsed: true, referralLimit: true, talentPoolUsed: true, talentPoolLimit: true },
-          },
-          children: { orderBy: { createdAt: "asc" }, take: 1, select: { id: true, name: true } },
-          matchingRequests: {
-            orderBy: { updatedAt: "desc" },
-            take: 1,
-            select: {
-              id: true, status: true, updatedAt: true,
-              nannyProfile: { select: { fullName: true, city: true } },
-              matchingResult: { select: { scoreOverall: true } },
-            },
-          },
-          evaluations: {
-            select: { timing: true, status: true, parentDoneAt: true },
-          },
-          nannyAssignments: {
-            where: { isActive: true },
-            take: 1,
-            select: { id: true },
-          },
-          matchResults: {
-            where: { kontakTerbuka: true },
-            select: { nannyProfileId: true },
-          },
-        },
-      })
-    : null
+  const { profile, openToJobNannies, unlockedIds } = session?.user?.id
+    ? await getParentDashboard(session.user.id)
+    : { profile: null, openToJobNannies: [], unlockedIds: [] }
 
   const subscription = profile?.subscription
   const isPaid =
     subscription?.status === "ACTIVE" &&
     subscription?.endDate != null &&
-    subscription.endDate > new Date()
+    d(subscription.endDate)! > new Date()
 
   const quota = profile?.connectionQuotas?.[0]
   const referralRemaining = Math.max(0, (quota?.referralLimit ?? 3) - (quota?.referralUsed ?? 0))
@@ -110,27 +72,6 @@ export default async function ParentDashboardPage() {
       sub: isDone("MONTH_3") ? "Sudah diisi kedua pihak" : "Momen keputusan: lanjut atau ganti nanny",
     },
   ]
-
-  // Nanny openToJob untuk LinkedIn mode (sama kota jika ada, maks 5)
-  const unlockedIds = (profile?.matchResults ?? []).map(r => r.nannyProfileId)
-  const openToJobNannies = profile
-    ? await prisma.nannyProfile.findMany({
-        where: {
-          openToJob: true,
-          isAvailable: true,
-          ...(profile.city ? { city: profile.city } : {}),
-        },
-        select: {
-          id: true,
-          city: true,
-          yearsOfExperience: true,
-          nannyType: true,
-          preferredAgeGroup: true,
-        },
-        take: 5,
-        orderBy: { updatedAt: "desc" },
-      })
-    : []
 
   return (
     <div className="max-w-[480px] mx-auto px-4 pt-5 pb-28">

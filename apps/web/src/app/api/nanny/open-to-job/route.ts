@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic"
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 // PATCH /api/nanny/open-to-job
@@ -23,6 +24,7 @@ export async function PATCH(request: Request) {
       data: { openToJob },
       select: { openToJob: true },
     })
+    revalidateTag(`nanny-${session.user.id}`)
 
     return NextResponse.json({ success: true, data: { openToJob: profile.openToJob } })
   } catch (error) {

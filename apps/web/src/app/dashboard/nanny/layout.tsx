@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { cachedAuth } from "@/lib/auth-server"
 import { redirect } from "next/navigation"
 import NannyBottomNav from "@/components/layout/NannyBottomNav"
 
@@ -7,7 +7,7 @@ export default async function NannyDashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth()
+  const session = await cachedAuth()
 
   if (!session?.user?.canSwitchRoles && session?.user?.role !== "NANNY") {
     redirect("/auth/login")

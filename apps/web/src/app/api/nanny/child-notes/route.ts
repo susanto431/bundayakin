@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
@@ -56,6 +57,7 @@ export async function POST(request: Request) {
       where: { id: body.childId },
       data: { additionalNotes: updated },
     })
+    revalidateTag(`nanny-${session.user.id}`)
 
     return NextResponse.json({ success: true })
   } catch (error) {

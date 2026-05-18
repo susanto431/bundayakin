@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 // DELETE /api/upload/media/[id]
@@ -37,6 +38,7 @@ export async function DELETE(
       where: { id: params.id },
       data: { isActive: false },
     })
+    revalidateTag(`nanny-${session.user.id}`)
 
     return NextResponse.json({ success: true })
   } catch (error) {

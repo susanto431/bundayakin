@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logActivity } from "@/lib/activity"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 export async function POST() {
@@ -42,6 +43,7 @@ export async function POST() {
       entityId: sub.id,
     })
 
+    revalidateTag(`parent-${session.user.id}`)
     return NextResponse.json({
       success: true,
       endDate: sub.endDate,

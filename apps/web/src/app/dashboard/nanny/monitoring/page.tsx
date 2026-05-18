@@ -1,4 +1,5 @@
-import { auth } from "@/lib/auth"
+import { cachedAuth } from "@/lib/auth-server"
+import { getNannyMonitoringBase } from "@/lib/queries/nanny"
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import MonitoringForm from "./MonitoringForm"
@@ -22,13 +23,10 @@ export default async function NannyMonitoringPage({
 
   if (!assignmentId || !timing) notFound()
 
-  const session = await auth()
+  const session = await cachedAuth()
   if (!session?.user?.id) notFound()
 
-  const profile = await prisma.nannyProfile.findUnique({
-    where: { userId: session.user.id },
-    select: { id: true, gender: true },
-  })
+  const profile = await getNannyMonitoringBase(session.user.id)
   if (!profile) notFound()
 
   const assignment = await prisma.nannyAssignment.findFirst({

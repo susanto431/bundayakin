@@ -1,5 +1,6 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getNannyDashboard } from "@/lib/queries/nanny"
+import { d } from "@/lib/date"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
 
@@ -14,91 +15,27 @@ const TIMING_LABEL: Record<string, string> = {
 }
 
 export default async function NannyDashboardPage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   const profile = session?.user?.id
-    ? await prisma.nannyProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          fullName: true,
-          gender: true,
-          city: true,
-          surveyCompletedAt: true,
-          matchingRequests: {
-            orderBy: { updatedAt: "desc" },
-            take: 1,
-            select: {
-              id: true,
-              status: true,
-              matchingResult: { select: { scoreOverall: true } },
-            },
-          },
-          nannyAssignments: {
-            where: { isActive: true },
-            orderBy: { startDate: "desc" },
-            take: 1,
-            select: {
-              id: true,
-              startDate: true,
-              parentProfile: {
-                select: {
-                  fullName: true,
-                  children: {
-                    take: 1,
-                    orderBy: { createdAt: "asc" },
-                    select: { name: true, ageGroup: true },
-                  },
-                },
-              },
-              checkins: {
-                where: { nannyDoneAt: null },
-                orderBy: { scheduledAt: "asc" },
-                take: 1,
-                select: { timing: true },
-              },
-            },
-          },
-          referralsGiven: {
-            select: {
-              bonusReferrerIDR: true,
-              bonusPaidAt: true,
-            },
-          },
-          evaluations: {
-            where: {
-              status: { in: ["PENDING", "PARENT_DONE"] },
-              nannyDoneAt: null,
-            },
-            orderBy: { scheduledAt: "asc" },
-            take: 1,
-            select: {
-              assignmentId: true,
-              timing: true,
-              status: true,
-              parentProfile: { select: { fullName: true } },
-            },
-          },
-        },
-      })
+    ? await getNannyDashboard(session.user.id)
     : null
 
   const fullName = profile?.fullName ?? session?.user?.name ?? ""
   const honorific = profile?.gender === "Laki-laki" ? "Kak" : "Sus"
   const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "?????"}`
 
-  // Matching score
   const activeMatch = profile?.matchingRequests?.[0]
   const score = activeMatch?.matchingResult?.scoreOverall
     ? Math.round(activeMatch.matchingResult.scoreOverall)
     : null
 
-  // Active assignment
   const assignment = profile?.nannyAssignments?.[0] ?? null
   const isWorking = !!assignment
   const now = new Date()
 
   const daysWorking = assignment
-    ? Math.floor((now.getTime() - assignment.startDate.getTime()) / (1000 * 60 * 60 * 24))
+    ? Math.floor((now.getTime() - d(assignment.startDate)!.getTime()) / (1000 * 60 * 60 * 24))
     : 0
 
   const BONUS_DAYS = 90
@@ -106,12 +43,12 @@ export default async function NannyDashboardPage() {
   const bonusEarned = daysWorking >= BONUS_DAYS
 
   const targetDate = assignment
-    ? new Date(assignment.startDate.getTime() + BONUS_DAYS * 24 * 60 * 60 * 1000)
+    ? new Date(d(assignment.startDate)!.getTime() + BONUS_DAYS * 24 * 60 * 60 * 1000)
         .toLocaleDateString("id-ID", { day: "numeric", month: "long" })
     : null
 
   const startDateStr = assignment
-    ? assignment.startDate.toLocaleDateString("id-ID", { day: "numeric", month: "short" })
+    ? d(assignment.startDate)!.toLocaleDateString("id-ID", { day: "numeric", month: "short" })
     : null
 
   const familyName = assignment?.parentProfile?.fullName
@@ -120,13 +57,11 @@ export default async function NannyDashboardPage() {
   const childName = assignment?.parentProfile?.children?.[0]?.name ?? "si Kecil"
   const childAge = assignment?.parentProfile?.children?.[0]?.ageGroup ?? ""
 
-  // Pending bonus from referrals
   const bonusPending = (profile?.referralsGiven ?? []).reduce(
     (sum, r) => sum + (!r.bonusPaidAt && r.bonusReferrerIDR ? r.bonusReferrerIDR : 0),
     0
   )
 
-  // Pending monitoring — checkin (WEEK_1/WEEK_2) takes precedence over evaluation
   const pendingEval = profile?.evaluations?.[0] ?? null
   const pendingCheckin = assignment?.checkins?.[0] ?? null
   const pendingTiming = pendingCheckin?.timing ?? pendingEval?.timing ?? null

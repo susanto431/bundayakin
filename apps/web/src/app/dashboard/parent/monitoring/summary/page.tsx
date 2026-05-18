@@ -1,5 +1,5 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentMonitoringSummary } from "@/lib/queries/parent"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 
@@ -31,7 +31,7 @@ export default async function MonitoringSummaryPage({
 }: {
   searchParams: Promise<{ timing?: string }>
 }) {
-  const session = await auth()
+  const session = await cachedAuth()
   if (!session?.user?.id) redirect("/auth/login")
 
   const { timing: timingParam } = await searchParams
@@ -39,21 +39,7 @@ export default async function MonitoringSummaryPage({
   if (!timing) redirect("/dashboard/parent")
   const isWeekly = timing === "WEEK_1" || timing === "WEEK_2"
 
-  const profile = await prisma.parentProfile.findUnique({
-    where: { userId: session.user.id },
-    select: {
-      nannyAssignments: {
-        where: { isActive: true },
-        take: 1,
-        orderBy: { createdAt: "desc" },
-        select: {
-          nannyProfile: { select: { fullName: true } },
-          checkins: { where: { timing }, select: { timing: true, status: true, parentConditionRating: true, parentConcernFlag: true, parentAdaptRating: true, parentFreeText: true, parentDoneAt: true } },
-          evaluations: { where: { timing }, select: { timing: true, status: true, parentScores: true, parentNarrative: true, parentDoneAt: true, nannyDoneAt: true, aiSummary: true } },
-        },
-      },
-    },
-  })
+  const profile = await getParentMonitoringSummary(session.user.id, timing)
 
   const assignment = profile?.nannyAssignments?.[0]
   if (!assignment) {

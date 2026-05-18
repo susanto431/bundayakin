@@ -1,5 +1,5 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentSurveyStatus } from "@/lib/queries/parent"
 import { saveSurveyToDB } from "@/lib/survey-save"
 import type { SurveyAnswers } from "@/types/survey"
 import SurveyForm from "@/components/matching/SurveyForm"
@@ -27,13 +27,10 @@ async function saveDraft(answers: SurveyAnswers) {
 }
 
 export default async function ParentMatchingSurveyPage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   const profile = session?.user?.id
-    ? await prisma.parentProfile.findUnique({
-        where: { userId: session.user.id },
-        select: { surveyCompletedAt: true },
-      })
+    ? await getParentSurveyStatus(session.user.id)
     : null
 
   return (

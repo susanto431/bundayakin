@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 // POST /api/matching/unlock
@@ -146,6 +147,7 @@ export async function POST(request: Request) {
         ? quota.referralLimit - quota.referralUsed - 1
         : quota.talentPoolLimit - quota.talentPoolUsed - 1
 
+    revalidateTag(`parent-${session.user.id}`)
     console.info("[UNLOCK]", parentProfile.id, "→", nannyProfileId, flowType, `remaining=${remaining}`)
 
     return NextResponse.json({ success: true, data: { unlocked: true, remaining } })

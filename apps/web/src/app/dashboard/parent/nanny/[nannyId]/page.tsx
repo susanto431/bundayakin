@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { cachedAuth } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
 import Image from "next/image"
 import { notFound } from "next/navigation"
@@ -44,7 +44,7 @@ const NANNY_TYPE_LABEL: Record<string, string> = {
 }
 
 export default async function NannyProfilePage({ params }: { params: { nannyId: string } }) {
-  const session = await auth()
+  const session = await cachedAuth()
   if (!session?.user?.id) notFound()
 
   const parentProfile = await prisma.parentProfile.findUnique({

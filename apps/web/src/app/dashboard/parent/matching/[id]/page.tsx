@@ -1,5 +1,6 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getMatchingRequest } from "@/lib/queries/parent"
+import { d } from "@/lib/date"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { StartMatchingButton } from "@/components/matching/StartMatchingButton"
@@ -8,63 +9,21 @@ import UnlockContactButton from "@/components/matching/UnlockContactButton"
 export const metadata = { title: "Laporan Kecocokan — BundaYakin" }
 
 export default async function MatchingResultPage({ params }: { params: { id: string } }) {
-  const session = await auth()
+  const session = await cachedAuth()
   if (!session?.user?.id) notFound()
 
-  const request = await prisma.matchingRequest.findUnique({
-    where: { id: params.id },
-    select: {
-      id: true,
-      status: true,
-      parentProfileId: true,
-      nannyProfileId: true,
-      parentProfile: { select: { userId: true, surveyCompletedAt: true } },
-      nannyProfile: {
-        select: {
-          id: true,
-          userId: true,
-          fullName: true,
-          city: true,
-          surveyCompletedAt: true,
-        },
-      },
-      matchingResult: {
-        select: {
-          scoreOverall: true,
-          scoreDomainA: true,
-          scoreDomainB: true,
-          scoreDomainC: true,
-          negotiationPoints: true,
-          mismatchAreas: true,
-          matchHighlights: true,
-          tipsForParent: true,
-        },
-      },
-      updatedAt: true,
-    },
+  // We need parentProfileId to pass to getMatchingRequest for the quota query.
+  // First do a lightweight lookup to get parentProfileId, then use the cached query.
+  const { prisma } = await import("@/lib/prisma")
+  const parentProfile = await prisma.parentProfile.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true },
   })
+  if (!parentProfile) notFound()
+
+  const { request, matchResult, quota } = await getMatchingRequest(params.id, parentProfile.id)
 
   if (!request || request.parentProfile?.userId !== session.user.id) notFound()
-
-  const now = new Date()
-  const [matchResult, quota] = await Promise.all([
-    request.nannyProfileId
-      ? prisma.matchResult.findUnique({
-          where: {
-            parentProfileId_nannyProfileId: {
-              parentProfileId: request.parentProfileId,
-              nannyProfileId: request.nannyProfileId,
-            },
-          },
-          select: { kontakTerbuka: true },
-        })
-      : Promise.resolve(null),
-    prisma.connectionQuota.findFirst({
-      where: { parentProfileId: request.parentProfileId, periodEnd: { gt: now } },
-      orderBy: { periodEnd: "desc" },
-      select: { referralUsed: true, referralLimit: true },
-    }),
-  ])
 
   const alreadyUnlocked = matchResult?.kontakTerbuka ?? false
   const referralRemaining = Math.max(0, (quota?.referralLimit ?? 3) - (quota?.referralUsed ?? 0))
@@ -78,7 +37,7 @@ export default async function MatchingResultPage({ params }: { params: { id: str
   const domainB = result?.scoreDomainB ? Math.round(result.scoreDomainB) : null
   const domainC = result?.scoreDomainC ? Math.round(result.scoreDomainC) : null
 
-  const dateStr = request.updatedAt.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+  const dateStr = d(request.updatedAt)!.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
 
   const bothSurveyDone =
     !!request.parentProfile?.surveyCompletedAt &&

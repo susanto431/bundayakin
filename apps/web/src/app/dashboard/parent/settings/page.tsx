@@ -1,5 +1,6 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentSettings } from "@/lib/queries/parent"
+import { d } from "@/lib/date"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton"
@@ -11,27 +12,18 @@ export const metadata = { title: "Akun & Pengaturan — BundaYakin" }
 const WA_CONTACT = "https://wa.me/6287888180363?text=Halo%20tim%20BundaYakin%2C%20saya%20butuh%20bantuan"
 
 export default async function ParentSettingsPage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   const profile = session?.user?.id
-    ? await prisma.parentProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          subscription: { select: { status: true, startDate: true, endDate: true } },
-          children: {
-            orderBy: { createdAt: "asc" },
-            select: { id: true, name: true, ageGroup: true, gender: true },
-          },
-        },
-      })
+    ? await getParentSettings(session.user.id)
     : null
 
   const sub = profile?.subscription
   const isActive = sub?.status === "ACTIVE"
-  const endDate = sub?.endDate?.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) ?? "-"
-  const startDate = sub?.startDate?.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) ?? "-"
+  const endDate = d(sub?.endDate)?.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) ?? "-"
+  const startDate = d(sub?.startDate)?.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) ?? "-"
   const daysLeft = sub?.endDate
-    ? Math.max(0, Math.ceil((sub.endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(0, Math.ceil((d(sub.endDate)!.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0
 
   const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "4829"}`

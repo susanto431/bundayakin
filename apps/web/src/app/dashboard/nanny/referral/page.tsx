@@ -1,38 +1,15 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getNannyReferral } from "@/lib/queries/nanny"
+import { d } from "@/lib/date"
 import Link from "next/link"
 
 export const metadata = { title: "Bonus & Referral — BundaYakin" }
 
 export default async function NannyReferralPage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   const nannyProfile = session?.user?.id
-    ? await prisma.nannyProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          id: true,
-          referralsGiven: {
-            select: {
-              id: true,
-              status: true,
-              bonusReferrerIDR: true,
-              bonusPaidAt: true,
-              hiredAt: true,
-              month3At: true,
-            },
-          },
-          nannyAssignments: {
-            where: { isActive: true },
-            orderBy: { startDate: "desc" },
-            take: 1,
-            select: {
-              startDate: true,
-              parentProfile: { select: { fullName: true } },
-            },
-          },
-        },
-      })
+    ? await getNannyReferral(session.user.id)
     : null
 
   const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "?????"}`
@@ -52,7 +29,7 @@ export default async function NannyReferralPage() {
   let employerName: string | null = null
 
   if (activeAssignment) {
-    const start = activeAssignment.startDate
+    const start = d(activeAssignment.startDate)!
     daysWorked = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
     const BONUS_DAYS = 90
     daysLeft = Math.max(0, BONUS_DAYS - daysWorked)
@@ -168,7 +145,7 @@ export default async function NannyReferralPage() {
                 <div key={r.id} className="flex items-center justify-between bg-white border border-[#E0D0F0] rounded-[14px] px-3.5 py-2.5">
                   <div>
                     <p className="text-[12px] font-semibold text-[#5A3A7A]">
-                      {r.hiredAt ? r.hiredAt.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "—"}
+                      {r.hiredAt ? d(r.hiredAt)?.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) ?? "—" : "—"}
                     </p>
                     {r.bonusReferrerIDR ? (
                       <p className="text-[11px] text-[#999AAA]">{formatRupiah(r.bonusReferrerIDR)}</p>

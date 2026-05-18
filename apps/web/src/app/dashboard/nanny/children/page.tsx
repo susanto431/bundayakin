@@ -1,55 +1,18 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getNannyChildren } from "@/lib/queries/nanny"
 import Link from "next/link"
 import NannyChildNotesForm from "./NannyChildNotesForm"
 
 export const metadata = { title: "Catatan Anak — BundaYakin" }
 
 export default async function NannyChildrenPage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   if (!session?.user?.id) {
     return null
   }
 
-  // Find active assignment for this nanny
-  const nannyProfile = await prisma.nannyProfile.findUnique({
-    where: { userId: session.user.id },
-    select: {
-      id: true,
-      fullName: true,
-      nannyAssignments: {
-        where: { isActive: true },
-        take: 1,
-        select: {
-          id: true,
-          parentProfile: {
-            select: {
-              fullName: true,
-              children: {
-                orderBy: { createdAt: "asc" },
-                take: 1,
-                select: {
-                  id: true,
-                  name: true,
-                  ageGroup: true,
-                  gender: true,
-                  allergies: true,
-                  medicalNotes: true,
-                  pantangan: true,
-                  schedule: true,
-                  schoolName: true,
-                  schoolSchedule: true,
-                  additionalNotes: true,
-                  updatedAt: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  })
+  const nannyProfile = await getNannyChildren(session.user.id)
 
   const assignment = nannyProfile?.nannyAssignments?.[0]
   const child = assignment?.parentProfile?.children?.[0]

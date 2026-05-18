@@ -1,5 +1,5 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentProfile } from "@/lib/queries/parent"
 import Link from "next/link"
 import ParentProfileForm from "@/components/profile/ParentProfileForm"
 import EmailSection from "@/components/profile/EmailSection"
@@ -7,13 +7,10 @@ import EmailSection from "@/components/profile/EmailSection"
 export const metadata = { title: "Profil Saya — BundaYakin" }
 
 export default async function ParentProfilePage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   const profile = session?.user?.id
-    ? await prisma.parentProfile.findUnique({
-        where: { userId: session.user.id },
-        select: { fullName: true, phone: true, province: true, city: true, district: true, address: true },
-      })
+    ? await getParentProfile(session.user.id)
     : null
 
   const initial = {

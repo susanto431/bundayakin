@@ -1,31 +1,21 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentCariNanny } from "@/lib/queries/parent"
+import { d } from "@/lib/date"
 import Link from "next/link"
 import TalentPoolClient from "@/components/matching/TalentPoolClient"
 
 export const metadata = { title: "AI Talent Pool — BundaYakin" }
 
 export default async function CariNannyPage() {
-  const session = await auth()
+  const session = await cachedAuth()
   const now = new Date()
 
   const profile = session?.user?.id
-    ? await prisma.parentProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          subscription: { select: { status: true, endDate: true } },
-          connectionQuotas: {
-            where: { periodEnd: { gt: now } },
-            orderBy: { periodEnd: "desc" },
-            take: 1,
-            select: { talentPoolUsed: true, talentPoolLimit: true },
-          },
-        },
-      })
+    ? await getParentCariNanny(session.user.id)
     : null
 
   const sub = profile?.subscription
-  const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && sub.endDate > now
+  const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && d(sub.endDate)! > now
   const quota = profile?.connectionQuotas?.[0]
   const talentPoolRemaining = isPaid
     ? Math.max(0, (quota?.talentPoolLimit ?? 7) - (quota?.talentPoolUsed ?? 0))

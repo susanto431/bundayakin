@@ -1,7 +1,6 @@
-export const dynamic = "force-dynamic"
-
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { revalidateTag } from "next/cache"
 import { NextRequest, NextResponse } from "next/server"
 
 type Timing = "WEEK_1" | "WEEK_2" | "MONTH_1" | "MONTH_3"
@@ -36,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     const assignment = await prisma.nannyAssignment.findFirst({
       where: { id: assignmentId, parentProfileId: profile.id },
-      select: { id: true, nannyProfileId: true },
+      select: { id: true, nannyProfileId: true, nannyProfile: { select: { userId: true } } },
     })
     if (!assignment) {
       return NextResponse.json({ success: false, error: "Assignment tidak ditemukan" }, { status: 404 })
@@ -103,6 +102,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    revalidateTag(`parent-${session.user.id}`)
+    revalidateTag(`nanny-${assignment.nannyProfile.userId}`)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("[PARENT_MONITORING]", error)

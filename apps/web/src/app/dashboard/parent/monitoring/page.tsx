@@ -1,9 +1,9 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentSubscription, getParentMonitoring } from "@/lib/queries/parent"
+import { d } from "@/lib/date"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import MonitoringForm from "@/components/monitoring/MonitoringForm"
-import { getSubscriptionStatus } from "@/lib/subscription"
 import { PaidOnlyGate } from "@/components/layout/PaidOnlyGate"
 
 export const metadata = { title: "Pemantauan — BundaYakin" }
@@ -16,30 +16,18 @@ export default async function MonitoringPage({
 }: {
   searchParams: Promise<{ timing?: string }>
 }) {
-  const session = await auth()
+  const session = await cachedAuth()
   if (!session?.user?.id) redirect("/auth/login")
 
-  const { isPaid } = await getSubscriptionStatus(session.user.id)
+  const [subData, profile] = await Promise.all([
+    getParentSubscription(session.user.id),
+    getParentMonitoring(session.user.id),
+  ])
+
+  const sub = subData?.subscription
+  const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && d(sub.endDate)! > new Date()
 
   const { timing: timingParam } = await searchParams
-
-  const profile = await prisma.parentProfile.findUnique({
-    where: { userId: session.user.id },
-    select: {
-      id: true,
-      nannyAssignments: {
-        where: { isActive: true },
-        take: 1,
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          nannyProfile: { select: { fullName: true } },
-          checkins: { select: { timing: true, status: true, parentDoneAt: true } },
-          evaluations: { select: { timing: true, status: true, parentDoneAt: true } },
-        },
-      },
-    },
-  })
 
   const assignment = profile?.nannyAssignments?.[0]
 

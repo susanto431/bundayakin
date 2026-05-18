@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { cachedAuth } from "@/lib/auth-server"
 import { redirect } from "next/navigation"
 import ParentBottomNav from "@/components/layout/ParentBottomNav"
 import { InstallPrompt } from "@/components/layout/InstallPrompt"
@@ -8,7 +8,7 @@ export default async function ParentDashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth()
+  const session = await cachedAuth()
 
   if (!session?.user?.canSwitchRoles && session?.user?.role !== "PARENT") {
     redirect("/auth/login")

@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { r2 } from "@/lib/cloudflare"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 const MAX_SIZE = 5 * 1024 * 1024 // 5 MB
@@ -49,11 +50,13 @@ export async function POST(request: Request) {
           where: { userId: session.user.id },
           data: { profilePhotoUrl: url },
         })
+        revalidateTag(`nanny-${session.user.id}`)
       } else if (session.user.role === "PARENT") {
         await prisma.parentProfile.update({
           where: { userId: session.user.id },
           data: { profilePhotoUrl: url },
         })
+        revalidateTag(`parent-${session.user.id}`)
       }
 
       return NextResponse.json({ success: true, url }, { status: 201 })
@@ -94,12 +97,18 @@ export async function POST(request: Request) {
         },
       })
 
+      revalidateTag(`nanny-${session.user.id}`)
       return NextResponse.json({ success: true, url, mediaId: media.id }, { status: 201 })
     }
 
     return NextResponse.json({ success: false, error: "Tipe upload tidak valid" }, { status: 400 })
   } catch (error) {
-    console.error("[UPLOAD_POST]", error)
+    const msg = error instanceof Error ? error.message : String(error)
+    // Log detail lengkap di server untuk Vercel Function Logs
+    console.error("[UPLOAD_POST] error:", msg)
+    console.error("[UPLOAD_POST] R2_ENDPOINT configured:", !!process.env.R2_ENDPOINT)
+    console.error("[UPLOAD_POST] R2_ACCESS_KEY_ID configured:", !!process.env.R2_ACCESS_KEY_ID)
+    console.error("[UPLOAD_POST] R2_BUCKET_NAME configured:", !!process.env.R2_BUCKET_NAME)
     return NextResponse.json({ success: false, error: "Gagal mengupload file" }, { status: 500 })
   }
 }

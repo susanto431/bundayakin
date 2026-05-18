@@ -1,36 +1,18 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentReferral } from "@/lib/queries/parent"
+import { d } from "@/lib/date"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
 
 export const metadata = { title: "Referral — BundaYakin" }
 
 export default async function ReferralPage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "0000"}`
 
   const profile = session?.user?.id
-    ? await prisma.parentProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          referralsGiven: {
-            orderBy: { createdAt: "desc" },
-            select: {
-              id: true,
-              refereeType: true,
-              refereeName: true,
-              status: true,
-              bonusIDR: true,
-              bonusPaidAt: true,
-              dealAt: true,
-              createdAt: true,
-              updatedAt: true,
-              notes: true,
-            },
-          },
-        },
-      })
+    ? await getParentReferral(session.user.id)
     : null
 
   const referrals = profile?.referralsGiven ?? []
@@ -59,8 +41,8 @@ export default async function ReferralPage() {
     return name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
   }
 
-  function formatDate(d: Date) {
-    return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+  function formatDate(val: Date | string | null | undefined) {
+    return d(val)?.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) ?? "—"
   }
 
   return (

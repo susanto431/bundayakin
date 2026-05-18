@@ -6,6 +6,7 @@ import {
   type MayarWebhookPayload,
 } from "@/lib/mayar"
 import { logActivity } from "@/lib/activity"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 // POST /api/payment/webhook
@@ -72,6 +73,7 @@ export async function POST(request: Request) {
           entityId: transaction.subscriptionId,
           metadata: { invoiceId: notif.id, paymentMethod },
         })
+        revalidateTag(`parent-${sub.parentProfile.userId}`)
 
         // Buka talentPoolLimit untuk periode aktif setelah berlangganan
         const activePeriod = await prisma.connectionQuota.findFirst({

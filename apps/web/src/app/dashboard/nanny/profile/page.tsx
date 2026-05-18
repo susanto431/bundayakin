@@ -1,5 +1,6 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getNannyProfile } from "@/lib/queries/nanny"
+import { d } from "@/lib/date"
 import Link from "next/link"
 import NannyProfileForm from "@/components/profile/NannyProfileForm"
 import EmailSection from "@/components/profile/EmailSection"
@@ -7,37 +8,17 @@ import EmailSection from "@/components/profile/EmailSection"
 export const metadata = { title: "Profil Saya — BundaYakin" }
 
 export default async function NannyProfilePage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   const profile = session?.user?.id
-    ? await prisma.nannyProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          fullName: true,
-          phone: true,
-          dateOfBirth: true,
-          province: true,
-          city: true,
-          district: true,
-          bio: true,
-          nannyType: true,
-          preferredAgeGroup: true,
-          expectedSalaryMin: true,
-          expectedSalaryMax: true,
-          educationLevel: true,
-          yearsOfExperience: true,
-          skills: true,
-          languages: true,
-          religion: true,
-        },
-      })
+    ? await getNannyProfile(session.user.id)
     : null
 
   const initial = {
     fullName: profile?.fullName ?? session?.user?.name ?? "",
     phone: profile?.phone ?? "",
     dateOfBirth: profile?.dateOfBirth
-      ? profile.dateOfBirth.toISOString().split("T")[0]
+      ? (d(profile.dateOfBirth)?.toISOString().split("T")[0] ?? "")
       : "",
     province: profile?.province ?? "",
     city: profile?.city ?? "",

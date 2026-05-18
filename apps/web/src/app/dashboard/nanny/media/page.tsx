@@ -1,5 +1,5 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getNannyMedia } from "@/lib/queries/nanny"
 import { redirect } from "next/navigation"
 import { r2, cfStream } from "@/lib/cloudflare"
 import MediaClient from "./MediaClient"
@@ -7,23 +7,12 @@ import MediaClient from "./MediaClient"
 export const metadata = { title: "Kelola Media — BundaYakin" }
 
 export default async function NannyMediaPage() {
-  const session = await auth()
+  const session = await cachedAuth()
   if (!session?.user?.id || session.user.role !== "NANNY") {
     redirect("/auth/login")
   }
 
-  const nannyProfile = await prisma.nannyProfile.findUnique({
-    where: { userId: session.user.id },
-    select: {
-      id: true,
-      profilePhotoUrl: true,
-      media: {
-        where: { isActive: true },
-        orderBy: { sortOrder: "asc" },
-        select: { id: true, type: true, storageKey: true, slug: true, sortOrder: true },
-      },
-    },
-  })
+  const nannyProfile = await getNannyMedia(session.user.id)
 
   if (!nannyProfile) redirect("/auth/login")
 

@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logActivity } from "@/lib/activity"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 import type { ChildAgeGroup } from "@prisma/client"
 
@@ -91,6 +92,7 @@ export async function PATCH(
       entityId: child.id,
       metadata: { name: child.name },
     })
+    revalidateTag(`parent-${session.user.id}`)
 
     return NextResponse.json({ success: true, data: child })
   } catch (error) {
@@ -122,6 +124,7 @@ export async function DELETE(
       entity: "ChildProfile",
       entityId: params.id,
     })
+    revalidateTag(`parent-${session.user.id}`)
 
     return NextResponse.json({ success: true })
   } catch (error) {

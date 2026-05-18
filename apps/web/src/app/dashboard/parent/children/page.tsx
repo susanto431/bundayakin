@@ -1,18 +1,20 @@
 export const dynamic = "force-dynamic"
 
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentSubscription, getParentChildren } from "@/lib/queries/parent"
+import { d } from "@/lib/date"
 import Link from "next/link"
 import { ShareChildButton } from "@/components/children/ShareChildButton"
-import { getSubscriptionStatus } from "@/lib/subscription"
 
 export const metadata = { title: "Catatan Anak — BundaYakin" }
 
 export default async function ChildrenPage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   if (session?.user?.id) {
-    const { isPaid } = await getSubscriptionStatus(session.user.id)
+    const subData = await getParentSubscription(session.user.id)
+    const sub = subData?.subscription
+    const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && d(sub.endDate)! > new Date()
     if (!isPaid) {
       return (
         <div className="max-w-[480px] mx-auto px-4 pt-5 pb-28">
@@ -84,34 +86,12 @@ export default async function ChildrenPage() {
   }
 
   const profile = session?.user?.id
-    ? await prisma.parentProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          children: {
-            orderBy: { createdAt: "asc" },
-            take: 1,
-            select: {
-              id: true,
-              name: true,
-              ageGroup: true,
-              gender: true,
-              allergies: true,
-              medicalNotes: true,
-              pantangan: true,
-              schedule: true,
-              schoolName: true,
-              schoolSchedule: true,
-              additionalNotes: true,
-              updatedAt: true,
-            },
-          },
-        },
-      })
+    ? await getParentChildren(session.user.id)
     : null
 
   const child = profile?.children?.[0]
   const childName = child?.name ?? "si Kecil"
-  const lastUpdated = child?.updatedAt?.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) ?? "-"
+  const lastUpdated = d(child?.updatedAt)?.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) ?? "-"
 
   const hasProfile = !!child?.name
   const hasDevelopment = !!(child?.medicalNotes || child?.schoolName || child?.schoolSchedule)

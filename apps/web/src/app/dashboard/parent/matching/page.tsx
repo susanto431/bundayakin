@@ -1,5 +1,6 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getParentMatchingData } from "@/lib/queries/parent"
+import { d } from "@/lib/date"
 import Link from "next/link"
 import NannyInviteForm from "@/components/matching/NannyInviteForm"
 
@@ -9,45 +10,19 @@ type InvitedNanny = {
   id: string
   nannyName: string
   status: string
-  updatedAt: Date
+  updatedAt: Date | string
 }
 
 export default async function ParentMatchingPage() {
-  const session = await auth()
+  const session = await cachedAuth()
   const now = new Date()
 
   const profile = session?.user?.id
-    ? await prisma.parentProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          fullName: true,
-          phone: true,
-          city: true,
-          district: true,
-          surveyCompletedAt: true,
-          subscription: { select: { status: true, endDate: true } },
-          connectionQuotas: {
-            where: { periodEnd: { gt: now } },
-            orderBy: { periodEnd: "desc" },
-            take: 1,
-            select: { referralUsed: true, referralLimit: true, talentPoolUsed: true, talentPoolLimit: true },
-          },
-          matchingRequests: {
-            orderBy: { createdAt: "desc" },
-            take: 10,
-            select: {
-              id: true,
-              status: true,
-              updatedAt: true,
-              nannyProfile: { select: { fullName: true } },
-            },
-          },
-        },
-      })
+    ? await getParentMatchingData(session.user.id)
     : null
 
   const sub = profile?.subscription
-  const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && sub.endDate > now
+  const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && d(sub.endDate)! > now
   const quota = profile?.connectionQuotas?.[0]
   const referralRemaining = Math.max(0, (quota?.referralLimit ?? 3) - (quota?.referralUsed ?? 0))
   const talentPoolRemaining = isPaid ? Math.max(0, (quota?.talentPoolLimit ?? 7) - (quota?.talentPoolUsed ?? 0)) : 0
@@ -220,7 +195,7 @@ export default async function ParentMatchingPage() {
                       <div>
                         <p className="text-[13px] font-semibold text-[#5A3A7A]">{n.nannyName}</p>
                         <p className="text-[11px] text-[#999AAA]">
-                          {n.updatedAt.toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                          {d(n.updatedAt)!.toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
                         </p>
                       </div>
                     </div>

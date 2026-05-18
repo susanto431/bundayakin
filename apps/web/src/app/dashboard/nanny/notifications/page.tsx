@@ -1,9 +1,10 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { cachedAuth } from "@/lib/auth-server"
+import { getNannyNotifications } from "@/lib/queries/nanny"
 
 export const metadata = { title: "Notifikasi — BundaYakin" }
 
-function timeAgo(date: Date): string {
+function timeAgo(raw: Date | string): string {
+  const date = raw instanceof Date ? raw : new Date(raw)
   const diff = Math.floor((Date.now() - date.getTime()) / 1000)
   if (diff < 60) return "Baru saja"
   if (diff < 3600) return `${Math.floor(diff / 60)} menit lalu`
@@ -32,14 +33,10 @@ const TYPE_ICON: Record<string, { bg: string; stroke: string; path: string }> = 
 }
 
 export default async function NannyNotificationsPage() {
-  const session = await auth()
+  const session = await cachedAuth()
 
   const notifications = session?.user?.id
-    ? await prisma.notification.findMany({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: "desc" },
-        take: 50,
-      })
+    ? await getNannyNotifications(session.user.id)
     : []
 
   const unreadCount = notifications.filter(n => !n.isRead).length
