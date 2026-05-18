@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { cfStream } from "@/lib/cloudflare"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 // POST /api/upload/video/confirm
@@ -39,19 +40,29 @@ export async function POST(request: Request) {
     // Verifikasi video sudah ada di Cloudflare Stream
     const videoDetails = await cfStream.getVideoDetails(uid)
 
-    const existingCount = await prisma.nannyMedia.count({
-      where: { nannyProfileId: nannyProfile.id, type, isActive: true },
+    // Atomic: count + create dalam satu transaksi — mencegah race condition double-upload
+    const media = await prisma.$transaction(async (tx) => {
+      const count = await tx.nannyMedia.count({
+        where: { nannyProfileId: nannyProfile.id, type, isActive: true },
+      })
+      if (type === "INTRO_VIDEO" && count >= 1) {
+        throw new Error("LIMIT|Sudah ada video perkenalan. Hapus dulu sebelum upload baru.")
+      }
+      if (type === "SKILL_VIDEO" && count >= 3) {
+        throw new Error("LIMIT|Maksimal 3 video keahlian")
+      }
+      return tx.nannyMedia.create({
+        data: {
+          nannyProfileId: nannyProfile.id,
+          type,
+          storageKey: uid,
+          slug,
+          sortOrder: count,
+        },
+      })
     })
 
-    const media = await prisma.nannyMedia.create({
-      data: {
-        nannyProfileId: nannyProfile.id,
-        type,
-        storageKey: uid, // CF Stream UID
-        slug,
-        sortOrder: existingCount,
-      },
-    })
+    revalidateTag(`nanny-${session.user.id}`)
 
     return NextResponse.json({
       success: true,
@@ -63,6 +74,10 @@ export async function POST(request: Request) {
       },
     })
   } catch (error) {
+    const msg = error instanceof Error ? error.message : ""
+    if (msg.startsWith("LIMIT|")) {
+      return NextResponse.json({ success: false, error: msg.slice(6) }, { status: 400 })
+    }
     console.error("[UPLOAD_VIDEO_CONFIRM]", error)
     return NextResponse.json({ success: false, error: "Gagal menyimpan data video" }, { status: 500 })
   }
