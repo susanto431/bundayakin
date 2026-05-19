@@ -27,7 +27,7 @@ export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
       })
       const data = (await res.json()) as {
         success: boolean
-        data?: { snapToken?: string; unlocked?: boolean; free?: boolean }
+        data?: { paymentUrl?: string; unlocked?: boolean; free?: boolean }
         error?: string
       }
 
@@ -37,40 +37,24 @@ export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
         return
       }
 
-      // Paid tier — langsung terbuka tanpa payment
+      // Kuota tersedia — langsung terbuka tanpa payment
       if (data.data?.unlocked && data.data?.free) {
-        posthog.capture("nanny_profile_unlock_success", { nanny_id: nannyId, method: "subscription" })
+        posthog.capture("nanny_profile_unlock_success", { nanny_id: nannyId, method: "quota" })
         setLoading(false)
         onUnlocked()
         return
       }
 
-      // Free tier — buka Midtrans Snap
-      const snapToken = data.data?.snapToken
-      if (!snapToken) {
-        setError("Token pembayaran tidak tersedia")
+      // Kuota habis — redirect ke halaman pembayaran Mayar
+      const paymentUrl = data.data?.paymentUrl
+      if (!paymentUrl) {
+        setError("URL pembayaran tidak tersedia")
         setLoading(false)
         return
       }
 
-      window.snap?.pay(snapToken, {
-        onSuccess: () => {
-          posthog.capture("nanny_profile_unlock_success", { nanny_id: nannyId, method: "payment" })
-          setLoading(false)
-          onUnlocked()
-        },
-        onPending: () => {
-          setLoading(false)
-        },
-        onError: () => {
-          posthog.capture("nanny_profile_unlock_payment_error", { nanny_id: nannyId })
-          setLoading(false)
-          setError("Pembayaran gagal. Coba lagi.")
-        },
-        onClose: () => {
-          setLoading(false)
-        },
-      })
+      posthog.capture("nanny_profile_unlock_payment_redirect", { nanny_id: nannyId })
+      window.location.href = paymentUrl
     } catch {
       setLoading(false)
       setError("Terjadi kesalahan. Coba lagi.")

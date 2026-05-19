@@ -24,16 +24,9 @@ export default function PlacementFeePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matchingRequestId: matchingId }),
       })
-      const data = await res.json() as { success: boolean; snapToken?: string; error?: string }
-      if (data.success && data.snapToken) {
-        // Open Midtrans Snap
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(window as any).snap?.pay(data.snapToken, {
-          onSuccess: () => router.push("/dashboard/parent"),
-          onPending: () => router.push("/dashboard/parent"),
-          onError: () => { setLoading(false) },
-          onClose: () => { setLoading(false) },
-        })
+      const data = await res.json() as { success: boolean; data?: { paymentUrl?: string }; error?: string }
+      if (data.success && data.data?.paymentUrl) {
+        window.location.href = data.data.paymentUrl
       } else {
         setLoading(false)
       }
