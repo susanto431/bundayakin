@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { useSession } from "next-auth/react"
 
 type Props = {
   initialEmail: string
 }
 
 export default function EmailSection({ initialEmail }: Props) {
+  const { update } = useSession()
   const [email, setEmail] = useState(initialEmail)
   const [draft, setDraft] = useState("")
   const [saving, setSaving] = useState(false)
@@ -28,6 +30,8 @@ export default function EmailSection({ initialEmail }: Props) {
       } else {
         setEmail(draft)
         setSaved(true)
+        // Refresh session JWT supaya email tersimpan di sesi aktif
+        await update({ email: draft })
       }
     } finally {
       setSaving(false)

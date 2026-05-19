@@ -16,11 +16,15 @@ export const authConfig: NextAuthConfig = {
         token.originalRole = (user as { role?: string }).role ?? ""
         token.canSwitchRoles = (user as { canSwitchRoles?: boolean }).canSwitchRoles ?? false
       }
-      // Role switcher: hanya user dengan canSwitchRoles yang bisa ganti role via update()
-      if (trigger === "update" && token.canSwitchRoles) {
-        const incoming = session as { switchToRole?: string } | undefined
-        if (incoming?.switchToRole) {
+      if (trigger === "update") {
+        const incoming = session as { switchToRole?: string; email?: string } | undefined
+        // Role switcher: hanya user dengan canSwitchRoles
+        if (incoming?.switchToRole && token.canSwitchRoles) {
           token.role = incoming.switchToRole
+        }
+        // Email update: simpan email baru ke JWT
+        if (incoming?.email) {
+          token.email = incoming.email
         }
       }
       return token
