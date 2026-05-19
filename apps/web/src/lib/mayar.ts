@@ -1,10 +1,8 @@
 // ============================================================
 // MAYAR PAYMENT GATEWAY
-// Dokumentasi: https://mayar.id/docs (perlu dikonfirmasi dengan tim Mayar)
+// Dokumentasi: https://docs.mayar.id/api-reference/introduction
 // Menggantikan Midtrans Snap sejak 17 Mei 2026
 // ============================================================
-
-import { createHmac } from "crypto"
 
 const API_KEY = process.env.MAYAR_API_KEY ?? ""
 const MAYAR_BASE = "https://api.mayar.id/hl/v1"
@@ -16,7 +14,7 @@ function authHeader() {
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export type MayarInvoiceParams = {
-  orderId: string        // ID unik dari sistem kita
+  orderId: string
   amount: number         // IDR
   customerName: string
   customerEmail: string
@@ -25,21 +23,29 @@ export type MayarInvoiceParams = {
   description?: string
 }
 
+// Struktur payload webhook dari Mayar: { event, data: { ... } }
 export type MayarWebhookPayload = {
-  id: string
-  status: string         // "paid" | "pending" | "expired" | "failed"
-  amount: number
-  referenceId: string    // orderId yang kita kirim
-  paidAt?: string
-  paymentMethod?: string
+  event: string
+  data: {
+    id: string
+    transactionId?: string
+    status: string            // "SUCCESS" | "FAILED" | "EXPIRED"
+    transactionStatus: string // "paid" | "pending" | "expired"
+    customerName?: string
+    customerEmail?: string
+    customerMobile?: string
+    amount: number
+    paymentMethod?: string | null
+    createdAt?: string
+    updatedAt?: string
+  }
 }
 
 // ── Functions ─────────────────────────────────────────────────────────────────
 
 /**
- * Buat payment invoice di Mayar dan dapatkan payment URL.
- * Gantikan createSnapToken dari Midtrans.
- * TODO: Sesuaikan endpoint dan struktur body dengan dokumentasi Mayar terbaru.
+ * Buat payment request di Mayar dan dapatkan payment URL.
+ * Response: { statusCode, messages, data: { id, transactionId, link } }
  */
 export async function createMayarInvoice(params: MayarInvoiceParams): Promise<{
   invoiceId: string
@@ -51,13 +57,9 @@ export async function createMayarInvoice(params: MayarInvoiceParams): Promise<{
     name: params.itemName,
     amount: params.amount,
     description: params.description ?? params.itemName,
-    customer: {
-      name: params.customerName,
-      email: params.customerEmail,
-      phone: params.customerPhone,
-    },
-    redirectUrl: `${appUrl}/dashboard/parent/subscription?payment=finish`,
-    referenceId: params.orderId,
+    email: params.customerEmail,
+    mobile: params.customerPhone,
+    redirectURL: `${appUrl}/dashboard/parent/subscription?payment=finish`,
   }
 
   const res = await fetch(`${MAYAR_BASE}/payment/create`, {
@@ -76,34 +78,29 @@ export async function createMayarInvoice(params: MayarInvoiceParams): Promise<{
 
   const data = await res.json()
 
-  // TODO: Sesuaikan field ini dengan response aktual Mayar API
   return {
     invoiceId: data.data?.id ?? data.id,
-    paymentUrl: data.data?.paymentUrl ?? data.paymentUrl,
+    paymentUrl: data.data?.link ?? data.link,
   }
 }
 
 /**
- * Verifikasi signature webhook Mayar.
- * TODO: Implementasi sesuai dokumentasi Mayar — ganti dengan logic aktual.
+ * Verifikasi token webhook dari query param ?token=...
+ * Mayar tidak mengirim HMAC signature — gunakan URL token sebagai gantinya.
+ * Daftarkan webhook URL: /api/payment/webhook?token=MAYAR_WEBHOOK_SECRET
  */
-export function verifyMayarWebhook(
-  payload: string,
-  signature: string
-): boolean {
-  const webhookSecret = process.env.MAYAR_WEBHOOK_SECRET ?? ""
-  const expected = createHmac("sha256", webhookSecret)
-    .update(payload)
-    .digest("hex")
-  return expected === signature
+export function verifyMayarWebhookToken(token: string | null): boolean {
+  const secret = process.env.MAYAR_WEBHOOK_SECRET ?? ""
+  if (!secret) return true   // jika tidak dikonfigurasi, lewati (tidak aman untuk prod)
+  return token === secret
 }
 
-/** Mayar payment berhasil jika status "paid" */
+/** Mayar payment berhasil jika data.status "SUCCESS" */
 export function isMayarPaymentSuccess(status: string): boolean {
-  return status === "paid" || status === "settlement"
+  return status === "SUCCESS" || status === "paid"
 }
 
-/** Mayar payment gagal jika status di bawah ini */
+/** Mayar payment gagal jika data.status berikut */
 export function isMayarPaymentFailed(status: string): boolean {
-  return status === "expired" || status === "failed" || status === "cancelled"
+  return status === "FAILED" || status === "EXPIRED" || status === "expired" || status === "failed"
 }

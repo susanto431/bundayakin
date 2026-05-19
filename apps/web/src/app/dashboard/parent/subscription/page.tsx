@@ -1,7 +1,7 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { getParentSubscription } from "@/lib/queries/parent"
 import { d } from "@/lib/date"
-import MidtransButton from "@/components/payment/MidtransButton"
+import MayarButton from "@/components/payment/MayarButton"
 import CancelSubscriptionButton from "@/components/payment/CancelSubscriptionButton"
 
 export const metadata = { title: "Langganan — BundaYakin" }
@@ -111,7 +111,7 @@ export default async function SubscriptionPage() {
               </div>
               <p className="text-white/60 text-xs mt-1">per tahun · sekitar Rp 41.667/bulan</p>
             </div>
-            <MidtransButton label="Aktifkan Sekarang — Rp 500.000" />
+            <MayarButton label="Aktifkan Sekarang — Rp 500.000" />
           </div>
         </div>
       )}
@@ -142,7 +142,7 @@ export default async function SubscriptionPage() {
         {isActive && endDate && endDate.getTime() - Date.now() < 30 * 24 * 60 * 60 * 1000 && (
           <div className="mt-4 pt-4 border-t border-[#E0D0F0]">
             <p className="text-xs text-[#A97CC4] mb-3">Langganan Anda hampir berakhir!</p>
-            <MidtransButton label="Perpanjang Sekarang" />
+            <MayarButton label="Perpanjang Sekarang" />
           </div>
         )}
 
@@ -152,7 +152,7 @@ export default async function SubscriptionPage() {
 
       {/* Guarantee note */}
       <p className="text-center text-xs text-[#999AAA] mt-4 leading-relaxed">
-        Pembayaran aman melalui Midtrans · GoPay, transfer bank, kartu kredit tersedia
+        Pembayaran aman melalui Mayar · Transfer bank, QRIS, kartu kredit tersedia
       </p>
     </div>
   )
