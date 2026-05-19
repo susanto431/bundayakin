@@ -4,7 +4,6 @@ import { useState, useRef, useCallback } from "react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
 import Link from "next/link"
-import * as tus from "tus-js-client"
 import {
   DndContext,
   closestCenter,
@@ -86,20 +85,24 @@ async function getVideoDuration(file: File): Promise<number> {
   })
 }
 
-async function uploadWithTus(
+async function uploadToCloudflare(
   file: File, uploadUrl: string, onProgress: (pct: number) => void
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const upload = new tus.Upload(file, {
-      endpoint: uploadUrl,
-      retryDelays: [0, 1000, 3000, 5000, 10000],
-      onProgress(bytesUploaded, bytesTotal) {
-        if (bytesTotal > 0) onProgress(Math.round((bytesUploaded / bytesTotal) * 100))
-      },
-      onSuccess() { resolve() },
-      onError(err) { reject(err) },
+    const xhr = new XMLHttpRequest()
+    xhr.upload.addEventListener("progress", (e) => {
+      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100))
     })
-    upload.start()
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve()
+      else reject(new Error(`Upload gagal: ${xhr.status}`))
+    })
+    xhr.addEventListener("error", () => reject(new Error("Upload gagal: network error")))
+    xhr.addEventListener("abort", () => reject(new Error("Upload dibatalkan")))
+    xhr.open("POST", uploadUrl)
+    const fd = new FormData()
+    fd.append("file", file)
+    xhr.send(fd)
   })
 }
 
@@ -283,7 +286,7 @@ export default function MediaClient({
 
       if (isIntro) setIntroPhase("upload"); else setSkillPhase("upload")
 
-      await uploadWithTus(file, uploadUrl, (pct) => {
+      await uploadToCloudflare(file, uploadUrl, (pct) => {
         if (isIntro) setIntroProgress(pct); else setSkillProgress(pct)
       })
 
