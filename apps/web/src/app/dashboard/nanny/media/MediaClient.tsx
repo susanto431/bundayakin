@@ -93,7 +93,6 @@ async function uploadWithTus(
     const upload = new tus.Upload(file, {
       endpoint: uploadUrl,
       retryDelays: [0, 1000, 3000, 5000, 10000],
-      metadata: { filename: file.name, filetype: file.type },
       onProgress(bytesUploaded, bytesTotal) {
         if (bytesTotal > 0) onProgress(Math.round((bytesUploaded / bytesTotal) * 100))
       },
