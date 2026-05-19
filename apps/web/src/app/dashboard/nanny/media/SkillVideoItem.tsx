@@ -3,7 +3,7 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
-type VideoItem = { id: string; embedUrl: string; thumbnailUrl?: string; slug?: string }
+type VideoItem = { id: string; embedUrl: string; thumbnailUrl?: string; slug?: string; isReady?: boolean }
 
 type Props = {
   video: VideoItem
@@ -44,24 +44,35 @@ export default function SkillVideoItem({ video, onDelete, disabled }: Props) {
         ⠿
       </div>
 
-      {video.thumbnailUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={video.thumbnailUrl}
-          alt={video.slug ?? "thumbnail"}
-          className="w-20 h-14 object-cover rounded-[8px] flex-shrink-0"
-        />
-      ) : (
-        <div className="w-20 h-14 rounded-[8px] bg-[#F3EEF8] flex-shrink-0 flex items-center justify-center">
-          <span className="text-xl">🎬</span>
-        </div>
-      )}
+      <div className="relative w-20 h-14 rounded-[8px] overflow-hidden flex-shrink-0">
+        {video.thumbnailUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={video.thumbnailUrl}
+            alt={video.slug ?? "thumbnail"}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-[#F3EEF8] flex items-center justify-center">
+            <span className="text-xl">🎬</span>
+          </div>
+        )}
+        {video.isReady === false && (
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+      </div>
 
       <div className="flex-1 min-w-0">
         <p className="text-[13px] font-semibold text-[#5A3A7A] truncate capitalize">
           {video.slug ?? "Video Keahlian"}
         </p>
-        <p className="text-[11px] text-[#999AAA]">Geser ⠿ untuk ubah urutan</p>
+        {video.isReady === false ? (
+          <p className="text-[11px] text-[#E07B39]">Sedang diproses… refresh sebentar lagi</p>
+        ) : (
+          <p className="text-[11px] text-[#999AAA]">Geser ⠿ untuk ubah urutan</p>
+        )}
       </div>
 
       <button

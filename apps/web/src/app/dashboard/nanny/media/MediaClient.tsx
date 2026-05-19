@@ -27,7 +27,9 @@ import SkillVideoItem from "./SkillVideoItem"
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type PhotoItem = { id: string; url: string; slug?: string }
-type VideoItem = { id: string; embedUrl: string; thumbnailUrl?: string; slug?: string }
+// isReady === false berarti video baru diupload, masih diproses CF Stream
+// isReady === undefined berarti video dari DB (treat as ready — show iframe)
+type VideoItem = { id: string; embedUrl: string; thumbnailUrl?: string; slug?: string; isReady?: boolean }
 type VideoPhase = "prepare" | "upload" | "confirm"
 type UploadSource = "camera" | "gallery"
 
@@ -299,9 +301,9 @@ export default function MediaClient({
       })
       const j3 = await res3.json()
       if (!j3.success) throw new Error(j3.error)
-      const { mediaId, embedUrl, thumbnailUrl } = j3.data
+      const { mediaId, embedUrl, thumbnailUrl, isReady } = j3.data
 
-      const item: VideoItem = { id: mediaId, embedUrl, thumbnailUrl, slug: displayLabel }
+      const item: VideoItem = { id: mediaId, embedUrl, thumbnailUrl, slug: displayLabel, isReady: isReady === true }
       if (isIntro) {
         setIntroVideo(item)
       } else {
@@ -525,7 +527,17 @@ export default function MediaClient({
             ) : introVideo ? (
               <div>
                 <div className="relative rounded-[12px] overflow-hidden bg-black aspect-video">
-                  <iframe src={introVideo.embedUrl} className="w-full h-full" allow="autoplay" title="Video Perkenalan" />
+                  {introVideo.isReady === false ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#1a1a1a]">
+                      <div className="w-6 h-6 border-2 border-[#5BBFB0] border-t-transparent rounded-full animate-spin" />
+                      <p className="text-white/70 text-[12px] text-center px-4">
+                        Sedang diproses oleh Cloudflare…<br />
+                        <span className="text-[11px] text-white/50">Refresh halaman dalam 1–2 menit untuk memutar video.</span>
+                      </p>
+                    </div>
+                  ) : (
+                    <iframe src={introVideo.embedUrl} className="w-full h-full" allow="autoplay" title="Video Perkenalan" />
+                  )}
                 </div>
                 <button onClick={() => handleDeleteMedia(introVideo.id, "intro")}
                   className="mt-2 min-h-[40px] px-4 rounded-[10px] border border-[#C75D5D] text-[#C75D5D] text-[12px] font-semibold hover:bg-[#FAEAEA] transition-colors"

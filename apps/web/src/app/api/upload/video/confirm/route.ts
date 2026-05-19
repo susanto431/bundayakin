@@ -71,6 +71,7 @@ export async function POST(request: Request) {
         uid,
         embedUrl: cfStream.embedUrl(uid),
         thumbnailUrl: videoDetails.thumbnailUrl,
+        isReady: videoDetails.state === "ready",
       },
     })
   } catch (error) {

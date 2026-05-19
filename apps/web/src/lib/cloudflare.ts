@@ -66,6 +66,7 @@ const STREAM_BASE = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}
 
 type StreamUploadResult = {
   uid: string
+  state: "queued" | "inprogress" | "ready" | "error" | string
   playbackUrl: string
   thumbnailUrl: string
 }
@@ -126,6 +127,7 @@ export const cfStream = {
     const data = await res.json()
     return {
       uid: data.result.uid,
+      state: (data.result.status?.state as string) ?? "queued",
       // Ambil dari API response — jangan konstruksi manual pakai ACCOUNT_ID
       // (ACCOUNT_ID ≠ customer subdomain CF Stream)
       playbackUrl: data.result.playback?.hls ?? `https://videodelivery.net/${uid}/manifest/video.m3u8`,
