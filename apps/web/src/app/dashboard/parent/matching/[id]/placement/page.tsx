@@ -2,11 +2,10 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 
 export default function PlacementFeePage() {
   const params = useParams()
-  const router = useRouter()
   const [agreed, setAgreed] = useState(false)
   const [loading, setLoading] = useState(false)
 
