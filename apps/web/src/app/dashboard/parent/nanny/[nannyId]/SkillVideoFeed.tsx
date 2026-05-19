@@ -67,7 +67,8 @@ export default function SkillVideoFeed({ videos }: { videos: SkillVideoItem[] })
           </div>
 
           {/* Swiper */}
-          <div className="flex-1 overflow-hidden">
+          {/* [&_.swiper-slide]:h-full — vertical Swiper butuh slide height eksplisit */}
+          <div className="flex-1 overflow-hidden [&_.swiper]:h-full [&_.swiper-slide]:h-full">
             <Swiper
               direction="vertical"
               initialSlide={openIndex}

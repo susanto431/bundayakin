@@ -24,11 +24,11 @@ function formatPeriod(
 }
 
 function scoreColor(s: number) {
-  return s >= 80 ? "#5BBFB0" : "#E07B39"
+  return s >= 80 ? "#5BBFB0" : s >= 60 ? "#E07B39" : "#C75D5D"
 }
 
 function scoreTextColor(s: number) {
-  return s >= 80 ? "text-[#2C5F5A]" : "text-[#E07B39]"
+  return s >= 80 ? "text-[#2C5F5A]" : s >= 60 ? "text-[#E07B39]" : "text-[#C75D5D]"
 }
 
 function verdictLabel(s: number) {
