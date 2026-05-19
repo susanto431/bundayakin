@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
 import Link from "next/link"
@@ -227,6 +227,45 @@ export default function MediaClient({
   const [showPortfolioModal, setShowPortfolioModal] = useState(false)
 
   const [error, setError] = useState<string | null>(null)
+
+  // ── Polling: tandai video ready saat CF Stream selesai encode ─────────────
+  useEffect(() => {
+    // embedUrl format: https://iframe.videodelivery.net/<uid>
+    const uidFromEmbed = (url: string) => new URL(url).pathname.replace(/^\//, "")
+
+    const pendingUids: string[] = []
+    if (introVideo?.isReady === false) pendingUids.push(uidFromEmbed(introVideo.embedUrl))
+    skillVideos.forEach((v) => {
+      if (v.isReady === false) pendingUids.push(uidFromEmbed(v.embedUrl))
+    })
+
+    if (pendingUids.length === 0) return
+
+    const interval = setInterval(async () => {
+      const stillPending: string[] = []
+      await Promise.all(
+        pendingUids.map(async (uid) => {
+          if (!uid) return
+          try {
+            const res = await fetch(`/api/upload/video/status?uid=${uid}`)
+            const json = await res.json()
+            if (json.data?.isReady) {
+              setIntroVideo((prev) => (prev && uidFromEmbed(prev.embedUrl) === uid ? { ...prev, isReady: true } : prev))
+              setSkillVideos((prev) => prev.map((v) => uidFromEmbed(v.embedUrl) === uid ? { ...v, isReady: true } : v))
+            } else {
+              stillPending.push(uid)
+            }
+          } catch {
+            stillPending.push(uid)
+          }
+        })
+      )
+      if (stillPending.length === 0) clearInterval(interval)
+    }, 5000)
+
+    return () => clearInterval(interval)
+    // introVideo dan skillVideos sebagai deps — effect restart saat video baru ditambah atau status berubah
+  }, [introVideo, skillVideos])  // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── dnd-kit sensors ────────────────────────────────────────────────────────
 

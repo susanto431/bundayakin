@@ -69,6 +69,7 @@ type StreamUploadResult = {
   state: "queued" | "inprogress" | "ready" | "error" | string
   playbackUrl: string
   thumbnailUrl: string
+  duration?: number
 }
 
 export const cfStream = {
@@ -132,6 +133,7 @@ export const cfStream = {
       // (ACCOUNT_ID ≠ customer subdomain CF Stream)
       playbackUrl: data.result.playback?.hls ?? `https://videodelivery.net/${uid}/manifest/video.m3u8`,
       thumbnailUrl: data.result.thumbnail ?? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`,
+      duration: typeof data.result.duration === "number" ? data.result.duration : undefined,
     }
   },
 
