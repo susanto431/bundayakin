@@ -99,7 +99,7 @@ export default function LinkedInModeSection({ nannies, isPaid, referralRemaining
               <div className="mt-3">
                 {isUnlocked ? (
                   <Link
-                    href="/dashboard/parent/matching"
+                    href={`/dashboard/parent/matching?invite=${nanny.id}`}
                     className="w-full flex items-center justify-center gap-1.5 bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[13px] px-4 py-2.5 rounded-[10px] min-h-[44px] transition-all"
                   >
                     Undang ke matching →

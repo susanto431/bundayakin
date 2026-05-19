@@ -1,8 +1,10 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { getParentMatchingData } from "@/lib/queries/parent"
+import { prisma } from "@/lib/prisma"
 import { d } from "@/lib/date"
 import Link from "next/link"
 import NannyInviteForm from "@/components/matching/NannyInviteForm"
+import DirectInviteCard from "@/components/matching/DirectInviteCard"
 
 export const metadata = { title: "Cari Nanny — BundaYakin" }
 
@@ -13,9 +15,14 @@ type InvitedNanny = {
   updatedAt: Date | string
 }
 
-export default async function ParentMatchingPage() {
+export default async function ParentMatchingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ invite?: string }>
+}) {
   const session = await cachedAuth()
   const now = new Date()
+  const { invite: inviteNannyId } = await searchParams
 
   const profile = session?.user?.id
     ? await getParentMatchingData(session.user.id)
@@ -38,6 +45,13 @@ export default async function ParentMatchingPage() {
   }))
 
   const inviteCode = `BY-${session?.user?.id?.slice(-4).toUpperCase() ?? "4829"}`
+
+  const inviteNanny = inviteNannyId
+    ? await prisma.nannyProfile.findUnique({
+        where: { id: inviteNannyId },
+        select: { id: true, city: true, yearsOfExperience: true },
+      })
+    : null
 
   const parentName = profile?.fullName ?? session?.user?.name ?? "Orang tua"
   const parentPhone = profile?.phone ?? "-"
@@ -74,6 +88,15 @@ export default async function ParentMatchingPage() {
           </span>
         </div>
       </div>
+
+      {/* Direct invite banner — dari LinkedIn mode unlock */}
+      {inviteNanny && (
+        <DirectInviteCard
+          nannyProfileId={inviteNanny.id}
+          nannyCity={inviteNanny.city ?? ""}
+          nannyExperience={inviteNanny.yearsOfExperience ?? 0}
+        />
+      )}
 
       {/* Limit warning / upgrade nudge */}
       {isLimitReached && !isPaid && (
