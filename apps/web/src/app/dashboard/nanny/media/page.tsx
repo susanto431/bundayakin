@@ -20,8 +20,8 @@ export default async function NannyMediaPage() {
   // Video dianggap "ready" jika webhook sudah pernah fire (durationSec !== null),
   // ATAU video sudah lebih dari 10 menit (video lama sebelum webhook dikonfigurasi).
   const TEN_MIN_MS = 10 * 60 * 1000
-  function videoIsReady(m: { durationSec: number | null; createdAt: Date }): boolean {
-    return m.durationSec !== null || (Date.now() - m.createdAt.getTime()) > TEN_MIN_MS
+  function videoIsReady(m: { durationSec: number | null; createdAt: Date | string }): boolean {
+    return m.durationSec !== null || (Date.now() - new Date(m.createdAt).getTime()) > TEN_MIN_MS
   }
 
   // Intro video
