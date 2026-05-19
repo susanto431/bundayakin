@@ -17,6 +17,13 @@ export default async function NannyMediaPage() {
 
   const media = nannyProfile.media
 
+  // Video dianggap "ready" jika webhook sudah pernah fire (durationSec !== null),
+  // ATAU video sudah lebih dari 10 menit (video lama sebelum webhook dikonfigurasi).
+  const TEN_MIN_MS = 10 * 60 * 1000
+  function videoIsReady(m: { durationSec: number | null; createdAt: Date }): boolean {
+    return m.durationSec !== null || (Date.now() - m.createdAt.getTime()) > TEN_MIN_MS
+  }
+
   // Intro video
   const introRaw = media.find((m) => m.type === "INTRO_VIDEO") ?? null
   const initialIntroVideo = introRaw
@@ -25,6 +32,7 @@ export default async function NannyMediaPage() {
         embedUrl: cfStream.embedUrl(introRaw.storageKey),
         thumbnailUrl: cfStream.thumbnailUrl(introRaw.storageKey),
         slug: introRaw.slug ?? undefined,
+        isReady: videoIsReady(introRaw),
       }
     : null
 
@@ -36,6 +44,7 @@ export default async function NannyMediaPage() {
       embedUrl: cfStream.embedUrl(m.storageKey),
       thumbnailUrl: cfStream.thumbnailUrl(m.storageKey),
       slug: m.slug ?? undefined,
+      isReady: videoIsReady(m),
     }))
 
   // Portfolio photos (simple grid — existing feature)

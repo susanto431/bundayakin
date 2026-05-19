@@ -150,7 +150,7 @@ export function getNannyMedia(userId: string) {
           media: {
             where: { isActive: true },
             orderBy: { sortOrder: "asc" },
-            select: { id: true, type: true, storageKey: true, slug: true, sortOrder: true },
+            select: { id: true, type: true, storageKey: true, slug: true, sortOrder: true, durationSec: true, createdAt: true },
           },
           portfolios: {
             orderBy: { sortOrder: "asc" },
