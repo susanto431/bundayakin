@@ -35,6 +35,8 @@ export const authConfig: NextAuthConfig = {
         session.user.role = (token.role as string) ?? ""
         session.user.originalRole = (token.originalRole as string) ?? token.role as string ?? ""
         session.user.canSwitchRoles = (token.canSwitchRoles as boolean) ?? false
+        // Pastikan email selalu tersinkron dari token ke session
+        if (token.email) session.user.email = token.email
       }
       return session
     },
