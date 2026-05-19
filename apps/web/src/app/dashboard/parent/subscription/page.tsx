@@ -3,6 +3,7 @@ import { getParentSubscription } from "@/lib/queries/parent"
 import { d } from "@/lib/date"
 import MayarButton from "@/components/payment/MayarButton"
 import CancelSubscriptionButton from "@/components/payment/CancelSubscriptionButton"
+import PaymentReturnBanner from "@/components/payment/PaymentReturnBanner"
 
 export const metadata = { title: "Langganan — BundaYakin" }
 
@@ -19,8 +20,13 @@ const FEATURES = [
   "Monitoring nanny selama 1 tahun",
 ]
 
-export default async function SubscriptionPage() {
+export default async function SubscriptionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ payment?: string }>
+}) {
   const session = await cachedAuth()
+  const { payment } = await searchParams
 
   let subStatus: string = "INACTIVE"
   let endDate: Date | null = null
@@ -37,6 +43,7 @@ export default async function SubscriptionPage() {
 
   const isActive = subStatus === "ACTIVE"
   const isExpired = subStatus === "EXPIRED"
+  const isPaymentReturn = payment === "finish"
 
   return (
     <div className="px-4 pt-10 max-w-lg mx-auto pb-10">
@@ -48,6 +55,9 @@ export default async function SubscriptionPage() {
           Akses penuh untuk menemukan dan memonitor nanny terbaik
         </p>
       </div>
+
+      {/* Banner setelah redirect dari Mayar */}
+      {isPaymentReturn && <PaymentReturnBanner isSubscriptionActive={isActive} />}
 
       {/* Active subscription card */}
       {isActive && endDate && (

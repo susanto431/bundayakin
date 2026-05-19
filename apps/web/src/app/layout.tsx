@@ -53,19 +53,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const snapUrl = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true"
-    ? "https://app.midtrans.com/snap/snap.js"
-    : "https://app.sandbox.midtrans.com/snap/snap.js"
-
   return (
     <html lang="id">
-      <head>
-        <script
-          src={snapUrl}
-          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
-          async
-        />
-      </head>
       <body className={`${jakarta.variable} ${dmSerif.variable} antialiased`}>
         <AuthSessionProvider>
           <PostHogProvider>
