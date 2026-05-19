@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
+import { resend, EMAIL_FROM } from "@/lib/resend"
+import { welcomeParentHtml, welcomeParentText } from "@/lib/emails/welcome-parent"
+import { welcomeNannyHtml, welcomeNannyText } from "@/lib/emails/welcome-nanny"
 
 export async function POST(req: NextRequest) {
   try {
@@ -100,6 +103,20 @@ export async function POST(req: NextRequest) {
         data: { userId: user.id, fullName: name, phone: phone ?? null },
         select: { id: true },
       })
+    }
+
+    // Welcome email — fire-and-forget, tidak boleh memblokir registrasi
+    if (user.email) {
+      const isParent = role === "PARENT"
+      resend.emails.send({
+        from: EMAIL_FROM,
+        to: user.email,
+        subject: isParent
+          ? "Selamat datang di BundaYakin, Bunda! 🌿"
+          : "Selamat bergabung di BundaYakin! 🌟",
+        html: isParent ? welcomeParentHtml(user.name ?? "") : welcomeNannyHtml(user.name ?? ""),
+        text: isParent ? welcomeParentText(user.name ?? "") : welcomeNannyText(user.name ?? ""),
+      }).catch(e => console.error("[REGISTER] welcome email failed", e))
     }
 
     return NextResponse.json({ success: true, data: user }, { status: 201 })
