@@ -4,11 +4,13 @@ import { useState } from "react"
 import { usePostHog } from "posthog-js/react"
 
 type Props = {
-  nannyId: string       // NannyProfile.id
+  nannyProfileId: string
+  flowType: "REFERRAL" | "TALENT_POOL"
+  quotaRemaining: number
   onUnlocked: () => void
 }
 
-export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
+export default function UnlockNannyButton({ nannyProfileId, flowType, quotaRemaining, onUnlocked }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const posthog = usePostHog()
@@ -17,17 +19,17 @@ export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
     if (loading) return
     setLoading(true)
     setError(null)
-    posthog.capture("nanny_profile_unlock_initiated", { nanny_id: nannyId })
+    posthog.capture("nanny_profile_unlock_initiated", { nanny_id: nannyProfileId, flowType })
 
     try {
       const res = await fetch("/api/matching/unlock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nannyId }),
+        body: JSON.stringify({ nannyProfileId, flowType }),
       })
       const data = (await res.json()) as {
         success: boolean
-        data?: { paymentUrl?: string; unlocked?: boolean; free?: boolean }
+        data?: { paymentUrl?: string; unlocked?: boolean; remaining?: number }
         error?: string
       }
 
@@ -37,15 +39,14 @@ export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
         return
       }
 
-      // Kuota tersedia — langsung terbuka tanpa payment
-      if (data.data?.unlocked && data.data?.free) {
-        posthog.capture("nanny_profile_unlock_success", { nanny_id: nannyId, method: "quota" })
+      if (data.data?.unlocked) {
+        posthog.capture("nanny_profile_unlock_success", { nanny_id: nannyProfileId, flowType })
         setLoading(false)
         onUnlocked()
         return
       }
 
-      // Kuota habis — redirect ke halaman pembayaran Mayar
+      // Kuota habis — redirect ke halaman pembayaran Mayar (add-on)
       const paymentUrl = data.data?.paymentUrl
       if (!paymentUrl) {
         setError("URL pembayaran tidak tersedia")
@@ -53,7 +54,7 @@ export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
         return
       }
 
-      posthog.capture("nanny_profile_unlock_payment_redirect", { nanny_id: nannyId })
+      posthog.capture("nanny_profile_unlock_payment_redirect", { nanny_id: nannyProfileId })
       window.location.href = paymentUrl
     } catch {
       setLoading(false)
@@ -83,7 +84,7 @@ export default function UnlockNannyButton({ nannyId, onUnlocked }: Props) {
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
-            Buka profil — Rp 100rb
+            Pakai kuota (sisa {quotaRemaining}×)
           </>
         )}
       </button>

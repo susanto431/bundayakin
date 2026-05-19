@@ -157,6 +157,8 @@ export default async function ParentDashboardPage() {
             isUnlocked: unlockedIds.includes(n.id),
           }))}
           isPaid={isPaid}
+          referralRemaining={referralRemaining}
+          talentPoolRemaining={talentPoolRemaining}
         />
       )}
 

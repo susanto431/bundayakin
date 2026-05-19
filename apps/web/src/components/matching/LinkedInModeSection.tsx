@@ -15,6 +15,8 @@ type NannyCard = {
 type Props = {
   nannies: NannyCard[]
   isPaid: boolean
+  referralRemaining: number
+  talentPoolRemaining: number
 }
 
 const NANNY_TYPE_LABEL: Record<string, string> = {
@@ -24,7 +26,7 @@ const NANNY_TYPE_LABEL: Record<string, string> = {
   TEMPORARY: "Temporer",
 }
 
-export default function LinkedInModeSection({ nannies, isPaid }: Props) {
+export default function LinkedInModeSection({ nannies, isPaid, referralRemaining, talentPoolRemaining }: Props) {
   const [unlockedIds, setUnlockedIds] = useState<string[]>(
     nannies.filter(n => n.isUnlocked).map(n => n.id)
   )
@@ -103,7 +105,12 @@ export default function LinkedInModeSection({ nannies, isPaid }: Props) {
                     Undang ke matching →
                   </Link>
                 ) : (
-                  <UnlockNannyButton nannyId={nanny.id} onUnlocked={() => handleUnlocked(nanny.id)} />
+                  <UnlockNannyButton
+                    nannyProfileId={nanny.id}
+                    flowType={isPaid ? "TALENT_POOL" : "REFERRAL"}
+                    quotaRemaining={isPaid ? talentPoolRemaining : referralRemaining}
+                    onUnlocked={() => handleUnlocked(nanny.id)}
+                  />
                 )}
               </div>
             </div>
