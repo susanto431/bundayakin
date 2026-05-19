@@ -93,7 +93,7 @@ export default function AddPortfolioModal({ onSave, onCancel }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-40 bg-black/60 flex items-end">
+    <div className="fixed inset-0 z-[60] bg-black/60 flex items-end">
       <div className="w-full bg-white rounded-t-[24px] px-4 pt-5 pb-8 max-h-[90vh] overflow-y-auto">
         <div className="w-10 h-1 bg-[#E0D0F0] rounded-full mx-auto mb-4" />
         <h3 className="font-bold text-[#5A3A7A] text-[15px] mb-4">Tambah Pengalaman</h3>
