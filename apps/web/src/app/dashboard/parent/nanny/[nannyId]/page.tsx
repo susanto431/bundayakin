@@ -1,19 +1,26 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
+import { cfStream } from "@/lib/cloudflare"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import UnlockContactButton from "@/components/matching/UnlockContactButton"
+import SkillVideoFeed from "./SkillVideoFeed"
 
 export const metadata = { title: "Profil Nanny — BundaYakin" }
 
-const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL ?? "https://media.bundayakin.com"
+const MONTHS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"]
 
-function r2Url(storageKey: string) {
-  return `${R2_PUBLIC_URL}/${storageKey}`
-}
-
-function streamEmbedUrl(storageKey: string) {
-  return `https://iframe.cloudflarestream.com/${storageKey}`
+function formatPeriod(
+  startMonth: number,
+  startYear: number,
+  endMonth: number | null,
+  endYear: number | null,
+  isOngoing: boolean,
+) {
+  const start = `${MONTHS[startMonth - 1]} ${startYear}`
+  if (isOngoing) return `${start} – Sekarang`
+  if (endMonth && endYear) return `${start} – ${MONTHS[endMonth - 1]} ${endYear}`
+  return start
 }
 
 function scoreColor(s: number) {
@@ -75,6 +82,23 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
           select: { id: true, type: true, storageKey: true, slug: true, sortOrder: true },
           orderBy: { sortOrder: "asc" },
         },
+        portfolios: {
+          orderBy: { sortOrder: "asc" },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            startMonth: true,
+            startYear: true,
+            endMonth: true,
+            endYear: true,
+            isOngoing: true,
+            media: {
+              orderBy: { sortOrder: "asc" },
+              select: { id: true, url: true },
+            },
+          },
+        },
       },
     }),
     prisma.matchResult.findUnique({
@@ -102,8 +126,16 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
   if (!nanny) notFound()
 
   const introVideo = nanny.media.find((m) => m.type === "INTRO_VIDEO")
+  const skillVideoMedia = nanny.media.filter((m) => m.type === "SKILL_VIDEO")
   const portfolioPhotos = nanny.media.filter((m) => m.type === "PORTFOLIO_PHOTO")
-  const skillVideos = nanny.media.filter((m) => m.type === "SKILL_VIDEO").slice(0, 3)
+
+  // Pre-compute thumbnail and embed URLs server-side (uses env vars)
+  const skillVideos = skillVideoMedia.map((v) => ({
+    id: v.id,
+    slug: v.slug,
+    thumbnailUrl: cfStream.thumbnailUrl(v.storageKey),
+    embedUrl: cfStream.embedUrl(v.storageKey),
+  }))
 
   const score = matchResult ? matchResult.skorKeseluruhan : null
   const domainA = matchResult?.skorDomainA ?? null
@@ -200,42 +232,98 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
         </div>
       )}
 
-      {/* Video intro */}
-      {introVideo && (
-        <div className="mb-4">
+      {/* Video Perkenalan — portrait aspect ratio */}
+      {introVideo ? (
+        <div className="mb-5">
           <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
-            Video perkenalan
+            Video Perkenalan
           </p>
-          <div className="rounded-[12px] overflow-hidden border border-[#E0D0F0]">
-            <iframe
-              src={streamEmbedUrl(introVideo.storageKey)}
-              width="100%"
-              style={{ aspectRatio: "16/9", display: "block" }}
-              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-              allowFullScreen
-            />
+          <div className="flex justify-center">
+            <div className="w-full max-w-[260px] rounded-[14px] overflow-hidden border border-[#E0D0F0] bg-black"
+              style={{ aspectRatio: "9/16" }}>
+              <iframe
+                src={cfStream.embedUrl(introVideo.storageKey)}
+                className="w-full h-full"
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+                title="Video Perkenalan"
+              />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="mb-5 border-2 border-dashed border-[#E0D0F0] rounded-[14px] p-5 text-center">
+          <p className="text-[12px] text-[#999AAA]">Belum ada video perkenalan</p>
+        </div>
+      )}
+
+      {/* Video Keahlian — horizontal card feed + fullscreen Swiper */}
+      {skillVideos.length > 0 ? (
+        <div className="mb-5">
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-3">
+            Video Keahlian · {skillVideos.length} video
+          </p>
+          <SkillVideoFeed videos={skillVideos} />
+        </div>
+      ) : (
+        <div className="mb-5">
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
+            Video Keahlian
+          </p>
+          <div className="border-2 border-dashed border-[#E0D0F0] rounded-[14px] p-5 text-center">
+            <p className="text-[12px] text-[#999AAA]">Belum ada video keahlian</p>
           </div>
         </div>
       )}
 
-      {/* Portfolio photos */}
-      {portfolioPhotos.length > 0 && (
-        <div className="mb-4">
-          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
-            Foto portfolio
+      {/* Pengalaman / Portfolio Entries */}
+      {nanny.portfolios.length > 0 && (
+        <div className="mb-5">
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-3">
+            Pengalaman
           </p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-4">
+            {nanny.portfolios.map((entry) => (
+              <div key={entry.id} className="border-l-2 border-[#5BBFB0] pl-3">
+                <p className="text-[13px] font-semibold text-[#5A3A7A]">{entry.title}</p>
+                <p className="text-[11px] text-[#999AAA] mt-0.5">
+                  {formatPeriod(entry.startMonth, entry.startYear, entry.endMonth, entry.endYear, entry.isOngoing)}
+                </p>
+                {entry.description && (
+                  <p className="text-[12px] text-[#666666] mt-1 leading-relaxed">{entry.description}</p>
+                )}
+                {entry.media.length > 0 && (
+                  <div className="flex gap-2 mt-2">
+                    {entry.media.map((m) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={m.id} src={m.url} alt="foto" className="w-14 h-14 object-cover rounded-[8px]" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Galeri Foto Portfolio */}
+      {portfolioPhotos.length > 0 && (
+        <div className="mb-5">
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
+            Galeri Foto
+          </p>
+          <div className="grid grid-cols-3 gap-2">
             {portfolioPhotos.map((photo) => (
               <div
                 key={photo.id}
                 className="relative aspect-square rounded-[10px] overflow-hidden bg-[#F3EEF8]"
               >
                 <Image
-                  src={r2Url(photo.storageKey)}
-                  alt={photo.slug ?? "Portfolio"}
+                  src={`${process.env.R2_PUBLIC_URL ?? "https://media.bundayakin.com"}/${photo.storageKey}`}
+                  alt={photo.slug ?? "Foto"}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 480px) 50vw, 240px"
+                  sizes="(max-width: 480px) 33vw, 160px"
                 />
               </div>
             ))}
@@ -243,8 +331,8 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
         </div>
       )}
 
-      {/* Bio & info */}
-      <div className="mb-4 space-y-3">
+      {/* Bio & Detail Profil */}
+      <div className="mb-5 space-y-4">
         {nanny.bio && (
           <div>
             <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-1.5">
@@ -256,7 +344,7 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
 
         <div>
           <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
-            Detail profil
+            Detail Profil
           </p>
           <div className="bg-white border border-[#E0D0F0] rounded-[14px] divide-y divide-[#F3EEF8]">
             {nanny.yearsOfExperience !== null && nanny.yearsOfExperience !== undefined && (
@@ -331,37 +419,10 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
         )}
       </div>
 
-      {/* Skill videos */}
-      {skillVideos.length > 0 && (
-        <div className="mb-4">
-          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
-            Video keahlian
-          </p>
-          <div className="space-y-3">
-            {skillVideos.map((video) => (
-              <div key={video.id}>
-                {video.slug && (
-                  <p className="text-[12px] font-semibold text-[#5A3A7A] mb-1">{video.slug}</p>
-                )}
-                <div className="rounded-[12px] overflow-hidden border border-[#E0D0F0]">
-                  <iframe
-                    src={streamEmbedUrl(video.storageKey)}
-                    width="100%"
-                    style={{ aspectRatio: "16/9", display: "block" }}
-                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Kontak */}
       <div className="mt-2">
         <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
-          Hubungi nanny
+          Hubungi Nanny
         </p>
         <UnlockContactButton
           nannyProfileId={params.nannyId}

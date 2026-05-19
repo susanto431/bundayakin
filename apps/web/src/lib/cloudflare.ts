@@ -126,8 +126,10 @@ export const cfStream = {
     const data = await res.json()
     return {
       uid: data.result.uid,
-      playbackUrl: `https://customer-${ACCOUNT_ID}.cloudflarestream.com/${uid}/manifest/video.m3u8`,
-      thumbnailUrl: `https://customer-${ACCOUNT_ID}.cloudflarestream.com/${uid}/thumbnails/thumbnail.jpg`,
+      // Ambil dari API response — jangan konstruksi manual pakai ACCOUNT_ID
+      // (ACCOUNT_ID ≠ customer subdomain CF Stream)
+      playbackUrl: data.result.playback?.hls ?? `https://videodelivery.net/${uid}/manifest/video.m3u8`,
+      thumbnailUrl: data.result.thumbnail ?? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`,
     }
   },
 
@@ -147,6 +149,7 @@ export const cfStream = {
   },
 
   thumbnailUrl(uid: string) {
-    return `https://customer-${ACCOUNT_ID}.cloudflarestream.com/${uid}/thumbnails/thumbnail.jpg`
+    // videodelivery.net tidak butuh customer subdomain (ACCOUNT_ID ≠ customer subdomain)
+    return `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`
   },
 }
