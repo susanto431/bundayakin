@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import ChildDetailClient from "./ChildDetailClient"
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata() {
   return { title: "Detail Anak — BundaYakin" }
 }
 

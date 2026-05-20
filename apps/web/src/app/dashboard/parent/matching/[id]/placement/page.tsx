@@ -61,7 +61,7 @@ export default async function PlacementFeePage({ params }: { params: { id: strin
       nannyCity={nannyCity}
       nannyType={nannyType}
       score={score}
-      children={parentProfile.children.map(c => ({
+      childList={parentProfile.children.map(c => ({
         id: c.id,
         name: c.name,
         ageGroup: c.ageGroup,

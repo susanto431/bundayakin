@@ -16,15 +16,6 @@ const AGE_OPTIONS = [
   { label: "6 tahun ke atas", months: 90 },
 ]
 
-function ageGroupLabel(dob: Date): string {
-  const months = (Date.now() - dob.getTime()) / (1000 * 60 * 60 * 24 * 30.44)
-  if (months < 6) return "0–6 bulan"
-  if (months < 12) return "6–12 bulan"
-  if (months < 36) return "1–3 tahun"
-  if (months < 72) return "3–6 tahun"
-  return "6 tahun ke atas"
-}
-
 function monthsAgoDate(months: number): string {
   const d = new Date()
   d.setMonth(d.getMonth() - months)

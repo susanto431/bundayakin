@@ -16,7 +16,7 @@ type Props = {
   nannyCity: string | null
   nannyType: string
   score: number | null
-  children: Child[]
+  childList: Child[]
   placementFeeIDR: number
 }
 
@@ -41,11 +41,11 @@ export default function PlacementClient({
   nannyCity,
   nannyType,
   score,
-  children,
+  childList,
   placementFeeIDR,
 }: Props) {
   const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(
-    () => new Set(children.length === 1 ? [children[0].id] : [])
+    () => new Set(childList.length === 1 ? [childList[0].id] : [])
   )
   const [agreed, setAgreed] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -139,7 +139,7 @@ export default function PlacementClient({
         Sus {firstName} akan merawat siapa?
       </p>
       <div className="bg-white border border-[#E0D0F0] rounded-[16px] overflow-hidden mb-4">
-        {children.length === 0 ? (
+        {childList.length === 0 ? (
           <div className="p-4 text-center">
             <p className="text-[13px] text-[#999AAA]">Belum ada data anak.</p>
             <Link href="/dashboard/parent/children" className="text-[13px] text-[#A97CC4] font-semibold mt-1 inline-block">
@@ -147,14 +147,14 @@ export default function PlacementClient({
             </Link>
           </div>
         ) : (
-          children.map((child, idx) => {
+          childList.map((child, idx) => {
             const checked = selectedChildIds.has(child.id)
             return (
               <button
                 key={child.id}
                 onClick={() => toggleChild(child.id)}
                 className={`w-full flex items-center gap-3 px-3.5 py-3 min-h-[48px] text-left transition-colors ${
-                  idx < children.length - 1 ? "border-b border-[#E0D0F0]" : ""
+                  idx < childList.length - 1 ? "border-b border-[#E0D0F0]" : ""
                 } ${checked ? "bg-[#F3EEF8]" : "bg-white hover:bg-[#FDFBFF]"}`}
               >
                 {/* Checkbox */}
