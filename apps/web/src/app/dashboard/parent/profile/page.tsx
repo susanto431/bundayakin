@@ -15,7 +15,7 @@ export default async function ParentProfilePage() {
 
   const initial = {
     fullName: profile?.fullName ?? session?.user?.name ?? "",
-    phone: profile?.phone ?? "",
+    phone: profile?.user?.phone ?? "",
     province: profile?.province ?? "",
     city: profile?.city ?? "",
     district: profile?.district ?? "",

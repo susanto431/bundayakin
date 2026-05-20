@@ -73,7 +73,7 @@ export function getParentMatchingData(userId: string) {
         where: { userId },
         select: {
           fullName: true,
-          phone: true,
+          user: { select: { phone: true } },
           city: true,
           district: true,
           surveyCompletedAt: true,
@@ -106,7 +106,7 @@ export function getParentProfile(userId: string) {
     async () =>
       prisma.parentProfile.findUnique({
         where: { userId },
-        select: { fullName: true, phone: true, province: true, city: true, district: true, address: true },
+        select: { fullName: true, user: { select: { phone: true } }, province: true, city: true, district: true, address: true },
       }),
     [`parent-profile`, userId],
     { revalidate: 60, tags: [`parent-${userId}`] }

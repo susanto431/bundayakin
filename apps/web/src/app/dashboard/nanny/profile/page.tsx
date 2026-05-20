@@ -16,7 +16,7 @@ export default async function NannyProfilePage() {
 
   const initial = {
     fullName: profile?.fullName ?? session?.user?.name ?? "",
-    phone: profile?.phone ?? "",
+    phone: profile?.user?.phone ?? "",
     dateOfBirth: profile?.dateOfBirth
       ? (d(profile.dateOfBirth)?.toISOString().split("T")[0] ?? "")
       : "",

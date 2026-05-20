@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
           select: {
             id: true, userId: true, fullName: true, dateOfBirth: true, city: true,
             educationLevel: true, yearsOfExperience: true, nannyType: true,
-            profilePhotoUrl: true, phone: true, bio: true,
+            profilePhotoUrl: true, user: { select: { phone: true } }, bio: true,
           },
         },
       },
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
           select: {
             id: true, userId: true, fullName: true, dateOfBirth: true, city: true,
             educationLevel: true, yearsOfExperience: true, nannyType: true,
-            profilePhotoUrl: true, phone: true, bio: true,
+            profilePhotoUrl: true, user: { select: { phone: true } }, bio: true,
           },
         },
       },

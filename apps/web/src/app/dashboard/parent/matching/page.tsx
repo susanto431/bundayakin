@@ -54,7 +54,7 @@ export default async function ParentMatchingPage({
     : null
 
   const parentName = profile?.fullName ?? session?.user?.name ?? "Orang tua"
-  const parentPhone = profile?.phone ?? "-"
+  const parentPhone = profile?.user?.phone ?? "-"
   const parentEmail = session?.user?.email ?? "-"
   const parentLocation = [profile?.district, profile?.city].filter(Boolean).join(", ") || "Belum diisi"
   const helpWaMessage = encodeURIComponent(

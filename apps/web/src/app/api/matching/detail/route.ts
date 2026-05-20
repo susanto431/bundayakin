@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
             yearsOfExperience: true,
             nannyType: true,
             profilePhotoUrl: true,
-            phone: true,
+            user: { select: { phone: true } },
             bio: true,
           },
         },

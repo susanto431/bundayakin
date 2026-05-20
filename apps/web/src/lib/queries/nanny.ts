@@ -81,7 +81,7 @@ export function getNannyProfile(userId: string) {
         where: { userId },
         select: {
           fullName: true,
-          phone: true,
+          user: { select: { phone: true } },
           dateOfBirth: true,
           province: true,
           city: true,

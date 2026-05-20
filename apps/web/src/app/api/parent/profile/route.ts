@@ -60,8 +60,8 @@ export async function PATCH(request: Request) {
           where: { id: session.user.id },
           data: { phone: newPhone },
         })
-      } catch (e: any) {
-        if (e?.code === "P2002") {
+      } catch (e: unknown) {
+        if (e instanceof Error && (e as { code?: string }).code === "P2002") {
           return NextResponse.json({ success: false, error: "Nomor HP sudah digunakan akun lain" }, { status: 409 })
         }
         throw e
