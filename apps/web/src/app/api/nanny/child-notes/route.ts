@@ -17,6 +17,9 @@ export async function POST(request: Request) {
     if (!body.childId || !body.notes?.trim()) {
       return NextResponse.json({ success: false, error: "Data tidak lengkap" }, { status: 400 })
     }
+    if (body.notes.trim().length > 2000) {
+      return NextResponse.json({ success: false, error: "Catatan terlalu panjang (maks. 2000 karakter)" }, { status: 400 })
+    }
 
     const nannyProfile = await prisma.nannyProfile.findUnique({
       where: { userId: session.user.id },

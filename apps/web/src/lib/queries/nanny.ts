@@ -13,11 +13,13 @@ export function getNannyDashboard(userId: string) {
           city: true,
           surveyCompletedAt: true,
           matchingRequests: {
+            where: { status: { in: ["PENDING", "PROCESSING", "COMPLETED", "NEGOTIATING"] } },
             orderBy: { updatedAt: "desc" },
             take: 3,
             select: {
               id: true,
               status: true,
+              parentProfileId: true,
               matchingResult: { select: { scoreOverall: true } },
               parentProfile: { select: { fullName: true } },
             },
@@ -29,11 +31,11 @@ export function getNannyDashboard(userId: string) {
             select: {
               id: true,
               startDate: true,
+              parentProfileId: true,
               parentProfile: {
                 select: {
                   fullName: true,
                   children: {
-                    take: 1,
                     orderBy: { createdAt: "asc" },
                     select: { name: true, ageGroup: true },
                   },
@@ -215,7 +217,7 @@ export function getNannyChildren(userId: string) {
           id: true,
           fullName: true,
           matchingRequests: {
-            where: { status: { in: ["PENDING", "PROCESSING", "COMPLETED", "NEGOTIATING"] } },
+            where: { status: { in: ["PENDING", "PROCESSING", "COMPLETED", "NEGOTIATING", "ACCEPTED"] } },
             orderBy: { updatedAt: "desc" },
             take: 1,
             select: {
