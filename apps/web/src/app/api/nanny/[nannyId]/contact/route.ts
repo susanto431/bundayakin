@@ -36,14 +36,14 @@ export async function GET(_req: Request, { params }: { params: { nannyId: string
 
     const nanny = await prisma.nannyProfile.findUnique({
       where: { id: params.nannyId },
-      select: { phone: true },
+      select: { user: { select: { phone: true } } },
     })
 
     if (!nanny) {
       return NextResponse.json({ success: false, error: "Nanny tidak ditemukan" }, { status: 404 })
     }
 
-    const rawPhone = nanny.phone ?? null
+    const rawPhone = nanny.user?.phone ?? null
     const whatsapp = rawPhone
       ? rawPhone.replace(/\D/g, "").replace(/^0/, "62")
       : null

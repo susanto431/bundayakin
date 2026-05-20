@@ -19,30 +19,23 @@ export async function POST() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, name: true, email: true, phone: true, parentProfile: { select: { id: true, phone: true } } },
+      select: { id: true, name: true, email: true, phone: true },
     })
     if (!user?.email) {
       return NextResponse.json({ success: false, error: "Email pengguna tidak ditemukan. Tambahkan email di halaman profil." }, { status: 400 })
     }
-
-    const rawPhone = user.parentProfile?.phone ?? user.phone
-    if (!rawPhone) {
+    if (!user.phone) {
       return NextResponse.json({ success: false, error: "Nomor HP diperlukan untuk pembayaran. Tambahkan nomor HP di halaman profil." }, { status: 400 })
     }
-    const normalizedPhone = rawPhone.replace(/\D/g, "").replace(/^0/, "62")
+    const normalizedPhone = user.phone.replace(/\D/g, "").replace(/^0/, "62")
     if (normalizedPhone.length < 10) {
       return NextResponse.json({ success: false, error: `Nomor HP tidak valid (${normalizedPhone.length} digit, minimal 10). Perbarui nomor HP di halaman profil.` }, { status: 400 })
     }
 
-    let parentProfile = user.parentProfile
-      ? { id: user.parentProfile.id }
-      : null
-    if (!parentProfile) {
-      parentProfile = await prisma.parentProfile.findUnique({
-        where: { userId: user.id },
-        select: { id: true },
-      })
-    }
+    let parentProfile = await prisma.parentProfile.findUnique({
+      where: { userId: user.id },
+      select: { id: true },
+    })
     if (!parentProfile) {
       parentProfile = await prisma.parentProfile.create({
         data: { userId: user.id, fullName: user.name ?? "Orang tua" },
@@ -91,7 +84,6 @@ export async function POST() {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
     console.error("[PAYMENT_CREATE] error:", msg)
-    // Surfacing pesan Mayar ke client supaya bisa debug
     if (msg.startsWith("Mayar error")) {
       return NextResponse.json({ success: false, error: msg }, { status: 500 })
     }

@@ -14,12 +14,16 @@ export async function GET() {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { phone: true },
+    })
+
     const profile = await prisma.nannyProfile.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
         fullName: true,
-        phone: true,
         dateOfBirth: true,
         province: true,
         city: true,
@@ -38,7 +42,7 @@ export async function GET() {
       },
     })
 
-    return NextResponse.json({ success: true, data: profile })
+    return NextResponse.json({ success: true, data: profile ? { ...profile, phone: user?.phone ?? "" } : null })
   } catch (error) {
     console.error("[NANNY_PROFILE_GET]", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
@@ -79,12 +83,27 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ success: false, error: "Nama tidak boleh kosong" }, { status: 400 })
     }
 
+    // Update User.phone jika ada perubahan
+    if (body.phone !== undefined) {
+      const newPhone = body.phone.trim() || null
+      try {
+        await prisma.user.update({
+          where: { id: session.user.id },
+          data: { phone: newPhone },
+        })
+      } catch (e: any) {
+        if (e?.code === "P2002") {
+          return NextResponse.json({ success: false, error: "Nomor HP sudah digunakan akun lain" }, { status: 409 })
+        }
+        throw e
+      }
+    }
+
     const profile = await prisma.nannyProfile.upsert({
       where: { userId: session.user.id },
       create: {
         userId: session.user.id,
         fullName: body.fullName?.trim() ?? session.user.name ?? "Nanny",
-        phone: body.phone?.trim() || null,
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
         province: body.province?.trim() || null,
         city: body.city?.trim() || null,
@@ -103,7 +122,6 @@ export async function PATCH(request: Request) {
       },
       update: {
         ...(body.fullName !== undefined && { fullName: body.fullName.trim() }),
-        ...(body.phone !== undefined && { phone: body.phone.trim() || null }),
         ...(body.dateOfBirth !== undefined && { dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null }),
         ...(body.province !== undefined && { province: body.province.trim() || null }),
         ...(body.city !== undefined && { city: body.city.trim() || null }),

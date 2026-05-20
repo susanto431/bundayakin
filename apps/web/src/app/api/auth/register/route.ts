@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     // Always create the role-specific profile immediately so survey and matching work.
     if (role === "NANNY") {
       const nannyProfile = await prisma.nannyProfile.create({
-        data: { userId: user.id, fullName: name, phone: phone ?? null, openToJob: true },
+        data: { userId: user.id, fullName: name, openToJob: true },
         select: { id: true },
       })
 
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       }
     } else if (role === "PARENT") {
       await prisma.parentProfile.create({
-        data: { userId: user.id, fullName: name, phone: phone ?? null },
+        data: { userId: user.id, fullName: name },
         select: { id: true },
       })
     }

@@ -11,11 +11,15 @@ export async function GET() {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
+    const userPhone = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { phone: true },
+    })
+
     const data = await prisma.nannyProfile.findUnique({
       where: { userId: session.user.id },
       select: {
         fullName: true,
-        phone: true,
         city: true,
         district: true,
         address: true,
@@ -31,7 +35,7 @@ export async function GET() {
     })
 
     const payload = JSON.stringify(
-      { exportedAt: new Date().toISOString(), profile: data },
+      { exportedAt: new Date().toISOString(), profile: { ...data, phone: userPhone?.phone ?? null } },
       null,
       2
     )

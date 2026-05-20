@@ -20,7 +20,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
         parentProfileId: true,
         nannyProfileId: true,
         parentProfile: { select: { userId: true } },
-        nannyProfile: { select: { phone: true } },
+        nannyProfile: { select: { user: { select: { phone: true } } } },
       },
     })
 
@@ -46,7 +46,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
       return NextResponse.json({ success: false, error: "Kontak belum dibuka" }, { status: 403 })
     }
 
-    const rawPhone = matchingRequest.nannyProfile?.phone ?? null
+    const rawPhone = matchingRequest.nannyProfile?.user?.phone ?? null
     // Normalise to WA-ready format: strip +/spaces/dashes, replace leading 0 with 62
     const whatsapp = rawPhone
       ? rawPhone.replace(/\D/g, "").replace(/^0/, "62")

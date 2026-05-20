@@ -214,7 +214,6 @@ model ParentProfile {
   id              String   @id @default(cuid())
   userId          String   @unique
   fullName        String
-  phone           String?
   province        String?  // provinsi
   city            String?
   district        String?  // kecamatan
@@ -327,7 +326,6 @@ model NannyProfile {
   fullName            String
   dateOfBirth         DateTime?
   gender              String?            @default("Perempuan")
-  phone               String?
   province            String?            // provinsi
   city                String?
   district            String?
