@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { AGE_OPTIONS, AGE_GROUP_LABEL, monthsAgoDate } from "@/constants/children"
 
 type Child = {
   id: string
@@ -11,26 +12,6 @@ type Child = {
   allergies: string | null
   medicalNotes: string | null
   pantangan: string | null
-}
-
-const AGE_OPTIONS = [
-  { label: "0–6 bln", months: 3 },
-  { label: "6–12 bln", months: 9 },
-  { label: "1–3 thn", months: 24 },
-  { label: "3 thn ke atas", months: 54 },
-]
-
-const AGE_GROUP_LABEL: Record<string, string> = {
-  INFANT_0_6M: "0–6 bln",
-  INFANT_6_12M: "6–12 bln",
-  TODDLER_1_3Y: "1–3 thn",
-  PRESCHOOL_3_6Y: "3 thn ke atas",
-}
-
-function monthsAgoDate(months: number): string {
-  const d = new Date()
-  d.setMonth(d.getMonth() - months)
-  return d.toISOString().split("T")[0]
 }
 
 export default function ChildrenListClient({ initialChildren }: { initialChildren: Child[] }) {
@@ -141,7 +122,7 @@ export default function ChildrenListClient({ initialChildren }: { initialChildre
       {children.length > 0 && (
         <div className="space-y-2.5 mb-4">
           {children.map(child => {
-            const hasProfile = !!child.name
+            const hasProfile = !!child.allergies
             const hasDevelopment = !!child.medicalNotes
             const hasRules = !!child.pantangan
             const initials = child.name.split(" ").map(w => w[0]).slice(0, 2).join("")

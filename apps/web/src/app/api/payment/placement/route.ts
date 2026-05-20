@@ -1,9 +1,8 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { createMayarInvoice } from "@/lib/mayar"
+import { PLACEMENT_FEE_IDR } from "@/constants/pricing"
 import { NextResponse } from "next/server"
-
-const PLACEMENT_FEE_IDR = 1_200_000
 
 // POST /api/payment/placement
 // Orang tua konfirmasi penempatan nanny, memilih anak yang ditangani, dan membayar fee.

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { AGE_GROUP_LABEL } from "@/constants/children"
 
 type Child = {
   id: string
@@ -26,13 +27,7 @@ const NANNY_TYPE_LABEL: Record<string, string> = {
   TEMPORARY: "Sementara / kontrak singkat",
 }
 
-const AGE_GROUP_SHORT: Record<string, string> = {
-  INFANT_0_6M: "0–6 bln",
-  INFANT_6_12M: "6–12 bln",
-  TODDLER_1_3Y: "1–3 thn",
-  PRESCHOOL_3_6Y: "3 thn ke atas",
-  MIXED: "Campuran",
-}
+const AGE_GROUP_SHORT: Record<string, string> = { ...AGE_GROUP_LABEL, MIXED: "Campuran" }
 
 function formatRupiah(amount: number) {
   if (amount >= 1_000_000) return `${(amount / 1_000_000).toFixed(amount % 1_000_000 === 0 ? 0 : 1)}jt`
@@ -214,11 +209,17 @@ export default function PlacementClient({
 
       {/* T&C checkbox */}
       <label className="flex items-start gap-2.5 cursor-pointer mb-4">
+        <input
+          type="checkbox"
+          className="sr-only"
+          checked={agreed}
+          onChange={e => setAgreed(e.target.checked)}
+        />
         <div
+          aria-hidden="true"
           className={`w-5 h-5 rounded-[6px] border-[1.5px] flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
             agreed ? "bg-[#5BBFB0] border-[#5BBFB0]" : "bg-white border-[#C8B8DC]"
           }`}
-          onClick={() => setAgreed(v => !v)}
         >
           {agreed && (
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

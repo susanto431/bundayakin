@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic"
 
 import { cachedAuth } from "@/lib/auth-server"
-import { getParentSubscription } from "@/lib/queries/parent"
 import { prisma } from "@/lib/prisma"
 import { d } from "@/lib/date"
 import Link from "next/link"
@@ -14,8 +13,21 @@ export default async function ChildrenPage() {
 
   if (!session?.user?.id) return null
 
-  const subData = await getParentSubscription(session.user.id)
-  const sub = subData?.subscription
+  const profile = await prisma.parentProfile.findUnique({
+    where: { userId: session.user.id },
+    select: {
+      subscription: { select: { status: true, endDate: true } },
+      children: {
+        orderBy: [{ sortOrder: "asc" }, { dateOfBirth: "asc" }],
+        select: {
+          id: true, name: true, ageGroup: true, gender: true,
+          allergies: true, medicalNotes: true, pantangan: true,
+        },
+      },
+    },
+  })
+
+  const sub = profile?.subscription
   const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && d(sub.endDate)! > new Date()
 
   if (!isPaid) {
@@ -52,19 +64,6 @@ export default async function ChildrenPage() {
       </div>
     )
   }
-
-  const profile = await prisma.parentProfile.findUnique({
-    where: { userId: session.user.id },
-    select: {
-      children: {
-        orderBy: [{ sortOrder: "asc" }, { dateOfBirth: "asc" }],
-        select: {
-          id: true, name: true, ageGroup: true, gender: true,
-          allergies: true, medicalNotes: true, pantangan: true,
-        },
-      },
-    },
-  })
 
   const children = profile?.children ?? []
 

@@ -1,0 +1,3 @@
+export const SUBSCRIPTION_FEE_IDR = 500_000
+export const PLACEMENT_FEE_IDR = 1_200_000
+export const EXTRA_CONNECTION_FEE_IDR = 100_000

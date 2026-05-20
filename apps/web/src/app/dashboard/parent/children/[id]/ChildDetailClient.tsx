@@ -20,25 +20,9 @@ type Child = {
   updatedAt: string
 }
 
-const AGE_OPTIONS = [
-  { label: "0–6 bln", months: 3 },
-  { label: "6–12 bln", months: 9 },
-  { label: "1–3 thn", months: 24 },
-  { label: "3 thn ke atas", months: 54 },
-]
+import { AGE_OPTIONS, AGE_GROUP_LABEL, monthsAgoDate } from "@/constants/children"
 
-const AGE_GROUP_TO_LABEL: Record<string, string> = {
-  INFANT_0_6M: "0–6 bln",
-  INFANT_6_12M: "6–12 bln",
-  TODDLER_1_3Y: "1–3 thn",
-  PRESCHOOL_3_6Y: "3 thn ke atas",
-}
-
-function monthsAgoDate(months: number): string {
-  const d = new Date()
-  d.setMonth(d.getMonth() - months)
-  return d.toISOString().split("T")[0]
-}
+const AGE_GROUP_TO_LABEL = AGE_GROUP_LABEL
 
 async function saveChild(id: string, data: Record<string, unknown>) {
   const res = await fetch(`/api/parent/children/${id}`, {
@@ -63,6 +47,18 @@ function inputCls() {
 
 function textareaCls() {
   return "w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[90px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#999AAA] outline-none transition-all resize-none leading-relaxed"
+}
+
+function SaveButton({ saving, saved }: { saving: boolean; saved: boolean }) {
+  return (
+    <button
+      type="submit"
+      disabled={saving}
+      className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] disabled:opacity-50 text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
+    >
+      {saving ? "Menyimpan..." : saved ? "Tersimpan ✓" : "Simpan perubahan"}
+    </button>
+  )
 }
 
 export default function ChildDetailClient({ child }: { child: Child }) {
@@ -146,16 +142,6 @@ export default function ChildDetailClient({ child }: { child: Child }) {
       setErrorRules(result.error ?? "Gagal menyimpan. Coba lagi.")
     }
   }
-
-  const SaveButton = ({ saving, saved }: { saving: boolean; saved: boolean }) => (
-    <button
-      type="submit"
-      disabled={saving}
-      className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] disabled:opacity-50 text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all"
-    >
-      {saving ? "Menyimpan..." : saved ? "Tersimpan ✓" : "Simpan perubahan"}
-    </button>
-  )
 
   return (
     <div className="max-w-[480px] mx-auto px-4 pt-5 pb-28">

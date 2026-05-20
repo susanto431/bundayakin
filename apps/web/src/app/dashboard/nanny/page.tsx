@@ -1,5 +1,6 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { getNannyDashboard } from "@/lib/queries/nanny"
+import { AGE_GROUP_LABEL } from "@/constants/children"
 import { d } from "@/lib/date"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
@@ -68,20 +69,13 @@ export default async function NannyDashboardPage() {
   const familyName = assignment?.parentProfile?.fullName
     ? assignment.parentProfile.fullName.split(" ")[0]
     : null
-  const AGE_GROUP_SHORT: Record<string, string> = {
-    INFANT_0_6M: "0–6 bln",
-    INFANT_6_12M: "6–12 bln",
-    TODDLER_1_3Y: "1–3 thn",
-    PRESCHOOL_3_6Y: "3 thn ke atas",
-  }
-
   const children = assignment?.assignedChildren?.map(ac => ac.childProfile) ?? []
   const firstChild = children[0] ?? null
   const childLabel = children.length > 1
     ? children.map(c => c.name).join(", ")
     : (firstChild?.name ?? "si Kecil")
   const childAgeLabel = children.length === 1 && firstChild?.ageGroup
-    ? ` (${AGE_GROUP_SHORT[firstChild.ageGroup] ?? firstChild.ageGroup})`
+    ? ` (${AGE_GROUP_LABEL[firstChild.ageGroup] ?? firstChild.ageGroup})`
     : ""
 
   const bonusPending = (profile?.referralsGiven ?? []).reduce(

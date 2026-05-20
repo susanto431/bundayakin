@@ -1,17 +1,10 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { getNannyChildren } from "@/lib/queries/nanny"
+import { AGE_GROUP_LABEL_LONG as AGE_GROUP_LABEL } from "@/constants/children"
 import Link from "next/link"
 import NannyChildNotesForm from "./NannyChildNotesForm"
 
 export const metadata = { title: "Catatan Anak — BundaYakin" }
-
-const AGE_GROUP_LABEL: Record<string, string> = {
-  INFANT_0_6M: "Bayi 0–6 bulan",
-  INFANT_6_12M: "Bayi 6–12 bulan",
-  TODDLER_1_3Y: "Balita 1–3 tahun",
-  PRESCHOOL_3_6Y: "3 tahun ke atas",
-  MIXED: "Lebih dari satu rentang usia",
-}
 
 export default async function NannyChildrenPage() {
   const session = await cachedAuth()

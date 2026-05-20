@@ -224,6 +224,7 @@ export function getNannyChildren(userId: string) {
           },
           nannyAssignments: {
             where: { isActive: true },
+            orderBy: { startDate: "desc" },
             take: 1,
             select: {
               id: true,

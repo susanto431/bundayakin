@@ -16,7 +16,6 @@ export default async function ChildDetailPage({ params }: { params: { id: string
     select: {
       id: true,
       name: true,
-      dateOfBirth: true,
       ageGroup: true,
       gender: true,
       allergies: true,

@@ -1,11 +1,10 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
+import { PLACEMENT_FEE_IDR } from "@/constants/pricing"
 import PlacementClient from "./PlacementClient"
 
 export const metadata = { title: "Konfirmasi Penempatan Nanny — BundaYakin" }
-
-const PLACEMENT_FEE_IDR = 1_200_000
 
 export default async function PlacementFeePage({ params }: { params: { id: string } }) {
   const session = await cachedAuth()
