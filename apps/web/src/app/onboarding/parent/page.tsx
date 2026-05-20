@@ -42,7 +42,6 @@ export default function OnboardingParentPage() {
   const [allergies, setAllergies] = useState("")
   const [additionalNotes, setAdditionalNotes] = useState("")
   const [loading, setLoading] = useState(false)
-  const [existingChildId, setExistingChildId] = useState<string | null>(null)
   const [fetching, setFetching] = useState(true)
 
   useEffect(() => {
@@ -50,20 +49,13 @@ export default function OnboardingParentPage() {
       .then(r => r.json())
       .then(({ data }) => {
         if (data?.length > 0) {
-          const c = data[0]
-          setExistingChildId(c.id)
-          setChildName(c.name ?? "")
-          setChildGender((c.gender as ChildGender) ?? "FEMALE")
-          setAllergies(c.allergies ?? "")
-          setAdditionalNotes(c.additionalNotes ?? "")
-          if (c.dateOfBirth) {
-            setChildAgeLabel(ageGroupLabel(new Date(c.dateOfBirth)))
-          }
+          // Sudah ada anak — arahkan ke halaman manajemen anak
+          router.replace("/dashboard/parent/children")
         }
       })
       .catch(() => {})
       .finally(() => setFetching(false))
-  }, [])
+  }, [router])
 
   const isToddler = childAgeLabel === "1–3 tahun"
   const selectedAgeOption = AGE_OPTIONS.find(o => o.label === childAgeLabel) ?? AGE_OPTIONS[2]
@@ -80,19 +72,11 @@ export default function OnboardingParentPage() {
       additionalNotes,
     }
     try {
-      if (existingChildId) {
-        await fetch(`/api/parent/children/${existingChildId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        })
-      } else {
-        await fetch("/api/parent/children", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        })
-      }
+      await fetch("/api/parent/children", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
     } catch {
       // non-blocking
     }
@@ -132,15 +116,12 @@ export default function OnboardingParentPage() {
           >
             ← Kembali ke catatan anak
           </Link>
-          <h2 className="text-[16px] font-bold text-[#5A3A7A]">
-            {existingChildId ? "Perbarui profil si Kecil" : "Ceritakan tentang si Kecil"}
-          </h2>
+          <h2 className="text-[16px] font-bold text-[#5A3A7A]">Ceritakan tentang si Kecil</h2>
           <p className="text-[12px] text-[#999AAA] mt-0.5">Membantu kami menemukan nanny yang paling cocok</p>
         </div>
 
         {/* Seek type */}
-        {!existingChildId && (
-          <div className="mb-4">
+        <div className="mb-4">
             <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Saya mencari nanny untuk</p>
             <div className="flex flex-wrap gap-2">
               {([["longterm", "Jangka panjang"], ["temporary", "Temporer / infal"], ["daily", "Per hari / per jam"]] as [SeekType, string][]).map(([v, label]) => (
@@ -150,7 +131,6 @@ export default function OnboardingParentPage() {
               ))}
             </div>
           </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Child name */}
@@ -248,7 +228,7 @@ export default function OnboardingParentPage() {
             disabled={loading || !childName.trim()}
             className="w-full flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px] transition-all disabled:opacity-50"
           >
-            {loading ? "Menyimpan..." : existingChildId ? "Simpan perubahan" : "Simpan & lanjut"}
+            {loading ? "Menyimpan..." : "Simpan & lanjut"}
           </button>
         </form>
       </div>

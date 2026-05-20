@@ -159,11 +159,11 @@ export default async function ParentSettingsPage() {
         {(profile?.children ?? []).map(c => (
           <div key={c.id} className="flex justify-between items-center py-2.5 border-b border-[#E0D0F0]">
             <span className="text-[13px] text-[#5A3A7A]">
-              {c.name} · {c.ageGroup} · {c.gender === "FEMALE" ? "Perempuan" : "Laki-laki"}
+              {c.name} · {c.ageGroup === "INFANT_0_6M" ? "0–6 bln" : c.ageGroup === "INFANT_6_12M" ? "6–12 bln" : c.ageGroup === "TODDLER_1_3Y" ? "1–3 thn" : "3 thn ke atas"} · {c.gender === "FEMALE" ? "Perempuan" : "Laki-laki"}
             </span>
             <Link
-              href="/onboarding/parent"
-              className="inline-flex items-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[12px] px-3.5 py-1 rounded-[8px] min-h-[36px] hover:bg-[#F3EEF8] transition-all"
+              href={`/dashboard/parent/children/${c.id}`}
+              className="inline-flex items-center bg-transparent border-[1.5px] border-[#C8B8DC] text-[#666666] font-semibold text-[12px] px-3.5 py-1 rounded-[8px] min-h-[40px] hover:bg-[#F3EEF8] transition-all"
             >
               Edit
             </Link>
@@ -171,10 +171,13 @@ export default async function ParentSettingsPage() {
         ))}
       </div>
       <Link
-        href="/onboarding/parent"
-        className="inline-flex items-center bg-[#E5F6F4] hover:bg-[#A8DDD8] text-[#1E4A45] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] border border-[#A8DDD8] transition-all mb-4"
+        href="/dashboard/parent/children"
+        className="inline-flex items-center gap-1.5 bg-[#E5F6F4] hover:bg-[#A8DDD8] text-[#1E4A45] font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[40px] border border-[#A8DDD8] transition-all mb-4"
       >
-        + Tambah profil anak
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Tambah profil anak
       </Link>
 
       {/* Bank account */}

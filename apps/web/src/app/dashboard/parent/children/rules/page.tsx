@@ -1,13 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import ParentBottomNav from "@/components/layout/ParentBottomNav"
 
 export default function ChildRulesPage() {
   const router = useRouter()
-  const [childId, setChildId] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  const childIdParam = searchParams.get("child")
+  const [childId, setChildId] = useState<string | null>(childIdParam)
   const [childName, setChildName] = useState("si Kecil")
   const [pantangan, setPantangan] = useState("")
   const [schedule, setSchedule] = useState("")
@@ -20,7 +22,9 @@ export default function ChildRulesPage() {
       .then(r => r.json())
       .then(({ data }) => {
         if (data?.length > 0) {
-          const c = data[0]
+          const c = childIdParam
+            ? (data.find((d: { id: string }) => d.id === childIdParam) ?? data[0])
+            : data[0]
           setChildId(c.id)
           setChildName(c.name ?? "si Kecil")
           setPantangan(c.pantangan ?? "")
@@ -30,7 +34,7 @@ export default function ChildRulesPage() {
       })
       .catch(() => {})
       .finally(() => setFetching(false))
-  }, [])
+  }, [childIdParam])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

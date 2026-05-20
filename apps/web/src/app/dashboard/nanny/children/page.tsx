@@ -9,7 +9,7 @@ const AGE_GROUP_LABEL: Record<string, string> = {
   INFANT_0_6M: "Bayi 0–6 bulan",
   INFANT_6_12M: "Bayi 6–12 bulan",
   TODDLER_1_3Y: "Balita 1–3 tahun",
-  PRESCHOOL_3_6Y: "Prasekolah 3–6 tahun",
+  PRESCHOOL_3_6Y: "3 tahun ke atas",
   MIXED: "Lebih dari satu rentang usia",
 }
 
@@ -23,7 +23,7 @@ export default async function NannyChildrenPage() {
   const nannyProfile = await getNannyChildren(session.user.id)
 
   const assignment = nannyProfile?.nannyAssignments?.[0]
-  const children = assignment?.parentProfile?.children ?? []
+  const children = assignment?.assignedChildren?.map(ac => ac.childProfile) ?? []
   const parentName = assignment?.parentProfile?.fullName ?? "Orang Tua"
 
   // Matching request yang sedang berjalan (tanpa assignment aktif)
@@ -178,13 +178,13 @@ export default async function NannyChildrenPage() {
                   <div className="p-3.5 space-y-2">
                     {child.pantangan && <Row label="Pantangan" value={child.pantangan} multiline />}
                     {child.schedule && <Row label="Rutinitas harian" value={child.schedule} multiline />}
-                    {child.additionalNotes && <Row label="Aturan lain / Catatan nanny" value={child.additionalNotes} multiline />}
+                    {child.additionalNotes && <Row label="Aturan lain" value={child.additionalNotes} multiline />}
                   </div>
                 </div>
               )}
 
               {/* Nanny notes form — per child */}
-              <NannyChildNotesForm childId={child.id} childName={child.name} />
+              <NannyChildNotesForm childId={child.id} childName={child.name} existingNotes={child.nannyNotes ?? null} />
             </div>
           ))}
 

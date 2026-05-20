@@ -5,9 +5,10 @@ import { useState } from "react"
 type Props = {
   childId: string
   childName: string
+  existingNotes: string | null
 }
 
-export default function NannyChildNotesForm({ childId, childName }: Props) {
+export default function NannyChildNotesForm({ childId, childName, existingNotes }: Props) {
   const [notes, setNotes] = useState("")
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -46,6 +47,13 @@ export default function NannyChildNotesForm({ childId, childName }: Props) {
       </div>
 
       <div className="p-3.5 space-y-3">
+        {existingNotes && (
+          <div className="bg-white border border-[#C8B8DC] rounded-[10px] px-3 py-2.5">
+            <p className="text-[11px] font-semibold text-[#A97CC4] uppercase tracking-wide mb-1.5">Catatan Sus sebelumnya</p>
+            <p className="text-[13px] text-[#5A3A7A] leading-relaxed whitespace-pre-line">{existingNotes}</p>
+          </div>
+        )}
+
         <p className="text-[13px] text-[#666666] leading-relaxed">
           Tuliskan pengamatan Sus — perkembangan baru, perubahan kebiasaan, atau hal penting yang perlu diketahui keluarga &amp; nanny berikutnya.
         </p>

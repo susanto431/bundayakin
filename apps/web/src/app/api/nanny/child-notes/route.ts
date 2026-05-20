@@ -29,36 +29,34 @@ export async function POST(request: Request) {
           where: { isActive: true },
           take: 1,
           select: {
-            parentProfile: {
-              select: {
-                children: { where: { id: body.childId }, select: { id: true } },
-              },
+            assignedChildren: {
+              where: { childProfileId: body.childId },
+              select: { childProfileId: true },
             },
           },
         },
       },
     })
 
-    // Verify nanny has active assignment linked to this child
-    const hasAccess = nannyProfile?.nannyAssignments?.[0]?.parentProfile?.children?.some(c => c.id === body.childId)
+    // Verify nanny has active assignment with this specific child
+    const hasAccess = (nannyProfile?.nannyAssignments?.[0]?.assignedChildren?.length ?? 0) > 0
     if (!hasAccess) {
       return NextResponse.json({ success: false, error: "Akses tidak diizinkan" }, { status: 403 })
     }
 
-    // Append nanny notes to additionalNotes field with timestamp prefix
     const child = await prisma.childProfile.findUnique({
       where: { id: body.childId },
-      select: { additionalNotes: true },
+      select: { nannyNotes: true },
     })
 
     const timestamp = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
-    const nannyNote = `[Catatan nanny · ${timestamp}]: ${body.notes.trim()}`
-    const existing = child?.additionalNotes?.trim() ?? ""
-    const updated = existing ? `${existing}\n\n${nannyNote}` : nannyNote
+    const newEntry = `[${timestamp}]: ${body.notes.trim()}`
+    const existing = child?.nannyNotes?.trim() ?? ""
+    const updated = existing ? `${existing}\n\n${newEntry}` : newEntry
 
     await prisma.childProfile.update({
       where: { id: body.childId },
-      data: { additionalNotes: updated },
+      data: { nannyNotes: updated },
     })
     revalidateTag(`nanny-${session.user.id}`)
 

@@ -21,6 +21,7 @@ export type MayarInvoiceParams = {
   customerPhone?: string
   itemName: string
   description?: string
+  redirectUrl?: string   // override default redirect setelah bayar
 }
 
 // Struktur payload webhook dari Mayar: { event, data: { ... } }
@@ -70,7 +71,7 @@ export async function createMayarInvoice(params: MayarInvoiceParams): Promise<{
     amount: params.amount,
     description: params.description ?? params.itemName,
     email: params.customerEmail,
-    redirectURL: `${appUrl}/dashboard/parent/subscription?payment=finish`,
+    redirectURL: params.redirectUrl ?? `${appUrl}/dashboard/parent/subscription?payment=finish`,
   }
   if (mobile) body.mobile = mobile
 

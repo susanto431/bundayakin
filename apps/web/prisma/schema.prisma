@@ -281,6 +281,7 @@ model ChildProfile {
   schoolName      String?
   schoolSchedule  String?
   additionalNotes String?        @db.Text
+  nannyNotes      String?        @db.Text  // catatan dari nanny — hanya bisa diisi nanny, tidak diedit orang tua
   caraMenenangkan String?        @db.Text  // cara menenangkan saat rewel
   doList          String[]                 // hal yang boleh/perlu dilakukan nanny
   dontList        String[]                 // hal yang tidak boleh dilakukan nanny
@@ -288,7 +289,8 @@ model ChildProfile {
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
-  parentProfile ParentProfile @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+  parentProfile ParentProfile  @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+  assignments   AssignmentChild[]
 
   @@index([parentProfileId])
 }
@@ -475,6 +477,7 @@ model Transaction {
   paidAt             DateTime?
   expiredAt          DateTime?
   notes              String?
+  metadata           Json?             // data konteks tambahan (matchingRequestId, childIds, dll)
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 
@@ -722,11 +725,32 @@ model NannyAssignment {
   evaluations Evaluation[]
 
   // Check-ins
-  checkins Checkin[]
+  checkins         Checkin[]
+
+  // Anak-anak yang ditangani nanny dalam penugasan ini
+  assignedChildren AssignmentChild[]
 
   @@index([parentProfileId])
   @@index([nannyProfileId])
   @@index([isActive])
+}
+
+// ============================================================
+// ASSIGNMENT CHILD — many-to-many NannyAssignment ↔ ChildProfile
+// ============================================================
+
+model AssignmentChild {
+  assignmentId   String
+  childProfileId String
+  isPrimary      Boolean  @default(false)
+  assignedAt     DateTime @default(now())
+
+  assignment   NannyAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  childProfile ChildProfile    @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+
+  @@id([assignmentId, childProfileId])
+  @@index([assignmentId])
+  @@index([childProfileId])
 }
 
 // ============================================================

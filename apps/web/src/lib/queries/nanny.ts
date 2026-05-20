@@ -32,14 +32,10 @@ export function getNannyDashboard(userId: string) {
               id: true,
               startDate: true,
               parentProfileId: true,
-              parentProfile: {
-                select: {
-                  fullName: true,
-                  children: {
-                    orderBy: { createdAt: "asc" },
-                    select: { name: true, ageGroup: true },
-                  },
-                },
+              parentProfile: { select: { fullName: true } },
+              assignedChildren: {
+                orderBy: { assignedAt: "asc" },
+                select: { childProfile: { select: { name: true, ageGroup: true } } },
               },
               checkins: {
                 where: { nannyDoneAt: null },
@@ -231,11 +227,12 @@ export function getNannyChildren(userId: string) {
             take: 1,
             select: {
               id: true,
-              parentProfile: {
+              parentProfile: { select: { fullName: true } },
+              assignedChildren: {
+                orderBy: { assignedAt: "asc" },
                 select: {
-                  fullName: true,
-                  children: {
-                    orderBy: { createdAt: "asc" },
+                  isPrimary: true,
+                  childProfile: {
                     select: {
                       id: true,
                       name: true,
@@ -248,6 +245,7 @@ export function getNannyChildren(userId: string) {
                       schoolName: true,
                       schoolSchedule: true,
                       additionalNotes: true,
+                      nannyNotes: true,
                       updatedAt: true,
                     },
                   },
