@@ -51,6 +51,8 @@ export async function createMayarInvoice(params: MayarInvoiceParams): Promise<{
   invoiceId: string
   paymentUrl: string
 }> {
+  if (!API_KEY) throw new Error("Mayar error: MAYAR_API_KEY tidak dikonfigurasi di environment variables")
+
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 
   const body = {
@@ -78,10 +80,14 @@ export async function createMayarInvoice(params: MayarInvoiceParams): Promise<{
 
   const data = await res.json()
 
-  return {
-    invoiceId: data.data?.id ?? data.id,
-    paymentUrl: data.data?.link ?? data.link,
+  const invoiceId = data.data?.id ?? data.id
+  const paymentUrl = data.data?.link ?? data.link
+
+  if (!paymentUrl) {
+    throw new Error(`Mayar error: link tidak ada di response. Data: ${JSON.stringify(data).slice(0, 300)}`)
   }
+
+  return { invoiceId: invoiceId ?? "", paymentUrl }
 }
 
 /**

@@ -25,13 +25,15 @@ export default async function NannyDashboardPage() {
   const honorific = profile?.gender === "Laki-laki" ? "Kak" : "Sus"
   const referralCode = `BY-REF-${session?.user?.id?.slice(-4).toUpperCase() ?? "?????"}`
 
+  const assignment = profile?.nannyAssignments?.[0] ?? null
+  const isWorking = !!assignment
+
+  // Matching requests yang sedang berjalan (hanya tampil jika belum ada assignment aktif)
+  const pendingMatches = !isWorking ? (profile?.matchingRequests ?? []) : []
   const activeMatch = profile?.matchingRequests?.[0]
   const score = activeMatch?.matchingResult?.scoreOverall
     ? Math.round(activeMatch.matchingResult.scoreOverall)
     : null
-
-  const assignment = profile?.nannyAssignments?.[0] ?? null
-  const isWorking = !!assignment
   const now = new Date()
 
   const daysWorking = assignment
@@ -188,6 +190,51 @@ export default async function NannyDashboardPage() {
             >
               Isi sekarang
             </Link>
+          </div>
+        </>
+      )}
+
+      {/* Matching sedang berjalan — tampil hanya jika belum ada assignment */}
+      {pendingMatches.length > 0 && (
+        <>
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Proses matching</p>
+          <div className="space-y-2 mb-4">
+            {pendingMatches.map(m => {
+              const parentFirstName = m.parentProfile?.fullName?.split(" ")[0] ?? "Orang tua"
+              const isDone = m.status === "COMPLETED" || m.status === "NEGOTIATING"
+              const matchScore = m.matchingResult?.scoreOverall ? Math.round(m.matchingResult.scoreOverall) : null
+              return (
+                <div key={m.id} className={`border rounded-[16px] p-3.5 ${isDone ? "bg-[#E5F6F4] border-[#A8DDD8]" : "bg-[#F3EEF8] border-[#E0D0F0]"}`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <p className={`text-[13px] font-bold ${isDone ? "text-[#1E4A45]" : "text-[#5A3A7A]"}`}>
+                        {isDone ? "✅" : "🔄"} Keluarga {parentFirstName} mengundang
+                      </p>
+                      <p className={`text-[12px] mt-0.5 ${isDone ? "text-[#2C5F5A]" : "text-[#999AAA]"}`}>
+                        {isDone && matchScore !== null
+                          ? `Kecocokan ${matchScore}% — menunggu keputusan keluarga`
+                          : m.status === "PROCESSING"
+                          ? "AI sedang menghitung kecocokan..."
+                          : "Menunggu pengisian survei kedua pihak"}
+                      </p>
+                    </div>
+                    {isDone && matchScore !== null && (
+                      <span className="flex-shrink-0 text-[11px] font-bold bg-white text-[#2C5F5A] border border-[#A8DDD8] px-2 py-0.5 rounded-full">
+                        {matchScore}%
+                      </span>
+                    )}
+                  </div>
+                  {!isDone && !profile?.surveyCompletedAt && (
+                    <Link
+                      href="/dashboard/nanny/survey"
+                      className="mt-2.5 inline-flex items-center bg-[#A97CC4] hover:bg-[#5A3A7A] text-white font-semibold text-[12px] px-3.5 py-1.5 rounded-[8px] min-h-[36px] transition-all"
+                    >
+                      Isi Tes Kecocokan sekarang →
+                    </Link>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </>
       )}

@@ -19,6 +19,10 @@ export default async function NannyChildrenPage() {
   const parentName = assignment?.parentProfile?.fullName ?? "Orang Tua"
   const childName = child?.name ?? "si Kecil"
 
+  // Matching request yang sedang berjalan (tanpa assignment aktif)
+  const pendingMatch = !assignment ? nannyProfile?.matchingRequests?.[0] : null
+  const pendingParentName = pendingMatch?.parentProfile?.fullName?.split(" ")[0] ?? null
+
   const AGE_GROUP_LABEL: Record<string, string> = {
     INFANT_0_6M: "Bayi 0–6 bulan",
     INFANT_6_12M: "Bayi 6–12 bulan",
@@ -41,23 +45,55 @@ export default async function NannyChildrenPage() {
       {!assignment || !child ? (
         /* No active assignment */
         <div className="space-y-4">
-          <div className="bg-[#F3EEF8] border border-[#C8B8DC] rounded-[16px] p-5 text-center">
-            <div className="w-12 h-12 bg-[#E8DCF0] rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A97CC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-              </svg>
+          {pendingMatch ? (
+            /* Ada matching request tapi belum ada assignment — in-progress state */
+            <div className="bg-[#E5F6F4] border border-[#A8DDD8] rounded-[16px] p-4">
+              <div className="w-10 h-10 bg-[#A8DDD8] rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E4A45" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                </svg>
+              </div>
+              <p className="text-[14px] font-bold text-[#1E4A45] text-center mb-1">Proses matching sedang berjalan</p>
+              {pendingParentName ? (
+                <p className="text-[12px] text-[#2C5F5A] text-center leading-relaxed mb-3">
+                  Keluarga <strong>{pendingParentName}</strong> mengundang Sus untuk proses matching.
+                  Catatan anak akan tersedia setelah penempatan dikonfirmasi oleh kedua pihak.
+                </p>
+              ) : (
+                <p className="text-[12px] text-[#2C5F5A] text-center leading-relaxed mb-3">
+                  Sus sedang dalam proses matching dengan sebuah keluarga.
+                  Catatan anak akan tersedia setelah penempatan dikonfirmasi.
+                </p>
+              )}
+              <div className="flex justify-center">
+                <Link
+                  href="/dashboard/nanny"
+                  className="inline-flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white font-semibold text-[13px] px-5 py-2.5 rounded-[10px] min-h-[44px] transition-all"
+                >
+                  Lihat status matching →
+                </Link>
+              </div>
             </div>
-            <p className="text-[14px] font-bold text-[#5A3A7A] mb-1">Belum Ada Penugasan Aktif</p>
-            <p className="text-[12px] text-[#666666] leading-relaxed mb-4">
-              Sus belum memiliki penugasan aktif. Halaman ini bisa diakses setelah Sus mulai bekerja dengan keluarga di BundaYakin.
-            </p>
-            <Link
-              href="/dashboard/nanny"
-              className="inline-flex items-center justify-center bg-[#A97CC4] hover:bg-[#5A3A7A] text-white font-semibold text-[13px] px-5 py-2.5 rounded-[10px] min-h-[44px] transition-all"
-            >
-              Kembali ke Dashboard
-            </Link>
-          </div>
+          ) : (
+            /* Tidak ada matching sama sekali */
+            <div className="bg-[#F3EEF8] border border-[#C8B8DC] rounded-[16px] p-5 text-center">
+              <div className="w-12 h-12 bg-[#E8DCF0] rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A97CC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+              </div>
+              <p className="text-[14px] font-bold text-[#5A3A7A] mb-1">Belum Ada Penugasan Aktif</p>
+              <p className="text-[12px] text-[#666666] leading-relaxed mb-4">
+                Halaman ini bisa diakses setelah Sus mulai bekerja dengan keluarga di BundaYakin.
+              </p>
+              <Link
+                href="/dashboard/nanny"
+                className="inline-flex items-center justify-center bg-[#A97CC4] hover:bg-[#5A3A7A] text-white font-semibold text-[13px] px-5 py-2.5 rounded-[10px] min-h-[44px] transition-all"
+              >
+                Kembali ke Dashboard
+              </Link>
+            </div>
+          )}
 
           <div className="bg-[#E5F6F4] border border-[#A8DDD8] rounded-[16px] p-4">
             <p className="text-[12px] font-bold text-[#1E4A45] mb-1">Apa itu Catatan Anak?</p>

@@ -14,11 +14,12 @@ export function getNannyDashboard(userId: string) {
           surveyCompletedAt: true,
           matchingRequests: {
             orderBy: { updatedAt: "desc" },
-            take: 1,
+            take: 3,
             select: {
               id: true,
               status: true,
               matchingResult: { select: { scoreOverall: true } },
+              parentProfile: { select: { fullName: true } },
             },
           },
           nannyAssignments: {
@@ -213,6 +214,16 @@ export function getNannyChildren(userId: string) {
         select: {
           id: true,
           fullName: true,
+          matchingRequests: {
+            where: { status: { in: ["PENDING", "PROCESSING", "COMPLETED", "NEGOTIATING"] } },
+            orderBy: { updatedAt: "desc" },
+            take: 1,
+            select: {
+              id: true,
+              status: true,
+              parentProfile: { select: { fullName: true } },
+            },
+          },
           nannyAssignments: {
             where: { isActive: true },
             take: 1,

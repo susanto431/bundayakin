@@ -78,7 +78,12 @@ export async function POST() {
 
     return NextResponse.json({ success: true, data: { paymentUrl: invoice.paymentUrl, invoiceId: invoice.invoiceId } })
   } catch (error) {
-    console.error("[PAYMENT_CREATE]", error)
-    return NextResponse.json({ success: false, error: "Gagal membuat pembayaran" }, { status: 500 })
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error("[PAYMENT_CREATE] error:", msg)
+    // Surfacing pesan Mayar ke client supaya bisa debug
+    if (msg.startsWith("Mayar error")) {
+      return NextResponse.json({ success: false, error: msg }, { status: 500 })
+    }
+    return NextResponse.json({ success: false, error: "Gagal membuat pembayaran", detail: msg }, { status: 500 })
   }
 }
