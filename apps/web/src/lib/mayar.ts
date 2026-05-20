@@ -43,6 +43,14 @@ export type MayarWebhookPayload = {
 
 // ── Functions ─────────────────────────────────────────────────────────────────
 
+// Normalize Indonesian phone: "08xx" → "628xx". Returns null if result < 10 chars.
+function normalizePhone(phone?: string): string | null {
+  if (!phone) return null
+  const digits = phone.replace(/\D/g, "")
+  const normalized = digits.startsWith("0") ? "62" + digits.slice(1) : digits
+  return normalized.length >= 10 ? normalized : null
+}
+
 /**
  * Buat payment request di Mayar dan dapatkan payment URL.
  * Response: { statusCode, messages, data: { id, transactionId, link } }
@@ -55,14 +63,16 @@ export async function createMayarInvoice(params: MayarInvoiceParams): Promise<{
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 
-  const body = {
+  const mobile = normalizePhone(params.customerPhone)
+
+  const body: Record<string, unknown> = {
     name: params.itemName,
     amount: params.amount,
     description: params.description ?? params.itemName,
     email: params.customerEmail,
-    mobile: params.customerPhone,
     redirectURL: `${appUrl}/dashboard/parent/subscription?payment=finish`,
   }
+  if (mobile) body.mobile = mobile
 
   const res = await fetch(`${MAYAR_BASE}/payment/create`, {
     method: "POST",
