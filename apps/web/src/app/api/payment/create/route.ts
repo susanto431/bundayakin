@@ -19,19 +19,30 @@ export async function POST() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, name: true, email: true, phone: true },
+      select: { id: true, name: true, email: true, phone: true, parentProfile: { select: { id: true, phone: true } } },
     })
     if (!user?.email) {
       return NextResponse.json({ success: false, error: "Email pengguna tidak ditemukan. Tambahkan email di halaman profil." }, { status: 400 })
     }
-    if (!user?.phone) {
+
+    const rawPhone = user.parentProfile?.phone ?? user.phone
+    if (!rawPhone) {
       return NextResponse.json({ success: false, error: "Nomor HP diperlukan untuk pembayaran. Tambahkan nomor HP di halaman profil." }, { status: 400 })
     }
+    const normalizedPhone = rawPhone.replace(/\D/g, "").replace(/^0/, "62")
+    if (normalizedPhone.length < 10) {
+      return NextResponse.json({ success: false, error: `Nomor HP tidak valid (${normalizedPhone.length} digit, minimal 10). Perbarui nomor HP di halaman profil.` }, { status: 400 })
+    }
 
-    let parentProfile = await prisma.parentProfile.findUnique({
-      where: { userId: user.id },
-      select: { id: true },
-    })
+    let parentProfile = user.parentProfile
+      ? { id: user.parentProfile.id }
+      : null
+    if (!parentProfile) {
+      parentProfile = await prisma.parentProfile.findUnique({
+        where: { userId: user.id },
+        select: { id: true },
+      })
+    }
     if (!parentProfile) {
       parentProfile = await prisma.parentProfile.create({
         data: { userId: user.id, fullName: user.name ?? "Orang tua" },
@@ -57,7 +68,7 @@ export async function POST() {
       amount: SUBSCRIPTION_AMOUNT,
       customerName: user.name ?? "Orang tua BundaYakin",
       customerEmail: user.email,
-      customerPhone: user.phone ?? undefined,
+      customerPhone: normalizedPhone,
       itemName: "Langganan BundaYakin 1 Tahun",
     })
 
