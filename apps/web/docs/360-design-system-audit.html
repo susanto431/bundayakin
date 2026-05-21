@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System Audit — 360 Apps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #00B79F;
+    --brand-hover: #009684;
+    --brand-soft: #e6f7f4;
+    --brand-soft-2: #d0f0ea;
+
+    --bg: #ffffff;
+    --bg-code: #f6f6f5;
+    --bg-table-head: #1a1a1a;
+    --bg-hover: #f5f5f5;
+
+    --ink: #1a1a1a;
+    --ink-2: #4a4a4a;
+    --ink-3: #6b6b6b;
+    --ink-muted: #9b9b9b;
+
+    --rule: #e8e8e8;
+    --rule-soft: #f0f0f0;
+
+    --danger: #d14343;
+    --warn: #e5a834;
+    --positive: #1e8a3b;
+    --critical: #c92626;
+
+    --rail-w: 100px;
+    --sidebar-w: 240px;
+    --toc-w: 200px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 14.5px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============ LEFT ICON RAIL ============ */
+  .rail {
+    position: fixed; top: 0; left: 0;
+    width: var(--rail-w); height: 100vh;
+    background: #fff;
+    border-right: 1px solid var(--rule);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 20px 0; z-index: 30;
+  }
+  .rail-logo {
+    width: 40px; height: 40px;
+    background: var(--brand); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 18px;
+    letter-spacing: -0.03em; margin-bottom: 32px;
+    box-shadow: 0 2px 8px rgba(0, 183, 159, 0.25);
+  }
+  .rail-nav { display: flex; flex-direction: column; gap: 4px; width: 100%; align-items: center; flex: 1; }
+  .rail-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 12px 8px; width: 76px; border-radius: 10px;
+    text-decoration: none; color: var(--ink-muted);
+    transition: all 0.15s; cursor: pointer;
+  }
+  .rail-item:hover { color: var(--ink); background: var(--bg-hover); }
+  .rail-item.active { color: var(--brand); }
+  .rail-item.active .rail-icon { background: var(--brand-soft); color: var(--brand); }
+  .rail-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-3); transition: all 0.15s;
+  }
+  .rail-item:hover .rail-icon { background: var(--bg-hover); }
+  .rail-label { font-size: 11px; font-weight: 500; letter-spacing: 0.01em; }
+  .rail-item.active .rail-label { font-weight: 600; }
+  .rail-footer {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #1a1a1a; display: flex; align-items: center; justify-content: center;
+    color: var(--brand); font-weight: 800; font-size: 14px;
+  }
+  .rail-footer-text { font-size: 10px; color: var(--ink-muted); margin-top: 4px; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    position: fixed; top: 0; left: var(--rail-w);
+    width: var(--sidebar-w); height: 100vh;
+    background: #fff;
+    border-right: 1px solid var(--rule);
+    padding: 28px 20px; overflow-y: auto; z-index: 20;
+  }
+  .sidebar-title {
+    font-size: 19px; font-weight: 700; letter-spacing: -0.01em;
+    color: var(--ink); padding: 0 12px 24px; margin-bottom: 8px;
+  }
+  .sidebar-nav { list-style: none; }
+  .sidebar-nav li { margin-bottom: 2px; }
+  .sidebar-nav a {
+    display: block; padding: 11px 14px; border-radius: 8px;
+    color: var(--ink-2); text-decoration: none;
+    font-size: 14px; font-weight: 500; transition: all 0.15s;
+  }
+  .sidebar-nav a:hover { background: var(--bg-hover); color: var(--ink); }
+  .sidebar-nav a.active { background: var(--brand-soft); color: var(--brand); font-weight: 600; }
+
+  /* ============ MAIN ============ */
+  .main {
+    margin-left: calc(var(--rail-w) + var(--sidebar-w));
+    margin-right: var(--toc-w);
+    min-height: 100vh;
+  }
+
+  .tabs {
+    position: sticky; top: 0; background: #fff;
+    border-bottom: 1px solid var(--rule);
+    padding: 22px 56px 0; display: flex; gap: 36px; z-index: 10;
+  }
+  .tab {
+    padding-bottom: 16px; font-size: 16px; font-weight: 600;
+    color: var(--ink-muted); text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px; cursor: pointer; transition: all 0.15s;
+  }
+  .tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+  .tab:hover:not(.active) { color: var(--ink-2); }
+
+  .content { padding: 40px 56px 120px; max-width: 980px; }
+
+  /* page header */
+  .page-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-muted); margin-bottom: 12px;
+  }
+  .page-title {
+    font-size: 36px; font-weight: 700; letter-spacing: -0.02em;
+    line-height: 1.15; color: var(--ink); margin-bottom: 12px;
+  }
+  .page-desc { font-size: 16px; color: var(--ink-3); max-width: 720px; line-height: 1.55; }
+  .page-meta {
+    display: flex; flex-wrap: wrap; gap: 24px; margin-top: 20px;
+    padding-bottom: 32px; border-bottom: 1px solid var(--rule);
+  }
+  .page-meta div { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink-muted); }
+  .page-meta div b { color: var(--ink); font-weight: 600; }
+
+  /* exec summary callout */
+  .exec-summary {
+    margin-top: 32px;
+    background: linear-gradient(135deg, var(--brand-soft) 0%, var(--brand-soft-2) 100%);
+    padding: 24px 28px; border-radius: 12px;
+    border-left: 3px solid var(--brand);
+  }
+  .exec-summary h3 {
+    font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--brand-hover); margin: 0 0 10px;
+  }
+  .exec-summary p { color: var(--ink); margin: 0; font-size: 15px; line-height: 1.65; }
+
+  /* ============ STAT GRID ============ */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin: 24px 0 32px;
+  }
+  .stat-card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .stat-num {
+    font-size: 32px; font-weight: 800; letter-spacing: -0.03em;
+    color: var(--ink); line-height: 1;
+  }
+  .stat-num.danger { color: var(--critical); }
+  .stat-num.warn { color: var(--warn); }
+  .stat-num.brand { color: var(--brand); }
+  .stat-label {
+    font-size: 12px; color: var(--ink-3); margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  section.major { scroll-margin-top: 70px; margin-top: 64px; }
+  section.major:first-of-type { margin-top: 40px; }
+
+  h2.section-h {
+    font-size: 28px; font-weight: 700; letter-spacing: -0.015em;
+    color: var(--ink); margin-bottom: 6px;
+  }
+  .section-sub { color: var(--ink-3); font-size: 15px; margin-bottom: 28px; }
+  h3 {
+    scroll-margin-top: 70px;
+    font-size: 20px; font-weight: 700; letter-spacing: -0.01em;
+    margin-top: 44px; margin-bottom: 10px; color: var(--ink);
+  }
+  h4 {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-3);
+    margin-top: 28px; margin-bottom: 12px;
+  }
+  p { margin-bottom: 12px; color: var(--ink-2); }
+  p strong, li strong, td strong { color: var(--ink); font-weight: 600; }
+
+  /* ============ TABLES ============ */
+  .table-wrap {
+    margin: 14px 0 24px;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .table-wrap.scroll-x { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    background: var(--bg-table-head); color: #fff;
+    text-align: left; padding: 14px 20px;
+    font-weight: 600; font-size: 13px; white-space: nowrap;
+  }
+  thead th:first-child { padding-left: 24px; }
+  tbody td {
+    padding: 12px 20px; border-top: 1px solid var(--rule-soft);
+    color: var(--ink-2); vertical-align: top; line-height: 1.5;
+  }
+  tbody td:first-child { padding-left: 24px; font-weight: 600; color: var(--ink); }
+  tbody tr:first-child td { border-top: none; }
+  tbody tr:hover td { background: #fafafa; }
+
+  /* ============ SWATCH CARDS ============ */
+  .palette-block { margin-bottom: 36px; }
+  .palette-name {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.01em;
+    margin-bottom: 4px; color: var(--ink);
+  }
+  .palette-desc { color: var(--ink-3); font-size: 14.5px; margin-bottom: 18px; max-width: 720px; }
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 16px;
+  }
+  .swatch-card {
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .swatch-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+  .swatch-card.flagged { border-color: var(--critical); }
+  .swatch-color { height: 100px; width: 100%; border-bottom: 1px solid var(--rule-soft); }
+  .swatch-meta { padding: 12px 14px 14px; }
+  .swatch-token { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 8px; word-break: break-word; }
+  .swatch-row {
+    display: flex; justify-content: space-between;
+    font-size: 11.5px; line-height: 1.7;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .swatch-row span:first-child { color: var(--ink-muted); }
+  .swatch-row span:last-child { color: var(--ink); }
+  .swatch-flag {
+    display: inline-block; margin-top: 6px;
+    background: #fdecec; color: var(--critical);
+    font-size: 10px; padding: 2px 6px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+
+  /* ============ CALLOUTS ============ */
+  .callout {
+    border-left: 3px solid var(--brand);
+    background: var(--brand-soft);
+    padding: 14px 18px; margin: 16px 0 22px;
+    border-radius: 0 8px 8px 0; font-size: 14px;
+    color: var(--ink-2);
+  }
+  .callout.warn { border-left-color: var(--warn); background: #fef7e6; }
+  .callout.crit { border-left-color: var(--danger); background: #fdecec; }
+  .callout.bug { border-left-color: var(--critical); background: #fdecec; }
+  .callout strong { color: var(--ink); }
+  .callout code { background: rgba(0,0,0,0.05); }
+
+  /* ============ CODE ============ */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86em;
+    background: var(--bg-code);
+    padding: 2px 6px; border-radius: 4px;
+    color: var(--ink); border: 1px solid var(--rule-soft);
+  }
+  pre {
+    background: #1d1d1d; color: #e8e6df;
+    padding: 18px 22px; border-radius: 10px;
+    overflow-x: auto; margin: 12px 0 20px;
+    font-size: 13px; line-height: 1.6;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+
+  .ic-swatch {
+    display: inline-block; width: 14px; height: 14px;
+    border-radius: 3px; border: 1px solid rgba(0,0,0,0.12);
+    vertical-align: -2px; margin-right: 6px;
+  }
+
+  /* ============ BADGES ============ */
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    background: var(--bg-code); color: var(--ink-2);
+    border: 1px solid var(--rule);
+  }
+  .badge.active { background: #e6f5ec; color: var(--positive); border-color: #b9e0c6; }
+  .badge.legacy { background: #fef7e6; color: #8a6d1f; border-color: #e9d99b; }
+  .badge.crit { background: #fdecec; color: var(--critical); border-color: #f2c4c4; }
+  .badge.brand { background: var(--brand-soft); color: var(--brand-hover); border-color: var(--brand-soft-2); }
+
+  /* row priority */
+  .row-crit td:first-child::before {
+    content: "🚨 "; margin-right: 2px;
+  }
+  .row-bug td:first-child::before {
+    content: "🐛 "; margin-right: 2px;
+  }
+
+  /* lists */
+  ul, ol { padding-left: 22px; margin-bottom: 14px; }
+  ul li, ol li { margin-bottom: 4px; color: var(--ink-2); }
+
+  /* ============ TOC ============ */
+  .toc {
+    position: fixed; top: 0; right: 0;
+    width: var(--toc-w); height: 100vh;
+    padding: 80px 24px 40px; overflow-y: auto; z-index: 5;
+  }
+  .toc-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 14px; }
+  .toc-list { list-style: none; }
+  .toc-list a {
+    display: block; padding: 6px 0 6px 12px;
+    border-left: 2px solid transparent;
+    color: var(--ink-3); text-decoration: none;
+    font-size: 13.5px; line-height: 1.45; transition: all 0.15s;
+  }
+  .toc-list a:hover { color: var(--ink); }
+  .toc-list a.active { color: var(--brand); border-left-color: var(--brand); font-weight: 600; }
+  .toc-list a.sub { padding-left: 24px; font-size: 12.5px; }
+
+  /* footer */
+  footer {
+    margin-top: 80px; padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; color: var(--ink-muted); line-height: 1.7;
+  }
+
+  .menu-toggle { display: none; }
+
+  @media (max-width: 1280px) {
+    :root { --toc-w: 0px; }
+    .toc { display: none; }
+    .main { margin-right: 0; }
+  }
+  @media (max-width: 980px) {
+    .rail, .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+    .rail.open, .sidebar.open { transform: translateX(0); }
+    .sidebar { left: 0; width: 280px; box-shadow: 4px 0 30px rgba(0,0,0,0.1); }
+    .rail.open + .sidebar { left: var(--rail-w); box-shadow: none; }
+    .main { margin-left: 0; }
+    .content, .tabs { padding-left: 20px; padding-right: 20px; }
+    .menu-toggle {
+      display: block; position: fixed; top: 14px; left: 14px; z-index: 40;
+      background: var(--ink); color: #fff; border: none;
+      padding: 8px 12px; border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer;
+    }
+    .page-title { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.querySelector('.rail').classList.toggle('open');document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- ============ LEFT ICON RAIL ============ -->
+<aside class="rail">
+  <div class="rail-logo">3</div>
+  <nav class="rail-nav">
+    <a class="rail-item">
+      <span class="rail-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
+      </span>
+      <span class="rail-label">Home</span>
+    </a>
+    <a class="rail-item">
+      <span class="rail-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </span>
+      <span class="rail-label">Components</span>
+    </a>
+    <a class="rail-item active">
+      <span class="rail-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h16v6H4z"/></svg>
+      </span>
+      <span class="rail-label">Foundations</span>
+    </a>
+  </nav>
+  <div style="display:flex; flex-direction:column; align-items:center;">
+    <div class="rail-footer">3</div>
+    <div class="rail-footer-text">360.design</div>
+  </div>
+</aside>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <div class="sidebar-title">Foundations</div>
+  <ul class="sidebar-nav">
+    <li><a href="javascript:void(0)" data-target="sec-1">Tech Stack</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-2" class="active">Design Tokens</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-3">Components</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-4">Inkonsistensi</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-5">Rekomendasi</a></li>
+  </ul>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+  <nav class="tabs">
+    <a class="tab active">Audit Report</a>
+    <a class="tab">Migration Plan</a>
+  </nav>
+
+  <div class="content">
+
+    <!-- Page header -->
+    <header>
+      <div class="page-eyebrow">Foundations · Design System Audit</div>
+      <h1 class="page-title">360 Apps — Design System Audit</h1>
+      <p class="page-desc">Analisis sistematis design system 360 Apps yang dibangun di atas Vue 3 + Inertia.js + Tailwind CSS dengan token shadcn-style. Mengidentifikasi konflik token, duplikasi komponen, dan poin migrasi sebagai landasan konsolidasi sistem.</p>
+      <div class="page-meta">
+        <div><b>Codebase</b> · 360-apps</div>
+        <div><b>Stack</b> · Vue 3 · Inertia · Tailwind v3</div>
+        <div><b>UI Lib</b> · Radix Vue · Headless UI</div>
+        <div><b>Tanggal</b> · 2026-05-19</div>
+      </div>
+
+      <div class="exec-summary">
+        <h3>Ringkasan Eksekutif</h3>
+        <p>Design system dibangun di atas Tailwind CSS dengan token berbasis CSS custom properties (shadcn pattern), namun implementasinya tidak konsisten. Ditemukan <strong>3 nilai hex berbeda untuk warna primary</strong>, 1 <strong>bug kritis</strong> pada token <code>--primary-foreground</code>, dan <strong>4 implementasi Select</strong> dengan library &amp; style berbeda. Total: 6 inkonsistensi kritis dan minimal 9 poin duplikasi yang perlu dikonsolidasi.</p>
+      </div>
+
+      <!-- stat grid -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num danger">4</div>
+          <div class="stat-label">Variasi warna primary yang berbeda</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num warn">4</div>
+          <div class="stat-label">Implementasi Select berbeda</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num danger">6</div>
+          <div class="stat-label">Konflik kritis ditemukan</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num warn">9+</div>
+          <div class="stat-label">Poin duplikasi komponen</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num brand">25+</div>
+          <div class="stat-label">Warna hardcode tanpa token</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ SECTION 1: TECH STACK ============ -->
+    <section class="major" id="sec-1">
+      <h2 class="section-h">Tech Stack &amp; Fondasi</h2>
+      <p class="section-sub">Library inti yang menopang seluruh frontend 360 Apps.</p>
+
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Layer</th><th>Library</th><th>Versi</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Framework JS</td><td>Vue 3 + Inertia.js</td><td><code>vue ^3.5.13</code> / <code>@inertiajs/vue3 ^2.0.0-beta.3</code></td><td><span class="badge active">Aktif</span></td></tr>
+            <tr><td>Build Tool</td><td>Vite</td><td><code>^6.2.0</code></td><td><span class="badge active">Aktif</span></td></tr>
+            <tr><td>CSS</td><td>Tailwind CSS</td><td><code>^3.4.1</code></td><td><span class="badge active">Aktif</span></td></tr>
+            <tr><td>Token System</td><td>CSS Custom Properties (shadcn pattern)</td><td>—</td><td><span class="badge active">Aktif</span></td></tr>
+            <tr><td>UI Kit (primitif)</td><td>Radix Vue + Reka UI</td><td><code>radix-vue ^1.9.11</code> / <code>reka-ui ^2.6.0</code></td><td><span class="badge active">Aktif</span></td></tr>
+            <tr><td>UI Kit (overlay)</td><td>Headless UI</td><td><code>@headlessui/vue ^1.7.23</code></td><td><span class="badge legacy">Aktif (Modal legacy)</span></td></tr>
+            <tr><td>Select v1</td><td>vue-multiselect</td><td><code>^3.4.0</code></td><td><span class="badge legacy">SelectNew.vue</span></td></tr>
+            <tr><td>Select v2</td><td>vue3-select-component</td><td><code>^0.14.0</code></td><td><span class="badge legacy">SelectV3.vue</span></td></tr>
+            <tr><td>Icons</td><td>Lucide Vue Next</td><td><code>^0.468.0</code></td><td><span class="badge active">Aktif</span></td></tr>
+            <tr><td>Tabel</td><td>DataTables.net Vue3</td><td><code>^3.0.4</code></td><td><span class="badge active">Aktif</span></td></tr>
+            <tr><td>Datepicker</td><td>@vuepic/vue-datepicker</td><td><code>^11.0.1</code></td><td><span class="badge active">Aktif</span></td></tr>
+            <tr><td>Chart</td><td>Chart.js</td><td><code>^4.5.0</code></td><td><span class="badge active">Aktif</span></td></tr>
+            <tr><td>Toast</td><td>vue-toastification</td><td><code>^2.0.0-rc.5</code></td><td><span class="badge active">Aktif</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 2: DESIGN TOKENS ============ -->
+    <section class="major" id="sec-2">
+      <h2 class="section-h">Design Tokens</h2>
+      <p class="section-sub">CSS custom properties di <code>resources/css/app.css</code> + override Tailwind di <code>tailwind.config.js</code>.</p>
+
+      <!-- 2.1 OFFICIAL TOKENS -->
+      <h3 id="sec-2-1">Color Palettes</h3>
+      <p>Token resmi mengikuti pattern shadcn dengan nilai HSL (tanpa <code>hsl()</code> wrapper).</p>
+
+      <!-- Brand / Primary -->
+      <div class="palette-block" style="margin-top: 24px;">
+        <div class="palette-name">Primary <span class="badge crit" style="vertical-align:4px;margin-left:6px;">4 VARIAN</span></div>
+        <div class="palette-desc">Teal-green sebagai warna aksi utama. Saat ini ada <strong>4 nilai hex berbeda</strong> untuk konsep yang sama — masalah konsistensi paling kritis.</div>
+        <div class="swatch-grid">
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#01BE98"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--primary <span class="badge brand" style="font-size:9px;">TOKEN</span></div>
+              <div class="swatch-row"><span>HSL</span><span>169 99% 38%</span></div>
+              <div class="swatch-row"><span>HEX</span><span>≈ #01BE98</span></div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#01c3a0"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Hardcode A</div>
+              <div class="swatch-row"><span>HEX</span><span>#01c3a0</span></div>
+              <div class="swatch-row"><span>RGB</span><span>1, 195, 160</span></div>
+              <div class="swatch-flag">app.ts:110 · nav-menu:13</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#01c19e"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Hardcode B</div>
+              <div class="swatch-row"><span>HEX</span><span>#01c19e</span></div>
+              <div class="swatch-row"><span>RGB</span><span>1, 193, 158</span></div>
+              <div class="swatch-flag">app.css:111 · Datepicker</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#39B597"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Hardcode C</div>
+              <div class="swatch-row"><span>HEX</span><span>#39B597</span></div>
+              <div class="swatch-row"><span>RGB</span><span>57, 181, 151</span></div>
+              <div class="swatch-flag">app.css:99 · DT pagination</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Background & Foreground -->
+      <div class="palette-block">
+        <div class="palette-name">Background &amp; Foreground</div>
+        <div class="palette-desc">Token netral untuk halaman, teks, dan elemen sekunder. Mendukung light dan dark mode.</div>
+        <div class="swatch-grid">
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#FFFFFF; border-bottom:1px solid var(--rule);"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--background</div>
+              <div class="swatch-row"><span>Light</span><span>0 0% 100%</span></div>
+              <div class="swatch-row"><span>Dark</span><span>0 0% 3.9%</span></div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#0A0A0A"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--foreground</div>
+              <div class="swatch-row"><span>Light</span><span>0 0% 3.9%</span></div>
+              <div class="swatch-row"><span>Dark</span><span>0 0% 98%</span></div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#1A1A1A"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--black-text</div>
+              <div class="swatch-row"><span>HSL</span><span>358 0% 10%</span></div>
+              <div class="swatch-flag">Missing ; — bug</div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#EBEBEB"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--secondary</div>
+              <div class="swatch-row"><span>Light</span><span>0 0% 92.1%</span></div>
+              <div class="swatch-row"><span>Dark</span><span>0 0% 14.9%</span></div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#F5F5F5"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--muted</div>
+              <div class="swatch-row"><span>Light</span><span>0 0% 96.1%</span></div>
+              <div class="swatch-row"><span>Dark</span><span>0 0% 6.9%</span></div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#737373"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--muted-foreground</div>
+              <div class="swatch-row"><span>Light</span><span>0 0% 45.1%</span></div>
+              <div class="swatch-row"><span>Dark</span><span>0 0% 63.9%</span></div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#F5F5F5"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--accent</div>
+              <div class="swatch-row"><span>Light</span><span>0 0% 96.1%</span></div>
+              <div class="swatch-row"><span>Use</span><span>Hover state</span></div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#EDEDED"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--border / --input</div>
+              <div class="swatch-row"><span>Border</span><span>0 0% 92.8%</span></div>
+              <div class="swatch-row"><span>Input</span><span>0 0% 89.8%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Destructive -->
+      <div class="palette-block">
+        <div class="palette-name">Destructive &amp; Status</div>
+        <div class="palette-desc">Warna untuk aksi destruktif, peringatan, dan sukses.</div>
+        <div class="swatch-grid">
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#EF4444"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">--destructive</div>
+              <div class="swatch-row"><span>Light</span><span>0 84.2% 60.2%</span></div>
+              <div class="swatch-row"><span>HEX</span><span>≈ #EF4444</span></div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#ffb800"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Warning (bright)</div>
+              <div class="swatch-row"><span>HEX</span><span>#ffb800</span></div>
+              <div class="swatch-flag">Tidak ada token</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#EFD488"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Warning (soft)</div>
+              <div class="swatch-row"><span>HEX</span><span>#EFD488</span></div>
+              <div class="swatch-flag">Tidak ada token</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#e6f9f6"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Primary Subtle</div>
+              <div class="swatch-row"><span>HEX</span><span>#e6f9f6</span></div>
+              <div class="swatch-flag">Chip · Dashboard</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Teal -->
+      <div class="palette-block">
+        <div class="palette-name">Table Accent (Hardcode di SingleTable)</div>
+        <div class="palette-desc">Trio warna teal untuk varian table — semuanya hardcode tanpa token di <code>SingleTable.vue</code>.</div>
+        <div class="swatch-grid">
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#278796"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Border</div>
+              <div class="swatch-row"><span>HEX</span><span>#278796</span></div>
+              <div class="swatch-flag">5 baris</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#d2f1fd"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Background</div>
+              <div class="swatch-row"><span>HEX</span><span>#d2f1fd</span></div>
+              <div class="swatch-flag">5 baris</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#145f6b"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Text</div>
+              <div class="swatch-row"><span>HEX</span><span>#145f6b</span></div>
+              <div class="swatch-flag">5 baris</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SelectNew rogue colors -->
+      <div class="palette-block">
+        <div class="palette-name">SelectNew Rogue Blue <span class="badge crit" style="vertical-align:4px;margin-left:6px;">KONFLIK BRAND</span></div>
+        <div class="palette-desc"><code>SelectNew.vue</code> memakai biru untuk hover/selected — bertentangan dengan brand teal-green dan tampak seperti komponen dari aplikasi lain.</div>
+        <div class="swatch-grid">
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#1d4ed8"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Selected/Hover</div>
+              <div class="swatch-row"><span>HEX</span><span>#1d4ed8</span></div>
+              <div class="swatch-flag">SelectNew · 7 lokasi</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#dbeafe"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Selected BG</div>
+              <div class="swatch-row"><span>HEX</span><span>#dbeafe</span></div>
+              <div class="swatch-flag">SelectNew:173</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disabled & Chart -->
+      <div class="palette-block">
+        <div class="palette-name">Other Hardcoded Values</div>
+        <div class="palette-desc">Warna lain yang tidak tertokenisasi — kandidat untuk dijadikan token atau diganti ke utility Tailwind.</div>
+        <div class="swatch-grid">
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#f3f3f3"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Disabled Input</div>
+              <div class="swatch-row"><span>HEX</span><span>#f3f3f3</span></div>
+              <div class="swatch-flag">Input/Money/Phone</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#f3f4f6"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Disabled Select</div>
+              <div class="swatch-row"><span>HEX</span><span>#f3f4f6</span></div>
+              <div class="swatch-flag">Mirip ≠ identik</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:#fafafa"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Header BG</div>
+              <div class="swatch-row"><span>HEX</span><span>#fafafa</span></div>
+              <div class="swatch-flag">5 lokasi · = sidebar BG</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:rgb(103,208,201)"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Chart Teal</div>
+              <div class="swatch-row"><span>RGBA</span><span>103, 208, 201</span></div>
+              <div class="swatch-flag">Chart.js inline</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:rgb(47,151,167)"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Chart Teal-dark</div>
+              <div class="swatch-row"><span>RGBA</span><span>47, 151, 167</span></div>
+              <div class="swatch-flag">Chart.js inline</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:rgb(163,181,217)"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Chart Lavender</div>
+              <div class="swatch-row"><span>RGBA</span><span>163, 181, 217</span></div>
+              <div class="swatch-flag">Chart.js inline</div>
+            </div>
+          </div>
+          <div class="swatch-card flagged">
+            <div class="swatch-color" style="background:rgb(232,128,129)"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Chart Pink</div>
+              <div class="swatch-row"><span>RGBA</span><span>232, 128, 129</span></div>
+              <div class="swatch-flag">Chart.js inline</div>
+            </div>
+          </div>
+          <div class="swatch-card">
+            <div class="swatch-color" style="background:#666"></div>
+            <div class="swatch-meta">
+              <div class="swatch-token">Secondary Text</div>
+              <div class="swatch-row"><span>HEX</span><span>#666</span></div>
+              <div class="swatch-row"><span>=</span><span>--muted-foreground</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.2 TYPOGRAPHY -->
+      <h3 id="sec-2-2" style="margin-top: 64px;">Tipografi</h3>
+      <p>Font utama: <strong>Segoe UI</strong> + system fallback. Terdefinisi di dua tempat (<code>tailwind.config.js:15</code> dan <code>app.css:8</code>).</p>
+
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Aspek</th><th>Nilai</th><th>Definisi</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Font family</td><td><code>'Segoe UI'</code> + system fallback</td><td>tailwind.config.js:15 · app.css:8</td><td><span class="badge active">Konsisten</span></td></tr>
+            <tr><td>Body default</td><td>Tailwind default (16px)</td><td>—</td><td>Implisit</td></tr>
+            <tr><td>Paling sering</td><td><code>text-sm</code> · <code>text-base</code> · <code>text-xs</code></td><td>Via Tailwind class</td><td>—</td></tr>
+            <tr><td>Heading H2</td><td><code>text-xl font-semibold</code></td><td>Heading.vue:16</td><td><span class="badge active">Tokenized</span></td></tr>
+            <tr class="row-crit"><td>Heading H3</td><td><code>text-2xl font-semibold</code></td><td>HeadingSmall.vue:11</td><td><span class="badge crit">H3 lebih besar dari H2</span></td></tr>
+            <tr><td>Hardcode 10px</td><td>3 lokasi inline style</td><td>Dashboard · AppFillSurvey · AppPreviewSurvey</td><td><span class="badge legacy">Inline</span></td></tr>
+            <tr><td>2rem (legacy sidebar)</td><td>Hardcode</td><td>ui/Sidebar.vue:64</td><td><span class="badge legacy">Legacy</span></td></tr>
+            <tr><td>0.875rem (legacy)</td><td>Hardcode = text-sm</td><td>ui/Sidebar.vue:86</td><td><span class="badge legacy">Legacy</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 2.3 SPACING -->
+      <h3 id="sec-2-3">Spacing</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Aspek</th><th>Status</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td>Spacing tokens custom</td><td><span class="badge legacy">Tidak ada</span></td><td>Hanya Tailwind default scale</td></tr>
+            <tr><td>Satuan utama</td><td><span class="badge active">rem (Tailwind)</span></td><td>p-2 = 0.5rem · p-4 = 1rem · gap-2 · gap-4</td></tr>
+            <tr><td>Breakpoints</td><td><span class="badge active">Default</span></td><td>md: (82×) · sm: (19×) · lg: (16×)</td></tr>
+            <tr><td>Inline margin</td><td><span class="badge crit">Hardcode</span></td><td><code>style="margin-top: 2rem"</code> di Schedule/Form.vue:1400</td></tr>
+            <tr><td>Inline display+flex</td><td><span class="badge crit">Hardcode</span></td><td><code>style="display: flex; gap: 1rem"</code> di Schedule/Form.vue:1413</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 2.4 RADIUS, SHADOW, Z -->
+      <h3 id="sec-2-4">Border Radius, Shadow, Z-Index</h3>
+
+      <h4>Border Radius</h4>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Token</th><th>Nilai</th><th>Lokasi</th></tr></thead>
+          <tbody>
+            <tr><td><code>--radius</code></td><td>0.5rem</td><td>app.css:39</td></tr>
+            <tr><td><code>rounded-lg</code></td><td>var(--radius) = 0.5rem</td><td>tailwind.config.js:17</td></tr>
+            <tr><td><code>rounded-md</code></td><td>calc(var(--radius) - 2px) = 0.375rem</td><td>tailwind.config.js:18</td></tr>
+            <tr><td><code>rounded-sm</code></td><td>calc(var(--radius) - 4px) = 0.25rem</td><td>tailwind.config.js:19</td></tr>
+            <tr><td>Paling dipakai</td><td><code>rounded-md</code> (65×) · <code>rounded-full</code> (35×) · <code>rounded-lg</code> (26×)</td><td>Komponen UI</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Box Shadow</h4>
+      <p>Tailwind default tanpa token shadow kustom. Distribusi pemakaian: <code>shadow-sm</code> (9×) · <code>shadow-lg</code> (6×) · <code>shadow-md</code> (5×) · <code>shadow-xl</code> (2×) · <code>shadow-xs</code> (2×) · <code>shadow-2xl</code> (1×).</p>
+
+      <h4>Z-Index — Tanpa Skala Resmi</h4>
+      <div class="callout warn"><strong>Masalah:</strong> Nilai z-index arbitrer tanpa pola. Disarankan buat skala eksplisit: overlay 50 / modal 100 / dropdown 200 / tooltip 9999.</div>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Nilai</th><th>Lokasi</th></tr></thead>
+          <tbody>
+            <tr><td><code>z-[9999]</code></td><td>Autocomplete.vue:15 · SheetNew.vue:13</td></tr>
+            <tr><td><code>z-[100]</code></td><td>Modal.vue:20 (prop) · Select.vue:305</td></tr>
+            <tr><td><code>z-[101]</code></td><td>Select.vue:310</td></tr>
+            <tr><td><code>z-50</code></td><td>Loading.vue · Notification.vue</td></tr>
+            <tr><td><code>z-10</code></td><td>Modal.vue:25</td></tr>
+            <tr><td><code>z-[-1]</code></td><td>Rating.vue:11 · RatingScale.vue:36</td></tr>
+            <tr><td><code>z-[1]</code></td><td>NavigationMenuIndicator.vue</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Hardcoded Breakpoints (di luar Tailwind prefix)</h4>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Nilai</th><th>Lokasi</th></tr></thead>
+          <tbody>
+            <tr><td><code>@media (max-width: 768px)</code></td><td>SheetNew.vue:169</td></tr>
+            <tr><td><code>@media (max-width: 480px)</code></td><td>SheetNew.vue:175</td></tr>
+            <tr><td><code>@media (max-width: 1024px)</code></td><td>ui/Sidebar.vue:165</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 3: COMPONENTS ============ -->
+    <section class="major" id="sec-3">
+      <h2 class="section-h">Inventaris Komponen</h2>
+      <p class="section-sub">Mapping seluruh komponen UI ke kategori fungsional dan library dasar.</p>
+
+      <h3 id="sec-3-1">Button</h3>
+      <p><strong>File:</strong> <code>components/ui/button/Button.vue</code> — wrapper Radix Vue <code>Primitive</code></p>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Variant</th><th>Class Inti</th><th>Catatan</th></tr></thead>
+          <tbody>
+            <tr><td><code>default</code></td><td>bg-primary text-white border border-primary hover:opacity-80</td><td>Tombol utama</td></tr>
+            <tr><td><code>danger</code></td><td>bg-red-500 text-white border border-danger</td><td><span class="badge crit">border-danger tidak ada di token</span></td></tr>
+            <tr><td><code>destructive</code></td><td>bg-destructive text-destructive-foreground</td><td>Via token</td></tr>
+            <tr><td><code>outline</code></td><td>border-input bg-background hover:bg-accent</td><td>Via token</td></tr>
+            <tr><td><code>outlinePrimary</code></td><td>border-primary text-primary hover:bg-primary</td><td>Via token</td></tr>
+            <tr><td><code>outlineDanger</code></td><td>border-red-500 text-red-500</td><td><span class="badge legacy">Hardcode red-500</span></td></tr>
+            <tr><td><code>ghostDanger</code></td><td>bg-transparent text-red-500</td><td><span class="badge legacy">Hardcode red-500</span></td></tr>
+            <tr><td><code>ghostPrimary</code></td><td>bg-transparent text-primary</td><td>Via token</td></tr>
+            <tr class="row-crit"><td><code>secondary</code></td><td>bg-secondary text-[#666] shadow-sm</td><td><span class="badge crit">text-[#666] hardcode</span></td></tr>
+            <tr><td><code>ghost</code></td><td>hover:bg-accent hover:text-gray-700</td><td><span class="badge legacy">text-gray-700 hardcode</span></td></tr>
+            <tr><td><code>link</code></td><td>text-primary underline-offset-4 hover:underline</td><td>Via token</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Sizes:</strong> <code>default</code> (h-9 px-4) · <code>sm</code> (h-8 px-3 text-xs) · <code>xs</code> (h-6 px-1 text-xs) · <code>lg</code> (h-10 px-8) · <code>icon</code> (h-9 w-9)</p>
+      <p><strong>Props:</strong> <code>variant</code> · <code>size</code> · <code>loading</code> (Loader2Icon) · <code>as</code> · <code>asChild</code> · <code>type</code></p>
+
+      <h3 id="sec-3-2">Form &amp; Input</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Komponen</th><th>File</th><th>Catatan</th></tr></thead>
+          <tbody>
+            <tr><td>Input</td><td>ui/input/Input.vue</td><td>h-10 · password toggle · disabled bg <code>#f3f3f3</code> hardcode</td></tr>
+            <tr><td>Textarea</td><td>ui/input/textarea.vue</td><td>Tersedia</td></tr>
+            <tr><td>MoneyInput</td><td>ui/MoneyInput.vue</td><td>Currency formatting · disabled <code>#f3f3f3</code></td></tr>
+            <tr><td>PhoneInput</td><td>ui/PhoneInput.vue</td><td>Country code prefix · disabled <code>#f3f3f3</code></td></tr>
+            <tr><td>Checkbox</td><td>ui/checkbox/Checkbox.vue</td><td>Radix Vue</td></tr>
+            <tr><td>Select (Radix)</td><td>ui/select/Select.vue</td><td>Custom dropdown portal, z-[100]</td></tr>
+            <tr class="row-crit"><td>SelectNew (vue-multiselect)</td><td>ui/select/SelectNew.vue</td><td><span class="badge crit">Hover/selected biru #1d4ed8 — konflik brand</span> · Penuh <code>!important</code></td></tr>
+            <tr><td>SelectV2 (Combobox)</td><td>ui/select/SelectV2.vue</td><td>Radix Vue combobox wrapper</td></tr>
+            <tr><td>SelectV3 (vue3-select-component)</td><td>ui/select/SelectV3.vue</td><td>Library keempat untuk Select</td></tr>
+            <tr><td>DateRange</td><td>ui/daterange/DateRange.vue</td><td>vue-datepicker</td></tr>
+            <tr><td>Tags</td><td>ui/Tags.vue</td><td>Tag input</td></tr>
+            <tr><td>Autocomplete</td><td>ui/Autocomplete.vue</td><td>Custom dropdown z-[9999]</td></tr>
+            <tr><td>Combobox kit</td><td>ui/combobox/</td><td>Radix Vue (8 sub-komponen)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="sec-3-3">Table</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Komponen</th><th>Implementasi</th><th>Fitur</th></tr></thead>
+          <tbody>
+            <tr><td>TableData</td><td>DataTables.net Vue3</td><td>Search · paginasi · sort · server-side fetch</td></tr>
+            <tr><td>TableDataNew</td><td>Custom Vue</td><td>Search · paginasi · sort · per-page · loading · debounce</td></tr>
+            <tr><td>SingleTable</td><td>Custom Vue (static/fetch)</td><td>Variants: bordered-horizontal · bordered-horizontal-survey-scheduled · bordered-vertical · warna hardcode</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="sec-3-4">Modal / Dialog / Sheet</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Komponen</th><th>Library</th><th>Props Kunci</th></tr></thead>
+          <tbody>
+            <tr class="row-crit"><td>Modal</td><td><span class="badge legacy">Headless UI</span></td><td><code>open</code> · <code>title</code> · <code>size</code> · <code>z</code> (default 100) · <code>withIcon</code> · <code>hideClose</code></td></tr>
+            <tr><td>Dialog kit</td><td><span class="badge active">Radix Vue</span></td><td>9 sub-komponen (Dialog · DialogContent · DialogScrollContent · dll)</td></tr>
+            <tr><td>Sheet kit</td><td><span class="badge active">Radix Vue</span></td><td>9 sub-komponen</td></tr>
+            <tr><td>SheetNew</td><td>Custom</td><td>BG: <code>#f3f4f6</code> · <code>#d1d5db</code> · <code>#9ca3af</code> hardcode · @media hardcode</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="sec-3-5">Navigation</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Komponen</th><th>File</th><th>Catatan</th></tr></thead>
+          <tbody>
+            <tr><td>AppSidebar</td><td>AppSidebar.vue</td><td>Sidebar utama</td></tr>
+            <tr><td>Sidebar kit (ui)</td><td>ui/sidebar/</td><td>20+ sub-komponen Radix</td></tr>
+            <tr class="row-crit"><td>Old Sidebar</td><td>ui/Sidebar.vue</td><td><span class="badge legacy">Legacy</span> scoped CSS + hardcode · dead code</td></tr>
+            <tr><td>NavMain · NavFooter · NavUser</td><td>Nav*.vue</td><td>Menu navigasi · footer · user avatar</td></tr>
+            <tr><td>Breadcrumbs</td><td>Breadcrumbs.vue · ui/breadcrumb/</td><td>Wrapper + 7 sub-komponen Radix</td></tr>
+            <tr class="row-crit"><td>Navigation Menu kit</td><td>ui/navigation-menu/</td><td>8 sub-komponen · <span class="badge crit">hardcode #01c3a0</span></td></tr>
+            <tr><td>Tabs · SurveyTab</td><td>Tabs.vue · SurveyTab.vue</td><td>Custom tabs · survey-specific</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="sec-3-6">Feedback (Loading · Toast · Chip)</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Komponen</th><th>Tipe</th><th>Catatan</th></tr></thead>
+          <tbody>
+            <tr><td>Loading (global)</td><td>Modal overlay · dots</td><td>Props: <code>show</code> · <code>message</code> · bg-black/40 · dots #fff</td></tr>
+            <tr><td>LoadingGenerateAI</td><td>Inline · AI-specific</td><td>bg-primary/20 · <span class="badge legacy">text-gray-900 hardcode</span></td></tr>
+            <tr><td>LoadingSendEmail</td><td>Modal overlay</td><td>Tersedia</td></tr>
+            <tr><td>Notification</td><td>Toast-like, pojok kanan</td><td>success/error/info/warning · auto-close 3s · success bg-primary</td></tr>
+            <tr><td>Chip</td><td>Badge/tag</td><td>9 variants · beberapa hex hardcode (<code>#ffb800</code> · <code>#EFD488</code> · <code>#e6f9f6</code>)</td></tr>
+            <tr><td>Skeleton</td><td>ui/skeleton/Skeleton.vue</td><td>Radix</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="sec-3-7">Layout &amp; Chart</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Komponen</th><th>Fungsi</th></tr></thead>
+          <tbody>
+            <tr><td>Card kit</td><td>6 sub-komponen (Card · CardHeader · CardContent · CardTitle · CardDescription · CardFooter)</td></tr>
+            <tr><td>Container</td><td>Wrapper grid responsif</td></tr>
+            <tr><td>AppShell · AppContent</td><td>Shell layout utama · konten area</td></tr>
+            <tr><td>Heading</td><td>H2 section header dengan tombol · <code>text-xl</code></td></tr>
+            <tr class="row-crit"><td>HeadingSmall</td><td>H3 · <code>text-2xl</code> — <span class="badge crit">lebih besar dari Heading</span></td></tr>
+            <tr><td>ChartContainer</td><td>Wrapper Chart.js · warna rgba hardcode di Overview &amp; Participants/Detail</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 4: INKONSISTENSI ============ -->
+    <section class="major" id="sec-4">
+      <h2 class="section-h">Inkonsistensi yang Ditemukan</h2>
+      <p class="section-sub">Konflik kritis, duplikasi, dead code, dan masalah struktural.</p>
+
+      <h3 id="sec-4-1">Konflik Kritis</h3>
+      <div class="callout bug">
+        <strong>🐛 Bug fungsional:</strong> Token <code>--primary-foreground</code> di <code>app.css:22</code> bernilai <code>169, 99%, 38%</code> — sama persis dengan <code>--primary</code>. Akibatnya teks di atas tombol primary tidak kontras dan menyalahi aksesibilitas. Ganti ke <code>0 0% 100%</code>.
+      </div>
+
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>#</th><th>Item</th><th>Lokasi A</th><th>Nilai A</th><th>Lokasi B</th><th>Nilai B</th><th>Dampak</th></tr></thead>
+          <tbody>
+            <tr class="row-crit"><td>1</td><td>Warna primary</td><td>app.css:21</td><td><code>hsl(169,99%,38%)</code> ≈ #01BE98</td><td>app.css:99</td><td><code>#39B597</code></td><td>Dua hijau berbeda di halaman sama</td></tr>
+            <tr class="row-crit"><td>1b</td><td>Primary (var 3)</td><td>app.css:99</td><td><code>#39B597</code></td><td>app.ts:110</td><td><code>#01c3a0</code></td><td>3 nilai berbeda untuk satu konsep</td></tr>
+            <tr class="row-crit"><td>1c</td><td>Primary (var 4)</td><td>app.css:111</td><td><code>#01c19e</code></td><td>token</td><td><code>hsl(169,99%,38%)</code></td><td>Datepicker beda dari komponen lain</td></tr>
+            <tr class="row-bug"><td>2</td><td><code>--primary-foreground</code> = <code>--primary</code></td><td>app.css:22</td><td><code>169, 99%, 38%</code></td><td>seharusnya</td><td>warna terang</td><td>Teks di atas tombol primary tidak kontras</td></tr>
+            <tr class="row-crit"><td>3</td><td>SelectNew hover biru vs hijau</td><td>SelectNew.vue:174</td><td><code>#1d4ed8</code> (biru)</td><td>token primary</td><td>teal-green</td><td>Visual tidak konsisten saat interaksi</td></tr>
+            <tr class="row-crit"><td>4</td><td>HeadingSmall lebih besar dari Heading</td><td>HeadingSmall.vue:11</td><td><code>text-2xl</code> (1.5rem)</td><td>Heading.vue:16</td><td><code>text-xl</code> (1.25rem)</td><td>Hierarki heading terbalik</td></tr>
+            <tr class="row-bug"><td>5</td><td>Missing semicolon CSS token</td><td>app.css:16</td><td><code>--black-text: 358 0% 10%</code></td><td>seharusnya</td><td>butuh <code>;</code></td><td>Token mungkin tidak terbaca</td></tr>
+            <tr class="row-crit"><td>6</td><td>Disabled bg input: 2 nilai berbeda</td><td>Input.vue:62</td><td><code>#f3f3f3</code></td><td>SelectNew.vue:213</td><td><code>#f3f4f6</code></td><td>Disabled tampak tidak konsisten</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="sec-4-2">Duplikasi</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Item</th><th>Duplikat 1</th><th>Duplikat 2</th><th>Duplikat 3</th><th>Duplikat 4</th><th>Rekomendasi</th></tr></thead>
+          <tbody>
+            <tr class="row-crit"><td>Select component</td><td>Select.vue</td><td>SelectNew.vue</td><td>SelectV2.vue</td><td>SelectV3.vue</td><td>Pilih satu, hapus sisanya</td></tr>
+            <tr><td>Sidebar</td><td>ui/Sidebar.vue</td><td>ui/sidebar/ (kit)</td><td>—</td><td>—</td><td>Hapus Sidebar.vue (legacy)</td></tr>
+            <tr><td>Table</td><td>TableData.vue</td><td>TableDataNew.vue</td><td>SingleTable.vue</td><td>—</td><td>Dokumentasikan kapan masing-masing dipakai</td></tr>
+            <tr><td>Modal/Dialog</td><td>Modal.vue (Headless UI)</td><td>ui/dialog/ (Radix)</td><td>—</td><td>—</td><td>Migrasi ke satu sistem</td></tr>
+            <tr><td>Loading</td><td>ui/Loading.vue</td><td>LoadingGenerateAI.vue</td><td>LoadingSendEmail.vue</td><td>—</td><td>Konsolidasi Loading dasar</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="sec-4-3">Dead Code</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>File</th><th>Isi</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>ui/Sidebar.vue (16–22)</td><td><code>&lt;!-- &lt;div class="flex"&gt;&lt;/div&gt; ... router-link --&gt;</code></td><td><span class="badge legacy">Comment block</span></td></tr>
+            <tr><td>pages/Subscribe/Index.vue:43</td><td><code>&lt;!-- &lt;CircleCheck fill="#22c55e" /&gt; --&gt;</code></td><td><span class="badge legacy">Commented out</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="sec-4-4">Inkonsistensi Struktural</h3>
+      <div class="table-wrap scroll-x">
+        <table>
+          <thead><tr><th>Komponen</th><th>Masalah</th><th>Lokasi</th></tr></thead>
+          <tbody>
+            <tr><td>AppLogo.vue</td><td><code>style="width: 7.5rem !important;"</code> menduplikasi <code>size-24</code> (6rem) — nilai pun berbeda</td><td>AppLogo.vue:5</td></tr>
+            <tr><td>Schedule/Form.vue</td><td><code>style="margin-top: 2rem"</code> seharusnya <code>mt-8</code></td><td>line 1400</td></tr>
+            <tr><td>Schedule/Form.vue</td><td><code>style="display: flex; gap: 1rem; justify-content: flex-end"</code> seharusnya <code>flex gap-4 justify-end</code></td><td>line 1413</td></tr>
+            <tr><td>Dashboard + 2 layouts</td><td><code>style="font-size: 10px"</code> — tidak ada equivalent Tailwind</td><td>Dashboard:505 · AppFillSurvey:323 · AppPreviewSurvey:290</td></tr>
+            <tr class="row-crit"><td>SelectNew.vue</td><td>13+ rule CSS dengan <code>!important</code> untuk override vue-multiselect</td><td>line 123–213</td></tr>
+            <tr><td>Z-index tanpa skala</td><td>Nilai arbitrary: 9999, 101, 100, 50, 10, 1, 0, -1</td><td>Berbagai file</td></tr>
+            <tr><td>AppHeader + 4 layouts</td><td><code>bg-[#fafafa]</code> hardcode alih-alih <code>bg-sidebar</code></td><td>AppHeader:118 dll</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 5: REKOMENDASI ============ -->
+    <section class="major" id="sec-5">
+      <h2 class="section-h">Rekomendasi</h2>
+      <p class="section-sub">Action item terprioritisasi untuk konsolidasi design system.</p>
+
+      <h3 id="sec-5-1">Prioritas Tinggi</h3>
+
+      <div class="callout bug" style="margin-top: 20px;">
+        <strong>1. Fix bug <code>--primary-foreground</code></strong> — <code>app.css:22</code>: nilainya saat ini sama dengan <code>--primary</code> (<code>169, 99%, 38%</code>). Seharusnya warna terang agar teks di atas tombol primary terbaca. Ganti ke <code>0 0% 100%</code> untuk kontras optimal. Ini bug fungsional yang mempengaruhi aksesibilitas.
+      </div>
+
+      <p><strong>2. Standardisasi satu nilai warna primary.</strong> Saat ini ada 4 variasi (<code>hsl(169,99%,38%)</code>, <code>#01c3a0</code>, <code>#01c19e</code>, <code>#39B597</code>). Putuskan satu nilai kanonik, masukkan ke token <code>--primary</code>, lalu ganti semua hardcode. Lokasi yang perlu diubah:</p>
+      <ul>
+        <li><code>app.css:99</code></li>
+        <li><code>app.css:111</code></li>
+        <li><code>app.ts:110</code></li>
+        <li><code>navigation-menu/index.ts:13</code></li>
+        <li><code>settings/Layout.vue:215</code></li>
+      </ul>
+
+      <p><strong>3. Konsolidasi komponen Select.</strong> 4 implementasi berbeda (<code>Select.vue</code>, <code>SelectNew.vue</code>, <code>SelectV2.vue</code>, <code>SelectV3.vue</code>) menyebabkan inkonsistensi visual (biru vs hijau) dan bundle size membengkak. Paling kritis: <code>SelectNew.vue</code> memiliki warna hover/selected biru <code>#1d4ed8</code> yang bertentangan dengan brand.</p>
+
+      <p><strong>4. Fix missing semicolon di CSS token.</strong> <code>app.css:16</code>: <code>--black-text: 358 0% 10%</code> perlu tambah <code>;</code> di akhir baris. Token ini bisa tidak dibaca browser di beberapa konfigurasi.</p>
+
+      <p><strong>5. Tambahkan token warna yang hilang.</strong> Buat token untuk warna yang berulang tapi tidak bertokenisasi:</p>
+<pre><code>--warning: hsl(43, 100%, 47%);        /* #ffb800 */
+--primary-subtle: hsl(169, 71%, 93%); /* #e6f9f6 */
+--disabled-bg: hsl(0, 0%, 95%);       /* #f3f3f3 */
+--table-accent: hsl(190, 60%, 40%);   /* #278796 */</code></pre>
+      <p>Ini akan menggantikan setidaknya 8 nilai hardcode yang tersebar.</p>
+
+      <h3 id="sec-5-2">Prioritas Sedang</h3>
+
+      <p><strong>1. Perbaiki hierarki Heading.</strong> <code>HeadingSmall.vue</code> menggunakan <code>text-2xl</code> sedangkan <code>Heading.vue</code> menggunakan <code>text-xl</code>. Secara semantik H3 seharusnya lebih kecil dari H2. Ganti <code>HeadingSmall.vue:11</code> ke <code>text-xl</code> dan <code>Heading.vue:16</code> ke <code>text-2xl</code>, atau sesuaikan nama komponen.</p>
+
+      <p><strong>2. Hapus komponen legacy.</strong> <code>components/ui/Sidebar.vue</code> (yang lama) sudah ada penggantinya di <code>components/ui/sidebar/</code> kit. Hapus file lama dan pastikan tidak ada import yang tersisa.</p>
+
+      <p><strong>3. Migrasi Modal ke Dialog kit.</strong> <code>components/Modal.vue</code> memakai Headless UI sementara <code>components/ui/dialog/</code> memakai Radix Vue. Pilih satu sistem. Modal.vue juga menggunakan <code>bg-white</code> hardcode di <code>Modal.vue:37</code> — ganti ke <code>bg-background</code>.</p>
+
+      <p><strong>4. Ganti inline style ke Tailwind.</strong> Tiga file (<code>Schedule/Form.vue</code>, <code>AppLogo.vue</code>) menggunakan <code>style=""</code> yang bisa diganti Tailwind class.</p>
+
+      <p><strong>5. Buat skala z-index eksplisit.</strong> Tambahkan komentar di <code>tailwind.config.js</code> atau <code>app.css</code> yang mendokumentasikan z-index scale: <code>overlay: 50</code>, <code>modal: 100</code>, <code>dropdown: 200</code>, <code>tooltip: 9999</code>. Saat ini nilai 9999 dan 101 tersebar tanpa pola.</p>
+
+      <h3 id="sec-5-3">Catatan untuk Tim Dev</h3>
+      <ul>
+        <li><code>bg-[#fafafa]</code> dipakai di 5 tempat (AppHeader, 3 layouts, settings). Nilai ini identik dengan <code>--sidebar-background: 0 0% 98%</code>. Ganti ke class Tailwind <code>bg-sidebar</code> untuk konsistensi.</li>
+        <li><code>disabled:bg-[#f3f3f3]</code> di Input.vue, MoneyInput.vue, dan PhoneInput.vue perlu disamakan — saat ini Input pakai <code>#f3f3f3</code> sementara SelectNew pakai <code>#f3f4f6</code>. Pertimbangkan buat token <code>--input-disabled</code>.</li>
+        <li>Chart.js di Overview.vue dan Detail.vue menggunakan warna rgba hardcode yang tidak berhubungan dengan token chart yang ada di <code>tailwind.config.js</code>. Pertimbangkan ekstrak ke konstanta di file terpisah.</li>
+      </ul>
+    </section>
+
+    <footer>
+      Di-generate dari analisis: <code>resources/js/</code> dan <code>resources/css/</code> · 2026-05-19<br>
+      Sumber utama: <code>app.css</code> · <code>tailwind.config.js</code> · <code>package.json</code> · 220 file .vue
+    </footer>
+
+  </div>
+</main>
+
+<!-- ============ TOC ============ -->
+<aside class="toc">
+  <div class="toc-title">On This Page</div>
+  <ul class="toc-list">
+    <li><a href="javascript:void(0)" data-target="sec-2-1">Color palettes</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-2-2" class="sub">Tipografi</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-2-3" class="sub">Spacing</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-2-4" class="sub">Radius · shadow · z</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-3-1">Button</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-3-2">Form &amp; input</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-3-3">Table</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-3-4">Modal · Dialog</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-3-5">Navigation</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-3-6">Feedback</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-4-1">Konflik kritis</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-4-2">Duplikasi</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-4-4">Struktural</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-5-1">Prioritas tinggi</a></li>
+    <li><a href="javascript:void(0)" data-target="sec-5-2">Prioritas sedang</a></li>
+  </ul>
+</aside>
+
+<script>
+  const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const allNavLinks = [...sidebarLinks, ...tocLinks];
+
+  // Build target list from data-target attribute
+  const targets = [];
+  allNavLinks.forEach(a => {
+    const id = a.getAttribute('data-target');
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) targets.push({ id, el, link: a });
+  });
+
+  // Smooth scroll on click via JS — no anchor navigation, no "external link" prompt
+  allNavLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = a.getAttribute('data-target');
+      const el = document.getElementById(id);
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.pageYOffset - 30;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+      return false;
+    });
+  });
+
+  // Active highlight on scroll
+  const onScroll = () => {
+    const scrollY = window.scrollY + 100;
+    let currentId = null;
+    for (const t of targets) if (t.el.offsetTop <= scrollY) currentId = t.id;
+    sidebarLinks.forEach(a => {
+      const aid = a.getAttribute('data-target');
+      a.classList.toggle('active', !!currentId && currentId.startsWith(aid));
+    });
+    tocLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('data-target') === currentId);
+    });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Tab switching (cosmetic)
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

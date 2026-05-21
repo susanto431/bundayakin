@@ -1,0 +1,55 @@
+# Architecture Decision Records — Index
+## BundaYakin — Human Care Consulting
+
+> ADR adalah log keputusan arsitektur yang sudah dibuat, alasannya, dan konsekuensinya.
+> Setiap keputusan teknis besar yang sulit dibalik atau berimplikasi luas WAJIB dicatat di sini.
+
+---
+
+## Cara Membuat ADR Baru
+
+1. Buat file baru: `ADR-00N_nama-keputusan.md` (N = nomor urut)
+2. Gunakan template di bawah
+3. Tambahkan entry ke tabel ini
+
+**Template ADR:**
+```markdown
+# ADR-00N — Judul Keputusan
+**Status:** Accepted | Superseded by ADR-00X | Deprecated
+**Tanggal:** YYYY-MM-DD
+**Decider:** [nama / peran]
+
+## Konteks
+[Apa masalah atau kebutuhan yang memicu keputusan ini?]
+
+## Opsi yang Dipertimbangkan
+1. [Opsi A]
+2. [Opsi B]
+3. [Opsi C]
+
+## Keputusan
+[Pilihan yang diambil dan alasan utamanya]
+
+## Konsekuensi
+[Trade-off, risiko, dan implikasi dari keputusan ini]
+
+## Catatan
+[Konteks tambahan, link referensi, hal yang perlu dimonitor]
+```
+
+---
+
+## Daftar ADR
+
+| ID | Judul | Status | Tanggal |
+|---|---|---|---|
+| [ADR-001](ADR-001_nextjs-app-router.md) | Next.js 14 App Router sebagai framework web | Accepted | Mei 2026 |
+| [ADR-002](ADR-002_neon-postgresql-prisma.md) | Neon PostgreSQL + Prisma sebagai database stack | Accepted | Mei 2026 |
+| [ADR-003](ADR-003_mayar-payment.md) | Mayar sebagai payment gateway | Accepted | Mei 2026 |
+| [ADR-004](ADR-004_cloudflare-r2-stream.md) | Cloudflare R2 + Stream untuk media storage | Accepted | Mei 2026 |
+| [ADR-005](ADR-005_claude-api-matching.md) | Claude API sebagai AI engine untuk matching | Accepted | Mei 2026 |
+| [ADR-006](ADR-006_pdf-service-python.md) | Service PDF terpisah (Python/ReportLab) di Railway | Accepted | Mei 2026 |
+
+---
+
+*Lihat juga: [TDD](../07_technical_design_document.md) · [Service Catalog](../04_service_module_catalog.md)*
