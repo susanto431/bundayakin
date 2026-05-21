@@ -52,13 +52,20 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 
 ### Profil Anak (Multi-Anak)
 
+> **Keputusan produk (22 Mei 2026):** Tambah & isi detail anak dibuka untuk **akun free**.
+> Pertimbangan: orang tua yang sudah invest waktu mengisi profil anak lebih termotivasi subscribe.
+> Data anak bukan fitur premium — yang premium adalah *berbagi ke nanny*. Memblok form isian terasa
+> menghukum sebelum orang tua merasakan nilainya. Upsell ditampilkan sebagai banner lembut, bukan paywall.
+> Yang tetap hanya untuk pelanggan: nanny bisa melihat & mengisi catatan dari sisi mereka.
+
 | Fitur | Status | Fasa | Catatan |
 |---|---|---|---|
-| Tambah anak pertama | ✅ | 1 | |
-| Multi-anak dalam satu akun | ✅ | 1 | `ChildProfile.sortOrder` |
-| Edit profil anak (alergi, jadwal, dll) | ✅ | 1 | |
+| Tambah anak pertama | ✅ | 1 | Tersedia untuk akun free |
+| Multi-anak dalam satu akun | ✅ | 1 | Tersedia untuk akun free; `ChildProfile.sortOrder` |
+| Edit profil anak (alergi, jadwal, dll) | ✅ | 1 | Tersedia untuk akun free |
 | Do-list dan don't-list per anak | ✅ | 1 | |
 | Cara menenangkan anak | ✅ | 1 | |
+| Nanny bisa lihat & isi catatan anak | ✅ | 1 | Hanya untuk pelanggan aktif; `NannyChildNotesForm` |
 | Drag & drop urutan anak | 📋 | 1 | UX improvement; sortOrder sudah ada di schema |
 | Foto profil anak | 📋 | 1 | |
 
