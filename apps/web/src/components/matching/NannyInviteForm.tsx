@@ -47,7 +47,7 @@ export default function NannyInviteForm({ inviteCode }: { inviteCode: string }) 
           type="tel"
           value={phone}
           onChange={e => setPhone(e.target.value)}
-          placeholder="0812..."
+          placeholder="0812 3456 7890"
           className="w-full px-3.5 py-2.5 text-[14px] text-[#5A3A7A] bg-white border-[1.5px] border-[#C8B8DC] rounded-[10px] min-h-[48px] focus:border-[#5BBFB0] focus:ring-2 focus:ring-[#5BBFB0]/15 placeholder:text-[#999AAA] outline-none transition-all mb-3"
         />
         <button

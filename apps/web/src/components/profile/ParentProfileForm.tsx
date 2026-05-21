@@ -80,7 +80,7 @@ export default function ParentProfileForm({ initial }: { initial: ProfileData })
       <div>
         <label htmlFor="phone" className={LABEL_CLASS}>Nomor HP</label>
         <input id="phone" name="phone" type="tel" value={form.phone}
-          onChange={handleChange} placeholder="cth: 08123456789" className={INPUT_CLASS} />
+          onChange={handleChange} placeholder="0812 3456 7890" className={INPUT_CLASS} />
       </div>
 
       <LocationSelector

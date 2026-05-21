@@ -97,7 +97,7 @@ export default function RegisterParentPage() {
           </div>
           <div>
             <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">Nomor HP</label>
-            <input name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="0812..." className={inputCls} />
+            <input name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="0812 3456 7890" className={inputCls} />
           </div>
           <div>
             <label className="block text-[13px] font-semibold text-[#5A3A7A] mb-1.5">Email <span className="font-normal text-[#999AAA]">(opsional)</span></label>
