@@ -28,9 +28,10 @@ export type MayarInvoiceParams = {
 export type MayarWebhookPayload = {
   event: string
   data: {
-    id: string
+    id: string              // payment transaction ID (berbeda dari productId)
     transactionId?: string
-    status: string            // "SUCCESS" | "FAILED" | "EXPIRED"
+    productId?: string      // ID produk/invoice yang kita buat (ini yang kita simpan sebagai mayarInvoiceId)
+    status: string          // "SUCCESS" | "FAILED" | "EXPIRED"
     transactionStatus: string // "paid" | "pending" | "expired"
     customerName?: string
     customerEmail?: string

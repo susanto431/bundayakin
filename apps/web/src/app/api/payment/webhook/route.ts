@@ -33,15 +33,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true })
     }
 
-    const { status, transactionStatus, paymentMethod, id: invoiceId, updatedAt } = notif.data
+    const { status, transactionStatus, paymentMethod, id: paymentId, productId, updatedAt } = notif.data
+
+    // Mayar mengirim data.id sebagai payment transaction ID,
+    // sedangkan data.productId adalah ID invoice/produk yang kita buat (tersimpan sebagai mayarInvoiceId).
+    const lookupId = productId ?? paymentId
 
     const transaction = await prisma.transaction.findUnique({
-      where: { mayarInvoiceId: invoiceId },
+      where: { mayarInvoiceId: lookupId },
       select: { id: true, subscriptionId: true, status: true, type: true, parentProfileId: true, metadata: true },
     })
     if (!transaction) {
       // Return 200 agar Mayar tidak retry — transaksi mungkin dari produk lain
-      console.warn("[WEBHOOK] Transaction not found, invoiceId:", invoiceId)
+      console.warn("[WEBHOOK] Transaction not found, lookupId:", lookupId, "paymentId:", paymentId)
       return NextResponse.json({ success: true })
     }
 
