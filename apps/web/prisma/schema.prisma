@@ -228,6 +228,9 @@ model ParentProfile {
   children  ChildProfile[]
   elderlies ElderlyProfile[]
 
+  // Consent UU PDP No. 27/2022
+  consentGivenAt      DateTime?
+
   // Survey
   surveyAnswers       Json?              // snapshot SurveyAnswers dari SurveyForm
   surveyCompletedAt   DateTime?
@@ -363,6 +366,9 @@ model NannyProfile {
   // Badges & reputation
   badges              String[]           // ["Terpercaya", "Terverifikasi", ...]
   reputationScore     Float?             @default(0)
+
+  // Consent UU PDP No. 27/2022
+  consentGivenAt      DateTime?
 
   // Survey
   surveyAnswers       Json?              // snapshot SurveyAnswers dari SurveyForm
