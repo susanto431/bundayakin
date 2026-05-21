@@ -87,7 +87,7 @@ export async function POST(request: Request) {
         where: { id: transaction.id },
         data: { mayarStatus: effectiveStatus },
       })
-      console.info("[WEBHOOK] Payment PENDING:", invoiceId, effectiveStatus)
+      console.info("[WEBHOOK] Payment PENDING:", lookupId, effectiveStatus)
     }
 
     // Selalu return 200 ke Mayar untuk event yang sudah ter-handle
