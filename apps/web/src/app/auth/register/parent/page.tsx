@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import Link from "next/link"
 
 export default function RegisterParentPage() {
@@ -47,7 +48,10 @@ export default function RegisterParentPage() {
       })
       const data = await res.json() as { success: boolean; error?: string }
       if (!data.success) { setError(data.error ?? "Terjadi kesalahan, coba lagi"); setLoading(false); return }
-      router.push("/auth/login?registered=1")
+      const credential = form.phone || form.email
+      const result = await signIn("credentials", { email: credential, password: form.password, redirect: false })
+      if (result?.error) { router.push("/auth/login?registered=1"); return }
+      window.location.href = "/"
     } catch {
       setError("Tidak dapat terhubung ke server")
       setLoading(false)

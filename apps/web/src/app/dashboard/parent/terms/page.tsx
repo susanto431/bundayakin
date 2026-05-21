@@ -24,7 +24,7 @@ export default function TermsReferralPage() {
 
           <h4 className="text-[12px] font-bold text-[#5A3A7A] mb-1">Kapan fee cair?</h4>
           <ul className="pl-4 mb-3 space-y-1 list-disc">
-            <li><strong>Merekomendasikan orang tua (jangka panjang):</strong> Rp 100.000 cair setelah OT deal dengan nanny, placement fee sudah dibayar, dan OT konfirmasi nanny tiba di rumah lewat platform.</li>
+            <li><strong>Merekomendasikan orang tua (jangka panjang):</strong> Rp 100.000 cair setelah orang tua deal dengan nanny, placement fee sudah dibayar, dan orang tua konfirmasi nanny tiba di rumah lewat platform.</li>
             <li><strong>Merekomendasikan orang tua (temporer/infal):</strong> Rp 75.000 dengan syarat yang sama.</li>
             <li><strong>Merekomendasikan nanny (jangka panjang):</strong> Rp 75.000 saat kondisi di atas terpenuhi. Tambahan Rp 125.000 jika nanny masih bekerja di keluarga yang sama setelah 3 bulan.</li>
             <li><strong>Merekomendasikan nanny (temporer/infal):</strong> Rp 75.000 saat kondisi terpenuhi. Tidak ada tambahan.</li>

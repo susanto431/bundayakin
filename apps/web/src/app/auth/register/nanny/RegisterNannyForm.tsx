@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import Link from "next/link"
 
 type Props = {
@@ -52,7 +53,9 @@ export default function RegisterNannyForm({ defaultCode = "" }: Props) {
       })
       const data = await res.json() as { success: boolean; error?: string }
       if (!data.success) { setError(data.error ?? "Terjadi kesalahan, coba lagi"); setLoading(false); return }
-      router.push("/auth/login?registered=1")
+      const result = await signIn("credentials", { email: form.phone, password: form.password, redirect: false })
+      if (result?.error) { router.push("/auth/login?registered=1"); return }
+      window.location.href = "/"
     } catch {
       setError("Tidak dapat terhubung ke server")
       setLoading(false)

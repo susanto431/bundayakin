@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { prisma } from "./prisma"
 import { authConfig } from "./auth.config"
+import { normalizePhone } from "./phone"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
@@ -17,11 +18,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.email || !credentials?.password) return null
 
         const credential = credentials.email as string
+        const normalizedCredential = normalizePhone(credential)
         const user = await prisma.user.findFirst({
           where: {
             OR: [
               { email: credential },
-              { phone: credential },
+              { phone: normalizedCredential },
             ],
           },
         })
@@ -35,7 +37,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!isValid) return null
 
-        const canSwitchRoles = user.phone === "087888180363" || user.role === "ADMIN"
+        const canSwitchRoles = (user.phone != null && normalizePhone(user.phone) === "6287888180363") || user.role === "ADMIN"
 
         return {
           id: user.id,

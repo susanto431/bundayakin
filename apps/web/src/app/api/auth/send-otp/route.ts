@@ -47,8 +47,9 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ target: phone, message, countryCode: "62" }),
     })
 
-    if (!res.ok) {
-      console.error("[SEND_OTP] Fonnte error", await res.text())
+    const fonnteResult = await res.json() as { status?: boolean; reason?: string }
+    if (!res.ok || !fonnteResult.status) {
+      console.error("[SEND_OTP] Fonnte error", fonnteResult)
       return NextResponse.json({ success: false, error: "Gagal mengirim OTP, coba lagi" }, { status: 500 })
     }
 

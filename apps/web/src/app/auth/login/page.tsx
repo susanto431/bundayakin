@@ -132,7 +132,7 @@ function LoginForm() {
             href="/auth/register/parent"
             className="flex-1 flex items-center justify-center bg-[#E5F6F4] hover:bg-[#A8DDD8] text-[#1E4A45] font-semibold text-[12px] min-h-[36px] rounded-[10px] transition-all"
           >
-            Daftar OT
+            Daftar Orang Tua
           </Link>
           <Link
             href="/auth/register/nanny"
