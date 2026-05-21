@@ -72,7 +72,7 @@ export async function POST(request: Request) {
         })
       }
 
-      console.info("[WEBHOOK] Payment SUCCESS:", invoiceId, transaction.type)
+      console.info("[WEBHOOK] Payment SUCCESS:", lookupId, transaction.type)
     } else if (isMayarPaymentFailed(effectiveStatus)) {
       await prisma.transaction.update({
         where: { id: transaction.id },
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
           mayarStatus: effectiveStatus,
         },
       })
-      console.info("[WEBHOOK] Payment FAILED:", invoiceId, effectiveStatus)
+      console.info("[WEBHOOK] Payment FAILED:", lookupId, effectiveStatus)
     } else {
       await prisma.transaction.update({
         where: { id: transaction.id },
