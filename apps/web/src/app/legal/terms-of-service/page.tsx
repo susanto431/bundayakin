@@ -108,7 +108,7 @@ export default function TermsOfServicePage() {
             <ul className="pl-4 space-y-1.5 list-disc leading-relaxed">
               <li>Akses ke platform untuk mengisi profil dan survey kapan saja.</li>
               <li>Menerima hasil laporan kecocokan (skor area yang match/tidak) setelah matching selesai.</li>
-              <li>Mode "Open to Job" untuk ditemukan oleh calon keluarga yang mencari nanny di talent pool.</li>
+              <li>Mode &ldquo;Open to Job&rdquo; untuk ditemukan oleh calon keluarga yang mencari nanny di talent pool.</li>
               <li>Program referral: mendapat bonus jika berhasil merekomendasikan nanny atau orang tua baru.</li>
             </ul>
           </div>
@@ -134,7 +134,7 @@ export default function TermsOfServicePage() {
             <p className="font-semibold text-red-700 mb-1">✗ Yang tidak kami jamin:</p>
             <ul className="space-y-1.5 list-disc pl-4">
               <li>Kejujuran atau integritas nanny. BundaYakin bukan lembaga verifikasi latar belakang kriminal.</li>
-              <li>Bahwa nanny yang "cocok" di laporan akan selalu berperilaku baik di rumah.</li>
+              <li>Bahwa nanny yang &ldquo;cocok&rdquo; di laporan akan selalu berperilaku baik di rumah.</li>
               <li>Hasil kerja atau performa nanny setelah mulai bekerja.</li>
             </ul>
           </div>
