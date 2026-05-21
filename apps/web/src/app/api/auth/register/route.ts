@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs"
 import { resend, EMAIL_FROM } from "@/lib/resend"
 import { welcomeParentHtml, welcomeParentText } from "@/lib/emails/welcome-parent"
 import { welcomeNannyHtml, welcomeNannyText } from "@/lib/emails/welcome-nanny"
+import { normalizePhone } from "@/lib/phone"
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,8 +37,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (phone) {
-      const existingPhone = await prisma.user.findUnique({ where: { phone } })
+    const normalizedPhone = phone ? normalizePhone(phone) : null
+
+    if (normalizedPhone) {
+      const existingPhone = await prisma.user.findUnique({ where: { phone: normalizedPhone } })
       if (existingPhone) {
         return NextResponse.json({ success: false, error: "Nomor HP sudah terdaftar" }, { status: 409 })
       }
@@ -51,7 +54,7 @@ export async function POST(req: NextRequest) {
         email,
         hashedPassword,
         role: role as "PARENT" | "NANNY",
-        phone: phone ?? null,
+        phone: normalizedPhone,
       },
       select: { id: true, email: true, name: true, role: true },
     })

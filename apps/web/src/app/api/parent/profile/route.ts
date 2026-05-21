@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logActivity } from "@/lib/activity"
+import { normalizePhone } from "@/lib/phone"
 import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
@@ -54,7 +55,7 @@ export async function PATCH(request: Request) {
 
     // Update User.phone jika ada perubahan
     if (body.phone !== undefined) {
-      const newPhone = body.phone.trim() || null
+      const newPhone = body.phone.trim() ? normalizePhone(body.phone.trim()) : null
       try {
         await prisma.user.update({
           where: { id: session.user.id },
