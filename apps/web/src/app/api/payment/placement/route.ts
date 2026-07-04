@@ -1,11 +1,15 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { createMayarInvoice } from "@/lib/mayar"
+import { activatePlacement, getAvailableGuarantee } from "@/lib/placement"
 import { PLACEMENT_FEE_IDR } from "@/constants/pricing"
+import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 // POST /api/payment/placement
 // Orang tua konfirmasi penempatan nanny, memilih anak yang ditangani, dan membayar fee.
+// Jaminan Kecocokan (PRD 06 §5): jika parent punya MatchGuarantee AVAILABLE →
+// penempatan langsung diaktifkan GRATIS (tanpa invoice Mayar), jaminan ditandai USED.
 export async function POST(request: Request) {
   try {
     const session = await auth()
@@ -62,6 +66,57 @@ export async function POST(request: Request) {
     if (invalidIds.length > 0) {
       return NextResponse.json({ success: false, error: "Satu atau lebih anak tidak valid" }, { status: 400 })
     }
+
+    // ── Jalur Jaminan Kecocokan: penempatan ulang gratis penuh ────────────────
+    const guarantee = await getAvailableGuarantee(parentProfile.id)
+    if (guarantee) {
+      const now = new Date()
+      const result = await activatePlacement({
+        matchingRequestId: body.matchingRequestId,
+        childIds: body.childIds,
+        startDate: now,
+        fromGuarantee: true, // penempatan hasil jaminan tidak menerbitkan jaminan baru (1× per penempatan)
+        extraTx: async (tx) => {
+          await tx.matchGuarantee.update({
+            where: { id: guarantee.id },
+            data: { status: "USED", usedAt: now },
+          })
+          // Jejak audit: transaksi Rp 0 agar riwayat pembayaran tetap utuh
+          await tx.transaction.create({
+            data: {
+              parentProfileId: parentProfile.id,
+              type: "PLACEMENT_FEE",
+              status: "SUCCESS",
+              amountIDR: 0,
+              paidAt: now,
+              notes: "Gratis — Jaminan Kecocokan",
+              metadata: { matchingRequestId: body.matchingRequestId, childIds: body.childIds, guaranteeId: guarantee.id },
+            },
+          })
+        },
+      })
+
+      if (result.status === "ALREADY_ACCEPTED") {
+        return NextResponse.json({ success: false, error: "Penempatan untuk matching ini sudah dikonfirmasi" }, { status: 400 })
+      }
+      if (result.status === "NOT_FOUND") {
+        return NextResponse.json({ success: false, error: "Matching request tidak valid untuk penempatan" }, { status: 400 })
+      }
+
+      // Simpan usedForAssignmentId setelah assignment terbentuk
+      await prisma.matchGuarantee.update({
+        where: { id: guarantee.id },
+        data: { usedForAssignmentId: result.assignmentId },
+      })
+
+      revalidateTag(`parent-${result.parentUserId}`)
+      revalidateTag(`nanny-${result.nannyUserId}`)
+
+      console.info("[PAYMENT_PLACEMENT] via Jaminan Kecocokan:", guarantee.id, "→ assignment:", result.assignmentId)
+      return NextResponse.json({ success: true, data: { free: true, guaranteeUsed: true } })
+    }
+
+    // ── Jalur normal: bayar via Mayar ─────────────────────────────────────────
 
     // Idempotency: kembalikan paymentUrl yang sudah ada kalau masih PENDING dan belum expired
     const existingTransaction = await prisma.transaction.findFirst({

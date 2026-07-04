@@ -58,6 +58,13 @@ export async function POST(request: Request) {
 
     const now = new Date()
 
+    // Jaminan Kecocokan (PRD 06 §5): pemegang jaminan aktif membuka kontak TANPA memakai kuota
+    const activeGuarantee = await prisma.matchGuarantee.findFirst({
+      where: { parentProfileId: parentProfile.id, status: "AVAILABLE" },
+      select: { id: true },
+    })
+    const viaGuarantee = activeGuarantee != null
+
     // Cek status langganan
     const sub = await prisma.subscription.findUnique({
       where: { parentProfileId: parentProfile.id },
@@ -84,25 +91,27 @@ export async function POST(request: Request) {
       })
     }
 
-    // Validasi ketersediaan kuota
-    if (flowType === "REFERRAL" && quota.referralUsed >= quota.referralLimit) {
-      return NextResponse.json(
-        { success: false, error: "Kuota referral habis untuk periode ini", code: "QUOTA_EXHAUSTED" },
-        { status: 400 }
-      )
-    }
-    if (flowType === "TALENT_POOL") {
-      if (!isSubscriber) {
+    // Validasi ketersediaan kuota — dilewati jika via Jaminan Kecocokan
+    if (!viaGuarantee) {
+      if (flowType === "REFERRAL" && quota.referralUsed >= quota.referralLimit) {
         return NextResponse.json(
-          { success: false, error: "Fitur Talent Pool memerlukan langganan aktif", code: "SUBSCRIPTION_REQUIRED" },
-          { status: 403 }
-        )
-      }
-      if (quota.talentPoolUsed >= quota.talentPoolLimit) {
-        return NextResponse.json(
-          { success: false, error: "Kuota talent pool habis untuk periode ini", code: "QUOTA_EXHAUSTED" },
+          { success: false, error: "Kuota referral habis untuk periode ini", code: "QUOTA_EXHAUSTED" },
           { status: 400 }
         )
+      }
+      if (flowType === "TALENT_POOL") {
+        if (!isSubscriber) {
+          return NextResponse.json(
+            { success: false, error: "Fitur Talent Pool memerlukan langganan aktif", code: "SUBSCRIPTION_REQUIRED" },
+            { status: 403 }
+          )
+        }
+        if (quota.talentPoolUsed >= quota.talentPoolLimit) {
+          return NextResponse.json(
+            { success: false, error: "Kuota talent pool habis untuk periode ini", code: "QUOTA_EXHAUSTED" },
+            { status: 400 }
+          )
+        }
       }
     }
 
@@ -122,35 +131,38 @@ export async function POST(request: Request) {
         skorKeseluruhan,
         kontakTerbuka: true,
         flowType,
-        quotaUsed: true,
+        quotaUsed: !viaGuarantee,
         koneksiDilakukanAt: now,
       },
       update: {
         kontakTerbuka: true,
         flowType,
-        quotaUsed: true,
+        quotaUsed: !viaGuarantee,
         koneksiDilakukanAt: now,
       },
     })
 
-    // Kurangi kuota
-    await prisma.connectionQuota.update({
-      where: { id: quota.id },
-      data:
-        flowType === "REFERRAL"
-          ? { referralUsed: quota.referralUsed + 1 }
-          : { talentPoolUsed: quota.talentPoolUsed + 1 },
-    })
+    // Kurangi kuota — kecuali via Jaminan Kecocokan
+    if (!viaGuarantee) {
+      await prisma.connectionQuota.update({
+        where: { id: quota.id },
+        data:
+          flowType === "REFERRAL"
+            ? { referralUsed: quota.referralUsed + 1 }
+            : { talentPoolUsed: quota.talentPoolUsed + 1 },
+      })
+    }
 
-    const remaining =
-      flowType === "REFERRAL"
-        ? quota.referralLimit - quota.referralUsed - 1
-        : quota.talentPoolLimit - quota.talentPoolUsed - 1
+    const remaining = viaGuarantee
+      ? (flowType === "REFERRAL" ? quota.referralLimit - quota.referralUsed : quota.talentPoolLimit - quota.talentPoolUsed)
+      : (flowType === "REFERRAL"
+          ? quota.referralLimit - quota.referralUsed - 1
+          : quota.talentPoolLimit - quota.talentPoolUsed - 1)
 
     revalidateTag(`parent-${session.user.id}`)
-    console.info("[UNLOCK]", parentProfile.id, "→", nannyProfileId, flowType, `remaining=${remaining}`)
+    console.info("[UNLOCK]", parentProfile.id, "→", nannyProfileId, flowType, `remaining=${remaining}`, viaGuarantee ? "(jaminan)" : "")
 
-    return NextResponse.json({ success: true, data: { unlocked: true, remaining } })
+    return NextResponse.json({ success: true, data: { unlocked: true, remaining, viaGuarantee } })
   } catch (error) {
     console.error("[UNLOCK]", error)
     return NextResponse.json({ success: false, error: "Gagal membuka kontak nanny" }, { status: 500 })

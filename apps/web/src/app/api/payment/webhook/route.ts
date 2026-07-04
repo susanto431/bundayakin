@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma"
-import { type NannyType } from "@prisma/client"
 import {
   verifyMayarWebhookToken,
   isMayarPaymentSuccess,
   isMayarPaymentFailed,
   type MayarWebhookPayload,
 } from "@/lib/mayar"
+import { activatePlacement } from "@/lib/placement"
 import { logActivity } from "@/lib/activity"
 import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
@@ -166,27 +166,20 @@ async function handlePlacementFeeSuccess(
     return
   }
 
-  const matchingRequest = await prisma.matchingRequest.findUnique({
-    where: { id: matchingRequestId },
-    select: {
-      id: true,
-      parentProfileId: true,
-      nannyProfileId: true,
-      nannyTypeRequested: true,
-      status: true,
-      nannyProfile: { select: { userId: true } },
-      parentProfile: { select: { userId: true } },
+  const result = await activatePlacement({
+    matchingRequestId,
+    childIds,
+    startDate: paidAt,
+    extraTx: async (tx) => {
+      // Update transaction ke SUCCESS — di dalam DB transaction agar atomic
+      await tx.transaction.update({
+        where: { id: transaction.id },
+        data: { status: "SUCCESS", mayarStatus: effectiveStatus, paymentMethod, paidAt },
+      })
     },
   })
 
-  if (!matchingRequest?.nannyProfileId) {
-    console.error("[WEBHOOK_PLACEMENT] matching request atau nannyProfileId tidak ditemukan:", matchingRequestId)
-    return
-  }
-
-  // Idempotency: kalau sudah ACCEPTED, assignment sudah dibuat sebelumnya
-  if (matchingRequest.status === "ACCEPTED") {
-    console.info("[WEBHOOK_PLACEMENT] Sudah diproses sebelumnya:", matchingRequestId)
+  if (result.status === "ALREADY_ACCEPTED") {
     // Pastikan transaction juga ter-update kalau retry terjadi setelah partial failure
     await prisma.transaction.updateMany({
       where: { id: transaction.id, status: { not: "SUCCESS" } },
@@ -194,93 +187,10 @@ async function handlePlacementFeeSuccess(
     })
     return
   }
+  if (result.status === "NOT_FOUND") return
 
-  const startDate = paidAt
-  const week1At = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000)
-  const week2At = new Date(startDate.getTime() + 14 * 24 * 60 * 60 * 1000)
-  const month1At = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000)
-  const month3At = new Date(startDate.getTime() + 90 * 24 * 60 * 60 * 1000)
-
-  const nannyType = (matchingRequest.nannyTypeRequested ?? "LIVE_IN") as NannyType
-
-  await prisma.$transaction(async (tx) => {
-    // Update transaction ke SUCCESS — di dalam DB transaction agar atomic
-    await tx.transaction.update({
-      where: { id: transaction.id },
-      data: { status: "SUCCESS", mayarStatus: effectiveStatus, paymentMethod, paidAt },
-    })
-
-    const assignment = await tx.nannyAssignment.create({
-      data: {
-        parentProfileId: matchingRequest.parentProfileId,
-        nannyProfileId: matchingRequest.nannyProfileId!,
-        startDate,
-        isActive: true,
-        nannyType,
-      },
-      select: { id: true },
-    })
-
-    await tx.assignmentChild.createMany({
-      data: childIds.map((childProfileId, idx) => ({
-        assignmentId: assignment.id,
-        childProfileId,
-        isPrimary: idx === 0,
-      })),
-    })
-
-    await tx.checkin.createMany({
-      data: [
-        { assignmentId: assignment.id, timing: "WEEK_1", scheduledAt: week1At },
-        { assignmentId: assignment.id, timing: "WEEK_2", scheduledAt: week2At },
-      ],
-    })
-
-    await tx.evaluation.createMany({
-      data: [
-        {
-          assignmentId: assignment.id,
-          parentProfileId: matchingRequest.parentProfileId,
-          nannyProfileId: matchingRequest.nannyProfileId!,
-          timing: "MONTH_1",
-          scheduledAt: month1At,
-        },
-        {
-          assignmentId: assignment.id,
-          parentProfileId: matchingRequest.parentProfileId,
-          nannyProfileId: matchingRequest.nannyProfileId!,
-          timing: "MONTH_3",
-          scheduledAt: month3At,
-        },
-      ],
-    })
-
-    await tx.matchingRequest.update({
-      where: { id: matchingRequestId },
-      data: { status: "ACCEPTED" },
-    })
-
-    await tx.notification.create({
-      data: {
-        userId: matchingRequest.parentProfile.userId,
-        type: "PLACEMENT_CONFIRMED",
-        title: "Penempatan nanny berhasil dikonfirmasi",
-        body: "Sus sudah siap mulai. Cek jadwal check-in minggu pertama di dashboard.",
-      },
-    })
-
-    await tx.notification.create({
-      data: {
-        userId: matchingRequest.nannyProfile!.userId,
-        type: "PLACEMENT_CONFIRMED",
-        title: "Selamat! Sus resmi ditempatkan",
-        body: "Penempatan sudah dikonfirmasi. Cek catatan anak dan jadwal check-in di dashboard.",
-      },
-    })
-  })
-
-  revalidateTag(`parent-${matchingRequest.parentProfile.userId}`)
-  revalidateTag(`nanny-${matchingRequest.nannyProfile!.userId}`)
+  revalidateTag(`parent-${result.parentUserId}`)
+  revalidateTag(`nanny-${result.nannyUserId}`)
 
   console.info("[WEBHOOK_PLACEMENT] Assignment created for matchingRequest:", matchingRequestId)
 }

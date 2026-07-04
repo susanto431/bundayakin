@@ -221,6 +221,7 @@ export function getParentMonitoring(userId: string) {
             orderBy: { createdAt: "desc" },
             select: {
               id: true,
+              startDate: true,
               nannyProfile: { select: { fullName: true } },
               checkins: { select: { timing: true, status: true, parentDoneAt: true } },
               evaluations: { select: { timing: true, status: true, parentDoneAt: true } },
@@ -231,6 +232,49 @@ export function getParentMonitoring(userId: string) {
     [`parent-monitoring`, userId],
     { revalidate: 30, tags: [`parent-${userId}`] }
   )()
+}
+
+// --- Pasca-penugasan: Jaminan Kecocokan aktif + penugasan terakhir yang berakhir ---
+// Tidak di-cache: dipakai tepat setelah aksi akhiri-penugasan / tulis-review.
+export async function getParentPostAssignmentInfo(userId: string) {
+  const profile = await prisma.parentProfile.findUnique({
+    where: { userId },
+    select: {
+      id: true,
+      matchGuarantees: {
+        where: { status: "AVAILABLE" },
+        take: 1,
+        orderBy: { createdAt: "desc" },
+        select: { id: true, createdAt: true },
+      },
+      nannyAssignments: {
+        where: { isActive: false },
+        take: 1,
+        orderBy: { endDate: "desc" },
+        select: {
+          id: true,
+          startDate: true,
+          endDate: true,
+          nannyProfile: { select: { fullName: true } },
+        },
+      },
+    },
+  })
+  if (!profile) return null
+
+  const endedAssignment = profile.nannyAssignments[0] ?? null
+  const reviewed = endedAssignment
+    ? (await prisma.trackRecordEntry.findUnique({
+        where: { assignmentId: endedAssignment.id },
+        select: { id: true },
+      })) != null
+    : false
+
+  return {
+    guarantee: profile.matchGuarantees[0] ?? null,
+    endedAssignment,
+    reviewed,
+  }
 }
 
 // --- Monitoring summary (/dashboard/parent/monitoring/summary) ---

@@ -18,6 +18,7 @@ type Props = {
   score: number | null
   childList: Child[]
   placementFeeIDR: number
+  hasGuarantee?: boolean // Jaminan Kecocokan aktif → penempatan ini gratis penuh
 }
 
 const NANNY_TYPE_LABEL: Record<string, string> = {
@@ -43,6 +44,7 @@ export default function PlacementClient({
   score,
   childList,
   placementFeeIDR,
+  hasGuarantee = false,
 }: Props) {
   const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(
     () => new Set(childList.length === 1 ? [childList[0].id] : [])
@@ -78,10 +80,13 @@ export default function PlacementClient({
       })
       const data = await res.json() as {
         success: boolean
-        data?: { paymentUrl?: string }
+        data?: { paymentUrl?: string; free?: boolean }
         error?: string
       }
-      if (data.success && data.data?.paymentUrl) {
+      if (data.success && data.data?.free) {
+        // Jaminan Kecocokan: penempatan langsung aktif tanpa pembayaran
+        window.location.href = "/dashboard/parent?placement=success"
+      } else if (data.success && data.data?.paymentUrl) {
         window.location.href = data.data.paymentUrl
       } else {
         setErrorMsg(data.error ?? "Terjadi kesalahan. Coba lagi.")
@@ -183,27 +188,46 @@ export default function PlacementClient({
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
         Biaya penempatan nanny
       </p>
-      <div className="bg-[#FEF0E7] border border-[#F5C4A0] rounded-[16px] p-3.5 mb-3">
-        <div className="flex justify-between items-start">
-          <div className="flex-1 mr-3">
-            <p className="text-[13px] font-bold text-[#A35320]">
-              {NANNY_TYPE_LABEL[nannyType] ?? nannyType}
-            </p>
-            <p className="text-[12px] text-[#7A4018] mt-1 leading-relaxed">
-              Termasuk: bonus untuk {firstName} kalau bertahan 3 bulan, dan fee untuk siapa pun yang merekomendasikan {firstName} ke Bunda.
+      {hasGuarantee ? (
+        <div className="bg-[#E5F6F4] border border-[#A8DDD8] rounded-[16px] p-3.5 mb-3">
+          <div className="flex justify-between items-start">
+            <div className="flex-1 mr-3">
+              <p className="text-[13px] font-bold text-[#1E4A45]">
+                {NANNY_TYPE_LABEL[nannyType] ?? nannyType}
+              </p>
+              <p className="text-[12px] text-[#2C5F5A] mt-1 leading-relaxed">
+                Penempatan ini <strong>gratis penuh</strong> karena Bunda memakai Jaminan Kecocokan dari penempatan sebelumnya.
+              </p>
+            </div>
+            <div className="flex-shrink-0 text-right">
+              <p className="text-[13px] text-[#999AAA] line-through">{formatRupiah(placementFeeIDR)}</p>
+              <p className="font-[var(--font-dm-serif)] text-[22px] text-[#2C5F5A]">Gratis</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-[#FEF0E7] border border-[#F5C4A0] rounded-[16px] p-3.5 mb-3">
+          <div className="flex justify-between items-start">
+            <div className="flex-1 mr-3">
+              <p className="text-[13px] font-bold text-[#A35320]">
+                {NANNY_TYPE_LABEL[nannyType] ?? nannyType}
+              </p>
+              <p className="text-[12px] text-[#7A4018] mt-1 leading-relaxed">
+                Termasuk: bonus untuk {firstName} kalau bertahan 3 bulan, dan fee untuk siapa pun yang merekomendasikan {firstName} ke Bunda.
+              </p>
+            </div>
+            <p className="font-[var(--font-dm-serif)] text-[22px] text-[#A35320] flex-shrink-0">
+              {formatRupiah(placementFeeIDR)}
             </p>
           </div>
-          <p className="font-[var(--font-dm-serif)] text-[22px] text-[#A35320] flex-shrink-0">
-            {formatRupiah(placementFeeIDR)}
-          </p>
         </div>
-      </div>
+      )}
 
       {/* Guarantee card */}
       <div className="bg-[#E5F6F4] border border-[#A8DDD8] rounded-[16px] p-3.5 mb-4">
-        <p className="text-[12px] font-bold text-[#1E4A45] mb-1">Jaminan kecocokan</p>
+        <p className="text-[12px] font-bold text-[#1E4A45] mb-1">Jaminan Kecocokan</p>
         <p className="text-[12px] text-[#2C5F5A] leading-relaxed">
-          Kalau dalam 3 bulan terasa tidak cocok: Bunda mendapat 1× penempatan nanny baru secara gratis. Prosedur klaim tersedia di halaman Bantuan.
+          Kalau nanny berhenti dalam 30 hari pertama: Bunda mendapat matching ulang dan 1× penempatan ulang secara gratis — otomatis, tanpa klaim manual.
         </p>
       </div>
 
@@ -251,6 +275,8 @@ export default function PlacementClient({
         >
           {loading
             ? "Memproses..."
+            : hasGuarantee
+            ? "Konfirmasi penempatan — Gratis (Jaminan Kecocokan)"
             : `Bayar Rp ${placementFeeIDR.toLocaleString("id-ID")} & konfirmasi`}
         </button>
         <Link

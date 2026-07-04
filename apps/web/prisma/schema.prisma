@@ -262,6 +262,12 @@ model ParentProfile {
   // Match results (Sprint 2 direktori)
   matchResults MatchResult[]
 
+  // Jaminan Kecocokan
+  matchGuarantees MatchGuarantee[]
+
+  // Rekam jejak yang ditulis parent ini
+  trackRecordsWritten TrackRecordEntry[]
+
   @@index([userId])
 }
 
@@ -721,6 +727,8 @@ model NannyAssignment {
   nannyType       NannyType
   salaryAgreed    Int?      // IDR/bulan
   notes           String?   @db.Text
+  endReason       String?   @db.Text // alasan penugasan berakhir — diisi saat diakhiri
+  fromGuarantee   Boolean   @default(false) // penempatan hasil klaim Jaminan Kecocokan (tidak menerbitkan jaminan baru)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -888,11 +896,39 @@ model TrackRecordEntry {
   durationMonths Int?
   reviewText     String?  @db.Text
   isVerified     Boolean  @default(false)
+
+  // Link ke penugasan nyata — sumber verifikasi (review hanya dari keluarga yang benar-benar mempekerjakan)
+  parentProfileId String?
+  assignmentId    String?  @unique
+
   createdAt      DateTime @default(now())
 
-  nannyProfile NannyProfile @relation(fields: [nannyProfileId], references: [id], onDelete: Cascade)
+  nannyProfile  NannyProfile   @relation(fields: [nannyProfileId], references: [id], onDelete: Cascade)
+  parentProfile ParentProfile? @relation(fields: [parentProfileId], references: [id])
 
   @@index([nannyProfileId])
+  @@index([parentProfileId])
+}
+
+// ============================================================
+// MATCH GUARANTEE — Jaminan Kecocokan (PRD 06 §5, Juli 2026)
+// Nanny berhenti ≤30 hari pertama → matching ulang tanpa kuota
+// + penempatan ulang gratis penuh. 1× per penempatan.
+// ============================================================
+
+model MatchGuarantee {
+  id                  String    @id @default(cuid())
+  parentProfileId     String
+  sourceAssignmentId  String    @unique // penugasan yang berakhir ≤30 hari
+  status              String    @default("AVAILABLE") // AVAILABLE | USED
+  reason              String?   @db.Text // alasan berhenti (dari endReason)
+  usedAt              DateTime?
+  usedForAssignmentId String?   // penugasan baru hasil klaim jaminan
+  createdAt           DateTime  @default(now())
+
+  parentProfile ParentProfile @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([parentProfileId, status])
 }
 
 model TrackRecordAccess {
