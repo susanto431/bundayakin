@@ -51,6 +51,7 @@ Domain Registry mendefinisikan **bounded context** dari platform BundaYakin — 
 
 **Aturan domain:**
 - Satu `User` bisa punya satu `ParentProfile` ATAU satu `NannyProfile`, tidak keduanya
+  - *Pengecualian teknis:* fitur switch-role (`api/user/switch-role`) hanya untuk akun testing internal/ADMIN (`canSwitchRoles`), mengganti role di JWT tanpa mengubah DB — bukan pelanggaran aturan domain untuk user umum
 - Admin dibuat manual (tidak ada UI registrasi admin)
 - OTP reset password hanya via nomor WA (tidak via email) — `OtpToken`
 - Email optional untuk nanny, wajib untuk orang tua
@@ -99,7 +100,7 @@ Domain Registry mendefinisikan **bounded context** dari platform BundaYakin — 
 - Dealbreaker tidak otomatis menolak — memicu notifikasi negosiasi
 - `MatchingRequest` punya periode eksklusif 7 hari (bisa diperpanjang 1x +3 hari)
 - Setelah `exclusiveUntil` lewat tanpa keputusan → status `EXPIRED` → nanny masuk talent pool
-- `MatchResult` adalah cache direktori (tanpa `MatchingRequest`) — dipakai di Fasa 2
+- `MatchResult` adalah cache skor direktori (tanpa `MatchingRequest`) — **sudah dipakai di Fasa 1** oleh direktori nanny internal (`cari-nanny/direktori`) dan Kuota Koneksi; jangan dirancukan dengan `MatchingResult` (output sesi matching formal)
 
 **Flow matching:**
 ```

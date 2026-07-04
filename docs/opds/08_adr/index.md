@@ -49,6 +49,7 @@
 | [ADR-004](ADR-004_cloudflare-r2-stream.md) | Cloudflare R2 + Stream untuk media storage | Accepted | Mei 2026 |
 | [ADR-005](ADR-005_claude-api-matching.md) | Claude API sebagai AI engine untuk matching | Accepted | Mei 2026 |
 | [ADR-006](ADR-006_pdf-service-python.md) | Service PDF terpisah (Python/ReportLab) di Railway | Accepted | Mei 2026 |
+| [ADR-007](ADR-007_langganan-dua-pilar.md) | Langganan dua pilar: nanny + Tumbuh Kembang | Accepted | Juli 2026 |
 
 ---
 

@@ -1,0 +1,134 @@
+# Proof of Concept (POC)
+## BundaYakin — Platform Kecocokan & Pemantauan Nanny
+
+> Versi 1.0 · Juli 2026 · Dokumen Internal OPDS
+> Disusun dari audit kode aktual (commit terakhir 22 Mei 2026) — bukan dari rencana.
+> Fungsi dokumen: bukti bahwa konsep inti **sudah terbukti berjalan end-to-end**, sebagai baseline pengembangan lanjutan.
+
+---
+
+## 1. Hipotesis yang Dibuktikan
+
+POC ini menjawab empat pertanyaan konsep yang menjadi taruhan produk:
+
+| # | Hipotesis | Status | Bukti |
+|---|---|---|---|
+| H1 | Kecocokan nanny ↔ keluarga bisa diukur objektif lewat survey paralel + AI scoring | ✅ Terbukti | 53 soal · 3 domain · Claude API menghasilkan skor 0–100 + narasi terstruktur |
+| H2 | Model bisnis langganan + Kuota Koneksi bisa dijalankan otomatis (tanpa admin manual) | ✅ Terbukti | Mayar production: invoice → webhook → aktivasi subscription & kuota otomatis |
+| H3 | Nanny mau/bisa punya profil digital multimedia (foto, video, portfolio) | ✅ Terbukti secara teknis | Upload R2 + Cloudflare Stream jalan; adopsi user riil belum diukur |
+| H4 | Pemantauan pasca-penempatan bisa dijadwalkan & diringkas AI | ✅ Terbukti | Check-in W1/W2 + Evaluasi M1/M3/kuartalan + `aiSummary` |
+
+Yang **belum** dibuktikan (bukan kegagalan — belum dikerjakan): Layer 2 psikotes AI, Layer 3 review psikolog operasional, konversi berbayar di pasar riil. Lihat §6.
+
+---
+
+## 2. Arsitektur yang Terbukti
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  apps/web — Next.js 14 App Router (Vercel)                   │
+│                                                              │
+│  UI (React + Tailwind + shadcn/ui)                           │
+│    └── src/app/dashboard/{parent,nanny,admin}                │
+│  Backend (Vercel serverless)                                 │
+│    └── src/app/api/* — 40+ endpoint                          │
+│                                                              │
+│  ├─► Neon PostgreSQL (Prisma, 25+ model)                     │
+│  ├─► Claude API (scoring & narasi — src/lib/claude.ts)       │
+│  ├─► Mayar (payment — src/lib/mayar.ts + webhook)            │
+│  ├─► Cloudflare R2 (foto) + Stream (video ≤3 menit)          │
+│  ├─► Resend (email transaksional)                            │
+│  └─► apps/pdf-service — FastAPI + ReportLab (Railway)        │
+│        POST /generate-report (auth: x-api-key)               │
+└──────────────────────────────────────────────────────────────┘
+```
+
+Keputusan arsitektur tercatat di [ADR index](08_adr/index.md) (6 ADR: App Router, Neon+Prisma, Mayar, R2/Stream, Claude API, PDF Python).
+
+---
+
+## 3. Alur End-to-End yang Terbukti Berjalan
+
+### 3.1 Tes Kecocokan (alur inti — H1)
+
+```
+Registrasi (auto-login) → onboarding → orang tua undang nanny (Flow A, kode)
+  atau pilih dari direktori/Talent Pool (Flow B, pelanggan)
+→ kedua pihak isi survey 53 soal secara independen (save & resume)
+→ kedua flag survey done → Claude API scoring
+→ MatchingResult: skor keseluruhan + per domain A/B/C, highlight, mismatch,
+  poin negosiasi, tips dua arah
+→ dealbreaker mismatch → framing "perlu dibicarakan" (bukan tolak otomatis)
+→ periode eksklusif 7 hari (+3 hari 1×) → ACCEPTED / REJECTED / EXPIRED
+→ laporan PDF via pdf-service
+```
+
+Kode kunci: `src/lib/claude.ts` (prompt & parsing), `src/constants/matching-weights.ts` (bobot configurable, dealbreaker penalty 0.3), `src/app/api/matching/*`.
+
+### 3.2 Monetisasi (H2)
+
+- Langganan Rp 500rb/tahun: halaman subscription → invoice Mayar → redirect checkout → webhook `api/payment/webhook` (lookup via `productId` + `lookupId`) → status ACTIVE + kuota talent pool terbuka.
+- Placement fee Rp 1,2jt / Rp 600rb via `api/payment/placement`.
+- Kuota Koneksi rolling 30 hari (3 referral gratis; +7 talent pool bila berlangganan) — logika di `src/lib/queries/parent.ts`.
+
+### 3.3 Profil digital nanny (H3)
+
+Profil dasar + skills/bahasa/agama, video perkenalan & keahlian (Cloudflare Stream, polling status processing), foto portfolio (R2), entri pengalaman kerja gaya LinkedIn, mode Open to Job, preview profil sendiri, dan tampilan untuk orang tua (`dashboard/parent/nanny/[nannyId]`).
+
+### 3.4 Pemantauan (H4)
+
+`NannyAssignment` (multi-anak via `AssignmentChild`) → Check-in minggu 1 & 2 → Evaluasi bulan 1, 3, kuartalan → ringkasan & rekomendasi AI → dashboard monitoring dua sisi.
+
+---
+
+## 4. Cara Menjalankan POC
+
+```bash
+# Web (dari root repo)
+cd apps/web && npm install
+cp .env.example .env   # isi kredensial: Neon, Anthropic, Mayar, Cloudflare, Resend
+npx prisma generate && npx prisma db push
+npm run dev            # localhost:3000
+
+# PDF service
+cd apps/pdf-service && pip install -r requirements.txt
+uvicorn main:app --reload   # health check: GET /health
+```
+
+Seed data: `npx prisma db seed` (soal survey) · `prisma/seed-matches.ts` (contoh match).
+Produksi: Vercel (root `apps/web`) + Railway (root `apps/pdf-service`), domain bundayakin.com.
+
+---
+
+## 5. Ukuran Sistem Saat Ini
+
+| Dimensi | Nilai |
+|---|---|
+| Model Prisma | 25+ (schema v1.1) |
+| Endpoint API | 40+ route serverless |
+| Bank soal Layer 1 | 53 pertanyaan, 9 aspek, 3 domain |
+| Fitur shipped | ±63 (lihat [Feature Registry](05_feature_registry.md)) |
+| Halaman dashboard | Parent 12 area · Nanny 9 area · Admin 1 area |
+| Model AI | claude-sonnet-4-20250514 (catatan upgrade di §6) |
+
+---
+
+## 6. Batas POC & Risiko untuk Pengembangan Lanjutan
+
+Hal yang **belum terbukti** dan menjadi pekerjaan fase berikutnya:
+
+1. **Layer 2 & 3 belum operasional** — schema dan tipe transaksi siap, UI psikotes dan SOP psikolog belum ada. Ini pembeda utama vs kompetitor, prioritas tinggi.
+2. **Monetisasi belum teruji pasar** — semua pipa pembayaran jalan, tetapi target 100 pelanggan berbayar (PRD §7) belum tervalidasi dengan user riil.
+3. **Loop reputasi belum tertutup** — Track Record & badge Terpercaya baru schema; tanpa UI input rekam jejak, janji "rekam jejak dua arah" belum terwujud.
+4. **Notifikasi belum simetris** — nanny punya halaman notifikasi, parent belum (baru placeholder di settings).
+5. **Tidak ada automated test** — perubahan matching engine berisiko regresi senyap; minimal butuh test untuk scoring & webhook payment.
+6. **Model AI perlu evaluasi upgrade** — masih `claude-sonnet-4-20250514`; keluarga Claude terbaru (Sonnet 5 dst.) berpotensi memperbaiki kualitas narasi & konsistensi JSON dengan biaya setara. Perlu A/B kecil sebelum ganti.
+7. **Scheduler evaluasi** — penjadwalan check-in/evaluasi bergantung request user (belum ada cron); evaluasi bisa terlewat bila user tidak membuka aplikasi.
+
+Rekomendasi arah UI/UX untuk fase berikutnya: lihat [11_ui_ux_review.md](11_ui_ux_review.md).
+
+**Arah pengembangan terbaru (Juli 2026):** langganan kini dua pilar — pilar kedua "Tumbuh Kembang" (kurva WHO, skrining KPSP, Konsultasi Psikolog Anak Rp 1jt/sesi, Portal Psikolog, log harian nanny) sudah diputuskan di [ADR-007](08_adr/ADR-007_langganan-dua-pilar.md) dan dispesifikasikan di [PRD Tumbuh Kembang](13_prd_tumbuh_kembang.md). Positioning & USP resmi ada di [14_positioning.md](14_positioning.md), termasuk keputusan **Jaminan Kecocokan** (matching ulang gratis jika nanny berhenti ≤30 hari — lihat PRD §5). Belum ada satu pun yang dibangun — POC ini tetap potret sistem per commit terakhir 22 Mei 2026.
+
+---
+
+*Lihat juga: [PRD](06_prd.md) · [Domain Registry](02_domain_registry.md) · [TDD](07_technical_design_document.md) · [CONTEXT.md](../../CONTEXT.md) (glossary domain kanonik)*

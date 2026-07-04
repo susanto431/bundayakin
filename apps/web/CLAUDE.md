@@ -86,13 +86,14 @@ apps/web/
 │   │   ├── layout/            ← Navbar, BottomNav, Sidebar
 │   │   ├── matching/          ← SurveyForm, ResultCard, dll
 │   │   ├── profile/           ← ChildProfileForm, NannyCard, dll
-│   │   ├── payment/           ← MidtransButton, SubscriptionBanner
+│   │   ├── payment/           ← tombol bayar Mayar, SubscriptionBanner
 │   │   └── shared/            ← Logo, LoadingSpinner, EmptyState
 │   ├── lib/
 │   │   ├── prisma.ts          ← WAJIB singleton pattern
 │   │   ├── auth.ts            ← NextAuth config
 │   │   ├── claude.ts          ← Anthropic SDK
-│   │   ├── midtrans.ts
+│   │   ├── mayar.ts           ← payment gateway Mayar
+│   │   ├── cloudflare.ts      ← R2 (foto) + Stream (video)
 │   │   └── resend.ts
 │   ├── types/
 │   │   └── next-auth.d.ts     ← extend Session dengan id & role
@@ -237,7 +238,7 @@ Dokumen lengkap: `docs/DESIGN_SYSTEM.md`
 - Langganan Rp 500rb/tahun: **10 koneksi/bulan** (3 referral + 7 talent pool)
 - Setelah kuota habis: Rp 100.000/koneksi tambahan via Mayar
 - Kuota renew tiap 30 hari dari tanggal aktivasi (bukan awal bulan kalender)
-- Konstanta di `src/constants/quota.ts`
+- Logika kuota di `src/lib/queries/parent.ts` · harga di `src/constants/pricing.ts` (tidak ada file `quota.ts`)
 
 ### 6.8 Media Upload
 - **Foto** (avatar, portfolio): upload ke Cloudflare R2 via `src/lib/cloudflare.ts`
@@ -339,7 +340,7 @@ NEXT_PUBLIC_APP_URL=       # https://bundayakin.com
 
 **Aturan env:**
 - Prefix `NEXT_PUBLIC_` hanya untuk variabel yang aman dibaca di browser
-- Jangan pernah expose `ANTHROPIC_API_KEY`, `MIDTRANS_SERVER_KEY`, atau `DATABASE_URL` ke client
+- Jangan pernah expose `ANTHROPIC_API_KEY`, `MAYAR_API_KEY`, atau `DATABASE_URL` ke client
 - `PDF_SERVICE_SECRET` dipakai sebagai `x-api-key` header saat Next.js memanggil Railway
 - File `.env` ada di `.gitignore` — jangan pernah commit
 
@@ -387,29 +388,32 @@ npx shadcn-ui@latest add input
 
 ---
 
+## 9b. Aturan Git — WAJIB
+
+- **JANGAN PERNAH menulis Claude sebagai kontributor** di commit atau PR: tanpa `Co-Authored-By: Claude ...`, tanpa "Generated with Claude Code", tanpa atribusi AI dalam bentuk apa pun (keputusan pemilik produk, Juli 2026).
+- Format commit message: conventional commit berbahasa Indonesia, konsisten dengan riwayat repo — contoh: `feat(matching): tambah jaminan kecocokan`, `fix(webhook): ...`
+- Commit/push hanya saat diminta.
+
 ## 10. Status MVP saat ini
 
-### apps/web (Next.js)
-- [x] Schema Prisma — selesai (17 model)
-- [x] Project Next.js setup
-- [x] Prisma + NeonDB connected
-- [x] NextAuth v5 + bcryptjs installed
-- [x] Monorepo structure — `apps/web/` & `apps/pdf-service/`
-- [ ] `src/lib/prisma.ts` — singleton
-- [ ] `src/lib/auth.ts` — NextAuth config
-- [ ] `src/types/next-auth.d.ts`
-- [ ] `middleware.ts` — route guard
-- [ ] Halaman auth (login, register parent, register nanny)
-- [ ] Dashboard parent skeleton
-- [ ] Dashboard nanny skeleton
-- [ ] Survey matching form
-- [ ] AI scoring integration
-- [ ] Payment Midtrans
-- [ ] Deploy Vercel (Root Directory: apps/web)
-- [ ] Domain Cloudflare → bundayakin.com
+> **Sumber kebenaran status fitur: [`docs/opds/05_feature_registry.md`](../../docs/opds/05_feature_registry.md)** — jangan update checklist di sini, update Feature Registry.
 
-### apps/pdf-service (Python)
-- [ ] Setup FastAPI + ReportLab
-- [ ] Endpoint `/generate-report`
-- [ ] Dockerfile
-- [ ] Deploy Railway (Root Directory: apps/pdf-service)
+Ringkasan per Juli 2026 (commit terakhir 22 Mei 2026):
+
+### apps/web (Next.js) — MVP Fasa 1 sudah berjalan
+- [x] Schema Prisma — 25+ model (v1.1: tanpa KTP, ConnectionQuota, Mayar, NannyMedia)
+- [x] Auth lengkap — NextAuth v5, register/login, OTP WA reset password, auto-login pasca registrasi
+- [x] Middleware route guard per role (PARENT / NANNY / ADMIN)
+- [x] Dashboard parent & nanny lengkap (profil, anak multi-anak, monitoring, referral, settings)
+- [x] Matching Engine Layer 1 — 53 soal, survey paralel, dealbreaker, AI scoring Claude API
+- [x] Direktori nanny internal + Kuota Koneksi (cache `MatchResult`)
+- [x] Payment Mayar production (subscription, placement fee, webhook)
+- [x] Media nanny — foto R2, video Cloudflare Stream (max 3 menit)
+- [x] PDF laporan matching via pdf-service
+- [x] Deploy Vercel + domain bundayakin.com
+- [ ] Layer 2 (psikotes AI) — schema ready, UI belum
+- [ ] Layer 3 (psikolog) — schema ready, SOP operasional belum
+- [ ] Notifikasi in-app parent, UI track record, payment add-on (lihat Feature Registry: ~17 item Planned)
+
+### apps/pdf-service (Python — Railway)
+- [x] FastAPI + ReportLab, endpoint generate report, Dockerfile, deploy Railway

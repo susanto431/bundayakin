@@ -1,8 +1,10 @@
 # Product Requirements Document (PRD)
 ## BundaYakin — Human Care Consulting
 
-> Versi 1.0 · Mei 2026 · Dokumen Internal OPDS
+> Versi 1.1 · Diperbarui Juli 2026 (audit kode vs dokumen) · Dokumen Internal OPDS
 > Scope: Fasa 1 — Platform Kecocokan & Pemantauan
+> Changelog v1.1: status Mayar diperbarui (production aktif), direktori nanny internal masuk scope shipped, auto-login pasca registrasi, profil anak dibuka untuk akun free
+> **Juli 2026:** langganan kini dua pilar ([ADR-007](08_adr/ADR-007_langganan-dua-pilar.md)) — pilar kedua "Tumbuh Kembang" punya PRD sendiri: [13_prd_tumbuh_kembang.md](13_prd_tumbuh_kembang.md)
 
 ---
 
@@ -105,8 +107,11 @@ Akibatnya:
 
 ### Dalam Scope
 
-- Registrasi dan onboarding (orang tua + nanny)
+- Registrasi dan onboarding (orang tua + nanny), auto-login setelah registrasi
 - Matching Engine Layer 1 (survey paralel + AI scoring)
+- Direktori nanny internal (browse + filter dalam dashboard, skor kecocokan via cache `MatchResult`)
+- **Jaminan Kecocokan** (diputuskan Juli 2026, belum dibangun): jika nanny berhenti dalam **30 hari pertama** penugasan → **matching ulang gratis tanpa memakai Kuota Koneksi DAN penempatan ulang gratis penuh (tanpa placement fee kedua)**. Pagar pengaman: (1) berlaku 1× per penempatan; (2) hanya jika berhenti ≤30 hari; (3) alasan berhenti terekam via check-in minggu 1 & 2. Senjata melawan "garansi ganti orang" penyalur tradisional — garansi mereka menjamin ketersediaan, garansi kami menjamin kecocokan; risiko rendah karena kecocokan sudah diukur di awal.
+- Profil anak bisa diisi akun free (keputusan 22 Mei 2026 — yang premium adalah *berbagi ke nanny*, bukan datanya)
 - Matching Engine Layer 2 (psikotes AI) — schema ready, UI menyusul
 - Placement fee flow (jangka panjang + infal)
 - Profil anak multi-anak
@@ -198,7 +203,7 @@ Akibatnya:
 ### Operasional
 
 - Tim sangat kecil — tidak ada QA engineer, tidak ada dedicated DevOps
-- Mayar belum diverifikasi per Mei 2026 (estimasi 3 hari lagi)
+- Mayar sudah diverifikasi dan production aktif (per akhir Mei 2026) — webhook lookup memakai `productId` Mayar
 - Layer 3 (psikolog) belum fully operasional — menunggu SOP psikolog HCC
 
 ---
@@ -218,7 +223,7 @@ Akibatnya:
 | Risiko | Probabilitas | Dampak | Mitigasi |
 |---|---|---|---|
 | Nanny tidak mau isi survey (UX terlalu panjang) | Tinggi | Tinggi | Survey dibuat mobile-friendly, progress indicator, bisa save & lanjut |
-| Mayar payment gagal/lambat diverifikasi | Sedang | Tinggi | Siapkan alternatif (Xendit atau manual transfer) sementara menunggu |
+| Mayar payment gagal/error webhook | Rendah (sudah production) | Tinggi | Verifikasi sudah selesai; monitoring webhook + fallback manual transfer jika insiden |
 | AI scoring bias atau tidak akurat | Sedang | Tinggi | Transparansi scoring, mekanisme appeal, tidak dijadikan satu-satunya penentu |
 | Data psikologis bocor | Rendah | Sangat Tinggi | Enkripsi, akses terbatas, audit log — lihat AI Governance |
 | Skalabilitas database saat user banyak | Rendah | Sedang | Neon serverless auto-scale, Prisma query optimization |

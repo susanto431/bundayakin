@@ -1,8 +1,8 @@
 # Feature Registry
 ## BundaYakin — Human Care Consulting
 
-> Versi 1.1 · Mei 2026 · Dokumen Internal OPDS
-> Diperbarui: 20 Mei 2026
+> Versi 1.2 · Dokumen Internal OPDS
+> Diperbarui: Juli 2026 (audit kode vs dokumen — sinkron dengan commit terakhir 22 Mei 2026)
 
 Feature Registry adalah **status snapshot** semua fitur platform. Berbeda dari backlog — ini mencatat apa yang sudah shipped, apa yang sedang berjalan, dan apa yang direncanakan.
 
@@ -30,9 +30,10 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 | Login credentials | ✅ | 1 | |
 | Middleware route protection | ✅ | 1 | |
 | Registrasi role PARENT vs NANNY | ✅ | 1 | |
-| Reset password via OTP WA | ✅ | 1 | |
+| Reset password via OTP WA | ✅ | 1 | Nomor WA dinormalisasi sebelum disimpan (commit 2ac0858) |
+| Auto-login setelah registrasi | ✅ | 1 | Commit 00885bc — registrasi langsung masuk dashboard tanpa login ulang |
 | Onboarding flow setelah registrasi | ✅ | 1 | Pertanyaan tipe nanny (jangka panjang/infal/harian) |
-| Switch role (satu akun dual role) | ✅ | 1 | `api/user/switch-role` + `RoleSwitcher.tsx` |
+| Switch role (testing/admin internal) | ✅ | 1 | `api/user/switch-role` + `RoleSwitcher.tsx` — **bukan fitur publik**: hanya akun dengan `canSwitchRoles` (nomor internal/ADMIN), JWT-only, tidak mengubah DB |
 | Hapus akun (parent & nanny) | ✅ | 1 | `DeleteAccountButton.tsx` + `DeleteNannyAccountButton.tsx` |
 | Google OAuth login | 🗂 | 1 | Nice-to-have |
 | Email verifikasi saat registrasi | 📋 | 1 | Resend sudah terintegrasi, welcome email ada; verifikasi registrasi belum |
@@ -115,6 +116,7 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 | Flow A — Referral (kode undangan) | ✅ | 1 | `api/matching/direct-invite` |
 | Flow B — Talent Pool (AI rekomen) | ✅ | 1 | `TalentPoolClient`; hanya untuk pelanggan aktif |
 | Notifikasi dealbreaker (negosiasi) | 📋 | 1 | Logic ada, notifikasi ke user belum dikonfirmasi |
+| Jaminan Kecocokan (re-match gratis ≤30 hari) | 🔄 | 1 | **Selesai dikoding Juli 2026, menunggu deploy.** `MatchGuarantee` + akhiri penugasan (`api/assignment/[id]/end`) + bypass kuota di unlock + placement gratis via jaminan + UI banner/kartu |
 | Psikotes AI Layer 2 | 📋 | 1 | Schema ready (`ADDON_PSIKOTES`), UI belum |
 | Review psikolog Layer 3 | 📋 | 1 | Schema ready (`ADDON_PSIKOLOG`), psikolog upload manual |
 
@@ -126,7 +128,7 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 |---|---|---|---|
 | Langganan Rp 500rb/tahun | ✅ | 1 | Halaman subscription + Mayar payment |
 | Invoice via Mayar | ✅ | 1 | Akun Mayar sudah diverifikasi, production aktif |
-| Mayar webhook handler | ✅ | 1 | `api/payment/webhook` (update subscription + quota) |
+| Mayar webhook handler | ✅ | 1 | `api/payment/webhook` (update subscription + quota); lookup transaksi via `productId` Mayar + `lookupId` (commit b3dc710, 5625743, 373774a) |
 | Cloudflare Stream webhook handler | ✅ | 1 | `api/webhooks/cloudflare-stream` |
 | Placement fee (jangka panjang & infal) | ✅ | 1 | Rp 1.2jt / Rp 600rb; `api/payment/placement` + halaman placement |
 | Halaman pricing publik | ✅ | 1 | `app/pricing/page.tsx` |
@@ -162,6 +164,7 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 | Evaluasi bulan 1 & 3 | ✅ | 1 | `Evaluation` model |
 | Evaluasi kuartalan | ✅ | 1 | |
 | AI ringkasan evaluasi | ✅ | 1 | `aiSummary`, `aiRecommendation` |
+| Akhiri penugasan oleh orang tua (+ alasan) | 🔄 | 1 | **Selesai dikoding Juli 2026, menunggu deploy.** `EndAssignmentCard` di monitoring; nanny kembali `isAvailable`; ≤30 hari → terbit Jaminan Kecocokan |
 | Dashboard monitoring orang tua | ✅ | 1 | `dashboard/parent/monitoring` + halaman ringkasan evaluasi |
 | Monitoring check-in nanny | ✅ | 1 | `dashboard/nanny/monitoring` + `MonitoringForm` |
 | PDF laporan evaluasi | 📋 | 1 | Integrasi pdf-service belum ada khusus untuk evaluasi |
@@ -176,7 +179,7 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 |---|---|---|---|
 | Schema TrackRecordEntry | ✅ | 1 | |
 | Schema TrackRecordAccess (beli akses Rp 50rb) | ✅ | 1 | |
-| Input rekam jejak setelah assignment selesai | 📋 | 1 | UI belum |
+| Input rekam jejak setelah assignment selesai | 🔄 | 1 | **Selesai dikoding Juli 2026, menunggu deploy.** `api/track-record` + `TrackRecordCard` di halaman monitoring; terverifikasi otomatis (terikat penugasan nyata), anonim kecuali opt-in |
 | UI beli akses track record | 📋 | 1 | |
 | Badge Terpercaya setelah 3 bulan | 📋 | 1 | Logic milestone ada di Referral |
 | Track record pemberi kerja (dua arah) | 🔮 | 2 | Fasa 2 |
@@ -226,6 +229,23 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 | Babysitter on-demand (hourly) | 🔮 | 3 | |
 | Referral fee antar keluarga | 🔮 | 3 | |
 | Community ekosistem | 🔮 | 3 | |
+
+---
+
+## Area 11 — Pilar Tumbuh Kembang (ADR-007, Juli 2026)
+
+> Detail scope & tahapan: [PRD Tumbuh Kembang](13_prd_tumbuh_kembang.md). Semua item Planned.
+
+| Fitur | Status | Tahap | Catatan |
+|---|---|---|---|
+| Kurva Pertumbuhan (WHO) | 📋 | 1 | Catat gratis, interpretasi khusus pelanggan |
+| Jurnal & Galeri Momen anak | 📋 | 1 | |
+| Skrining Perkembangan (KPSP) | 📋 | 2 | Wajib validasi instrumen oleh psikolog HCC dulu |
+| Konsultasi Psikolog Anak (add-on/sesi) | 📋 | 2 | Harga per level: Junior Rp 500rb · Mid Rp 1jt (peluncuran) · Senior Rp 2jt; pelanggan Rp 750rb (diskon 25%) |
+| Portal Psikolog (role baru) | 📋 | 2 | Jadwal & kapasitas konsultasi (3/hari/psikolog, maks 5) + antrean review konten; kelak dipakai juga untuk Layer 3 |
+| Edukasi Terkurasi (AI draft + review psikolog) | 📋 | 3 | Ritme dua-mingguan |
+| Kalender & pengingat imunisasi | 📋 | 3 | Disclaimer non-medis |
+| Log Harian Nanny | 📋 | 4 | Ditarik maju dari rencana Fasa 2 |
 
 ---
 

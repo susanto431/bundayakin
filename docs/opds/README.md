@@ -20,6 +20,13 @@ Folder ini adalah **single source of truth** untuk seluruh dimensi produk dan te
 | 7 | [Technical Design Document](07_technical_design_document.md) | Arsitektur teknis, stack, pola desain, deployment |
 | 8 | [ADR — Architecture Decision Records](08_adr/index.md) | Log semua keputusan arsitektur besar beserta konteksnya |
 | 9 | [AI Governance Document](09_ai_governance.md) | Panduan penggunaan AI, privasi data psikologis, dan batas sistem |
+| 10 | [Proof of Concept](10_proof_of_concept.md) | Bukti konsep yang sudah berjalan end-to-end + batas & risiko pengembangan lanjutan |
+| 11 | [UI/UX Review](11_ui_ux_review.md) | Audit UI/UX berbasis kode + roadmap rekomendasi perbaikan |
+| 12 | [Matriks Layanan (Bahasa Sederhana)](12_matriks_layanan.md) | **Mulai dari sini jika non-teknis** — apa itu BundaYakin, alur 5 babak, matriks layanan & status |
+| 13 | [PRD — Pilar Tumbuh Kembang](13_prd_tumbuh_kembang.md) | Pilar kedua langganan (ADR-007): kurva WHO, skrining, konsultasi psikolog anak, log harian nanny |
+| 14 | [Positioning, USP & ICP](14_positioning.md) | Kanvas positioning (April Dunford): alternatif kompetitif, atribut unik, ICP, kategori pasar, USP |
+
+> Glossary bahasa domain kanonik ada di [`CONTEXT.md`](../../CONTEXT.md) (root repo) — gunakan istilah di sana secara konsisten di kode, dokumen, dan UI.
 
 ---
 
@@ -40,6 +47,7 @@ Dokumen OPDS ini bersifat **strategic & cross-cutting**. Untuk detail operasiona
 
 ## Cara Menggunakan Sistem Ini
 
+- **Non-teknis / pemilik produk?** Baca [Matriks Layanan](12_matriks_layanan.md) dulu — ditulis tanpa istilah teknis
 - **Mulai baru?** Baca [PRD](06_prd.md) → [Product Ecosystem Blueprint](01_product_ecosystem_blueprint.md)
 - **Engineer baru?** Baca [TDD](07_technical_design_document.md) → [Service Catalog](04_service_module_catalog.md) → [ADR Index](08_adr/index.md)
 - **Mau tambah fitur?** Cek [Feature Registry](05_feature_registry.md) dan [Domain Registry](02_domain_registry.md)
