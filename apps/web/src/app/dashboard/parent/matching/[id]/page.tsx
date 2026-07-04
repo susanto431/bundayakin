@@ -23,6 +23,9 @@ export default async function MatchingResultPage({ params }: { params: { id: str
 
   const { request, matchResult, quota } = await getMatchingRequest(params.id, parentProfile.id)
 
+  const { getAvailableGuarantee } = await import("@/lib/placement")
+  const guarantee = await getAvailableGuarantee(parentProfile.id)
+
   if (!request || request.parentProfile?.userId !== session.user.id) notFound()
 
   const alreadyUnlocked = matchResult?.kontakTerbuka ?? false
@@ -126,6 +129,7 @@ export default async function MatchingResultPage({ params }: { params: { id: str
             flowType="REFERRAL"
             remainingQuota={referralRemaining}
             alreadyUnlocked={alreadyUnlocked}
+            hasGuarantee={guarantee != null}
           />
         </div>
       )}

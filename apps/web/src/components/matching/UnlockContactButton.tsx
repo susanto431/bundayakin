@@ -10,6 +10,7 @@ type Props = {
   flowType: "REFERRAL" | "TALENT_POOL"
   remainingQuota: number
   alreadyUnlocked: boolean
+  hasGuarantee?: boolean // Jaminan Kecocokan aktif → unlock gratis tanpa kuota
   onUnlocked?: () => void
 }
 
@@ -29,8 +30,10 @@ export default function UnlockContactButton({
   flowType,
   remainingQuota,
   alreadyUnlocked,
+  hasGuarantee = false,
   onUnlocked,
 }: Props) {
+  const [viaGuarantee, setViaGuarantee] = useState(false)
   const [state, setState] = useState<State>(
     alreadyUnlocked ? { kind: "loading" } : { kind: "idle" }
   )
@@ -71,11 +74,12 @@ export default function UnlockContactButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nannyProfileId, flowType }),
       })
-      const data = (await res.json()) as { success: boolean; error?: string }
+      const data = (await res.json()) as { success: boolean; error?: string; data?: { viaGuarantee?: boolean } }
       if (!data.success) {
         setState({ kind: "error", message: data.error ?? "Gagal membuka kontak" })
         return
       }
+      if (data.data?.viaGuarantee) setViaGuarantee(true)
       onUnlocked?.()
       await loadContact()
     } catch {
@@ -83,8 +87,8 @@ export default function UnlockContactButton({
     }
   }
 
-  // Kuota habis dan kontak belum terbuka
-  if (!alreadyUnlocked && remainingQuota === 0) {
+  // Kuota habis dan kontak belum terbuka — kecuali pemegang Jaminan Kecocokan (gratis)
+  if (!alreadyUnlocked && remainingQuota === 0 && !hasGuarantee) {
     return (
       <div className="bg-[#5A3A7A] rounded-[16px] p-4">
         <p className="text-[13px] font-bold text-white mb-1">Kuota koneksi habis</p>
@@ -115,6 +119,11 @@ export default function UnlockContactButton({
         <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#2C5F5A] mb-3">
           Kontak nanny
         </p>
+        {viaGuarantee && (
+          <p className="text-[11px] font-semibold bg-white text-[#2C5F5A] border border-[#A8DDD8] px-2.5 py-1 rounded-full inline-block mb-2.5">
+            Gratis — Jaminan Kecocokan · kuota tidak terpotong
+          </p>
+        )}
         <div className="space-y-2.5">
           {contact.phone && (
             <div className="flex items-center gap-2.5">
@@ -175,7 +184,9 @@ export default function UnlockContactButton({
         ) : (
           <>
             <LockIcon />
-            Buka kontak · Pakai kuota {quotaLabel} (sisa {remainingQuota}×)
+            {hasGuarantee
+              ? "Buka kontak — Gratis (Jaminan Kecocokan)"
+              : `Buka kontak · Pakai kuota ${quotaLabel} (sisa ${remainingQuota}×)`}
           </>
         )}
       </button>

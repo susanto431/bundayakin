@@ -46,7 +46,20 @@ export default async function CariNannyPage() {
             </Link>
           </div>
         </div>
-        <p className="mt-6 text-[12px] text-center" style={{ color: "#999AAA" }}>
+        {/* Escape route: jalur gratis tetap ditawarkan (usability walkthrough temuan #1) */}
+        <div className="w-full max-w-sm mt-4 bg-white border border-[#E0D0F0] rounded-[16px] p-4 text-center">
+          <p className="text-[13px] font-bold text-[#5A3A7A] mb-1">Belum siap berlangganan?</p>
+          <p className="text-[13px] text-[#666666] leading-relaxed mb-3">
+            Bunda tetap bisa mengundang nanny yang Bunda kenal untuk Tes Kecocokan — gratis 3× per 30 hari.
+          </p>
+          <Link
+            href="/dashboard/parent/matching"
+            className="inline-flex items-center justify-center w-full bg-transparent border-[1.5px] border-[#5BBFB0] text-[#2C5F5A] font-semibold text-[13px] min-h-[48px] rounded-[10px] hover:bg-[#E5F6F4] transition-all"
+          >
+            Undang nanny kenalan — gratis →
+          </Link>
+        </div>
+        <p className="mt-5 text-[12px] text-center" style={{ color: "#999AAA" }}>
           Sudah langganan?{" "}
           <Link href="/dashboard/parent" className="underline" style={{ color: "#A97CC4" }}>
             Kembali ke dashboard
@@ -56,5 +69,13 @@ export default async function CariNannyPage() {
     )
   }
 
-  return <TalentPoolClient talentPoolRemaining={talentPoolRemaining} />
+  const { prisma } = await import("@/lib/prisma")
+  const guarantee = session?.user?.id
+    ? await prisma.matchGuarantee.findFirst({
+        where: { parentProfile: { userId: session.user.id }, status: "AVAILABLE" },
+        select: { id: true },
+      })
+    : null
+
+  return <TalentPoolClient talentPoolRemaining={talentPoolRemaining} hasGuarantee={guarantee != null} />
 }

@@ -41,6 +41,7 @@ type Props = {
   onMatchCalculated?: () => void
   flowType?: "REFERRAL" | "TALENT_POOL"
   remainingQuota?: number
+  hasGuarantee?: boolean
   onContactUnlocked?: () => void
 }
 
@@ -81,6 +82,7 @@ export default function NannyDetailDrawer({
   flowType,
   remainingQuota = 0,
   onContactUnlocked,
+  hasGuarantee = false,
 }: Props) {
   const [detail, setDetail] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -366,6 +368,7 @@ export default function NannyDetailDrawer({
                 flowType="TALENT_POOL"
                 remainingQuota={remainingQuota}
                 alreadyUnlocked={false}
+                hasGuarantee={hasGuarantee}
                 onUnlocked={handleContactUnlocked}
               />
             ) : (

@@ -1,5 +1,5 @@
 import { cachedAuth } from "@/lib/auth-server"
-import { getParentDashboard } from "@/lib/queries/parent"
+import { getParentDashboard, getParentUnreadNotificationCount } from "@/lib/queries/parent"
 import { d } from "@/lib/date"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
@@ -14,6 +14,10 @@ export default async function ParentDashboardPage() {
   const { profile, openToJobNannies, unlockedIds } = session?.user?.id
     ? await getParentDashboard(session.user.id)
     : { profile: null, openToJobNannies: [], unlockedIds: [] }
+
+  const unreadCount = session?.user?.id
+    ? await getParentUnreadNotificationCount(session.user.id)
+    : 0
 
   const subscription = profile?.subscription
   const isPaid =
@@ -82,11 +86,28 @@ export default async function ParentDashboardPage() {
           <p className="text-[11px] text-[#999AAA]">Selamat datang,</p>
           <p className="font-[var(--font-dm-serif)] text-[20px] text-[#5A3A7A]"><em>Bunda</em> {firstName}</p>
         </div>
-        {isPaid && (
-          <span className="text-[11px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-2.5 py-1 rounded-full">
-            Aktif
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/parent/notifications"
+            className="relative w-12 h-12 flex items-center justify-center rounded-full bg-[#F3EEF8] border border-[#E0D0F0] hover:border-[#A97CC4] transition-colors"
+            aria-label={unreadCount > 0 ? `Notifikasi — ${unreadCount} belum dibaca` : "Notifikasi"}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A3A7A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-[#5BBFB0] text-white text-[10px] font-bold rounded-full">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </Link>
+          {isPaid && (
+            <span className="text-[11px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-2.5 py-1 rounded-full">
+              Aktif
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Alert pending monitoring */}
@@ -191,7 +212,15 @@ export default async function ParentDashboardPage() {
       {/* Timeline pemantauan */}
       {isPaid && (
         <>
-          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-3">Pemantauan berkala</p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA]">Pemantauan berkala</p>
+            <Link
+              href="/dashboard/parent/monitoring"
+              className="text-[12px] font-semibold text-[#A97CC4] hover:text-[#5A3A7A] transition-colors"
+            >
+              Kelola penugasan →
+            </Link>
+          </div>
           <div className="relative pl-5 mb-4">
             <div className="absolute left-[7px] top-1 bottom-1 w-[2px] bg-[#E0D0F0]" />
             {timelineItems.map((item) => {

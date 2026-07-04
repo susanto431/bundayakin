@@ -4,6 +4,7 @@ import { AGE_GROUP_LABEL } from "@/constants/children"
 import { d } from "@/lib/date"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
+import OpenToJobPromptCard from "@/components/profile/OpenToJobPromptCard"
 
 export const metadata = { title: "Dashboard Nanny — BundaYakin" }
 
@@ -109,10 +110,13 @@ export default async function NannyDashboardPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/dashboard/nanny/notifications"
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-[#F3EEF8] border border-[#E0D0F0] text-[18px] hover:border-[#A97CC4] transition-colors"
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-[#F3EEF8] border border-[#E0D0F0] hover:border-[#A97CC4] transition-colors"
             aria-label="Notifikasi"
           >
-            🔔
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A3A7A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
           </Link>
           {isWorking && (
             <span className="text-[12px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-2.5 py-1 rounded-full">
@@ -260,6 +264,11 @@ export default async function NannyDashboardPage() {
             })}
           </div>
         </>
+      )}
+
+      {/* Siap Kerja prompt — survey selesai, belum bekerja, belum open to job (usability #3) */}
+      {profile?.surveyCompletedAt && !isWorking && !profile?.openToJob && (
+        <OpenToJobPromptCard honorific={honorific} />
       )}
 
       {/* Psikotes nudge */}

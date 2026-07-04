@@ -59,15 +59,15 @@ Halaman langganan & pricing sudah ada dan bisa dijangkau dari beberapa pintu (se
 
 ## Ringkasan & Urutan Perbaikan
 
-| # | Temuan | Keparahan | Effort |
+| # | Temuan | Keparahan | Status |
 |---|---|---|---|
-| 2 | Parent tidak punya halaman notifikasi → hasil matching tidak pernah "sampai" | 🔴 | Sedang |
-| 1 | Paywall Talent Pool buntu — tidak menawarkan jalur gratis (undangan) | 🔴 | **Kecil (1 link)** |
-| 4 | Pemantauan tersembunyi dari navigasi | 🟠 | Kecil |
-| 3 | Nanny pasca-survey tidak dituntun menyalakan "Siap Kerja" | 🟠 | Kecil |
-| 5 | Pemakaian jaminan tidak diberi penanda saat unlock | 🟡 | Kecil |
+| 2 | Parent tidak punya halaman notifikasi → hasil matching tidak pernah "sampai" | 🔴 | ✅ **Diperbaiki Juli 2026** — halaman `/dashboard/parent/notifications` + lonceng berbadge angka di Beranda |
+| 1 | Paywall Talent Pool buntu — tidak menawarkan jalur gratis (undangan) | 🔴 | ✅ Diperbaiki — kartu "Belum siap berlangganan?" + link undang nanny gratis |
+| 4 | Pemantauan tersembunyi dari navigasi | 🟠 | ✅ Diperbaiki — link "Kelola penugasan →" permanen di Beranda |
+| 3 | Nanny pasca-survey tidak dituntun menyalakan "Siap Kerja" | 🟠 | ✅ Diperbaiki — kartu "Langkah terakhir" + tombol aktivasi langsung |
+| 5 | Pemakaian jaminan tidak diberi penanda saat unlock | 🟡 | ✅ Diperbaiki — label tombol & badge "Gratis — Jaminan Kecocokan" |
 
-Empat dari lima perbaikan berukuran kecil — layak digabung jadi satu paket kerja "usability quick wins" sebelum/bersama halaman notifikasi parent.
+Bonus perbaikan: emoji 🔔 di beranda nanny diganti ikon SVG (konsistensi ikon, temuan UI/UX review).
 
 ## Cara Melakukan Usability Testing Sungguhan (nanti, murah)
 

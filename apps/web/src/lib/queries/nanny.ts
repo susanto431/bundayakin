@@ -12,6 +12,7 @@ export function getNannyDashboard(userId: string) {
           gender: true,
           city: true,
           surveyCompletedAt: true,
+          openToJob: true,
           matchingRequests: {
             where: { status: { in: ["PENDING", "PROCESSING", "COMPLETED", "NEGOTIATING"] } },
             orderBy: { updatedAt: "desc" },

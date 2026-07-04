@@ -123,6 +123,12 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
     }),
   ])
 
+  const guaranteeRow = await prisma.matchGuarantee.findFirst({
+    where: { parentProfileId: parentProfile.id, status: "AVAILABLE" },
+    select: { id: true },
+  })
+  const hasGuarantee = guaranteeRow != null
+
   if (!nanny) notFound()
 
   const introVideo = nanny.media.find((m) => m.type === "INTRO_VIDEO")
@@ -430,6 +436,7 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
           flowType="TALENT_POOL"
           remainingQuota={talentPoolRemaining}
           alreadyUnlocked={kontakTerbuka}
+          hasGuarantee={hasGuarantee}
         />
       </div>
 

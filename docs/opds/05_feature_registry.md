@@ -207,7 +207,7 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 | Schema Notification | ✅ | 1 | |
 | Schema ActivityLog | ✅ | 1 | |
 | Notifikasi in-app nanny | ✅ | 1 | `dashboard/nanny/notifications` — MATCHING_READY, EVALUATION_DUE, PAYMENT, dll |
-| Notifikasi in-app parent | 📋 | 1 | Parent belum punya halaman notifikasi; hanya ada di settings page sebagai placeholder |
+| Notifikasi in-app parent | 🔄 | 1 | **Selesai dikoding Juli 2026, menunggu deploy.** `/dashboard/parent/notifications` + lonceng berbadge unread di Beranda; buka halaman = tandai terbaca |
 | Email transaksional via Resend | ✅ | 1 | Welcome email nanny & parent sudah aktif; template lain belum semua |
 | FAQ statis | ✅ | 1 | `dashboard/parent/faq` — dikelompokkan per kategori (Langganan, Cara Kerja, dll) |
 | PWA install prompt + offline page | ✅ | 1 | `InstallPrompt.tsx` + `ServiceWorkerRegister.tsx` + `app/offline` |

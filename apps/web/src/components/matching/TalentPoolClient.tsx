@@ -34,9 +34,10 @@ function SkeletonCard() {
 
 type Props = {
   talentPoolRemaining: number
+  hasGuarantee?: boolean
 }
 
-export default function TalentPoolClient({ talentPoolRemaining }: Props) {
+export default function TalentPoolClient({ talentPoolRemaining, hasGuarantee = false }: Props) {
   const [nannies, setNannies] = useState<NannyDirectoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -210,6 +211,7 @@ export default function TalentPoolClient({ talentPoolRemaining }: Props) {
           flowType="TALENT_POOL"
           remainingQuota={localQuota}
           onContactUnlocked={handleContactUnlocked}
+          hasGuarantee={hasGuarantee}
         />
       )}
     </div>

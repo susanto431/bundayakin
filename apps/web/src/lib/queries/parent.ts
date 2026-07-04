@@ -277,6 +277,26 @@ export async function getParentPostAssignmentInfo(userId: string) {
   }
 }
 
+// --- Notifikasi parent (/dashboard/parent/notifications) ---
+// Tidak di-cache: halaman sekaligus menandai semua notifikasi terbaca.
+export async function getParentNotifications(userId: string) {
+  const notifications = await prisma.notification.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  })
+  // Tandai terbaca SETELAH diambil — render masih menampilkan status unread yang benar
+  await prisma.notification.updateMany({
+    where: { userId, isRead: false },
+    data: { isRead: true },
+  })
+  return notifications
+}
+
+export async function getParentUnreadNotificationCount(userId: string) {
+  return prisma.notification.count({ where: { userId, isRead: false } })
+}
+
 // --- Monitoring summary (/dashboard/parent/monitoring/summary) ---
 export function getParentMonitoringSummary(userId: string, timing: EvaluationTiming) {
   return unstable_cache(
