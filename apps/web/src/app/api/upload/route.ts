@@ -112,6 +112,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, url, storageKey: key }, { status: 201 })
     }
 
+    // Foto Jurnal Momen anak (ChildJournalEntry) — upload ke R2, return URL+key saja
+    // Tidak disimpan ke database di sini; disimpan bersama caption saat POST journal
+    if (type === "CHILD_JOURNAL_PHOTO") {
+      if (session.user.role !== "PARENT") {
+        return NextResponse.json({ success: false, error: "Hanya orang tua yang bisa upload foto jurnal saat ini" }, { status: 403 })
+      }
+      const childId = formData.get("childId") as string | null
+      if (!childId) {
+        return NextResponse.json({ success: false, error: "childId diperlukan" }, { status: 400 })
+      }
+      const child = await prisma.childProfile.findFirst({
+        where: { id: childId, parentProfile: { userId: session.user.id } },
+        select: { id: true },
+      })
+      if (!child) {
+        return NextResponse.json({ success: false, error: "Data anak tidak ditemukan" }, { status: 404 })
+      }
+      const key = r2.keys.childJournalPhoto(session.user.id, childId, `${slug}.${ext}`)
+      const url = await r2.uploadPhoto(key, buffer, file.type)
+      return NextResponse.json({ success: true, url, storageKey: key }, { status: 201 })
+    }
+
     return NextResponse.json({ success: false, error: "Tipe upload tidak valid" }, { status: 400 })
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)

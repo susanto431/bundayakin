@@ -161,6 +161,37 @@ export default function ChildDetailClient({ child }: { child: Child }) {
         <p className="text-[12px] text-[#999AAA] mt-0.5">Terakhir diperbarui {child.updatedAt}</p>
       </div>
 
+      {/* Tumbuh Kembang — Kurva Pertumbuhan & Jurnal Momen (PRD 13, Tahap 1) */}
+      <div className="grid grid-cols-2 gap-2.5 mb-5">
+        <Link
+          href={`/dashboard/parent/children/${child.id}/growth`}
+          className="bg-white border border-[#E0D0F0] rounded-[14px] p-3.5 hover:border-[#5BBFB0] transition-all"
+        >
+          <div className="w-9 h-9 bg-[#E5F6F4] rounded-[9px] flex items-center justify-center mb-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2C5F5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 3v18h18" />
+              <path d="M18 9l-5 5-4-4-4 4" />
+            </svg>
+          </div>
+          <p className="text-[13px] font-bold text-[#5A3A7A] leading-tight">Tumbuh Kembang</p>
+          <p className="text-[11px] text-[#999AAA] mt-0.5">Kurva pertumbuhan WHO</p>
+        </Link>
+        <Link
+          href={`/dashboard/parent/children/${child.id}/journal`}
+          className="bg-white border border-[#E0D0F0] rounded-[14px] p-3.5 hover:border-[#A97CC4] transition-all"
+        >
+          <div className="w-9 h-9 bg-[#F3EEF8] rounded-[9px] flex items-center justify-center mb-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5A3A7A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <path d="M21 15l-5-5L5 21" />
+            </svg>
+          </div>
+          <p className="text-[13px] font-bold text-[#5A3A7A] leading-tight">Jurnal Momen</p>
+          <p className="text-[11px] text-[#999AAA] mt-0.5">Cerita & foto si kecil</p>
+        </Link>
+      </div>
+
       {/* SECTION 1 — Profil */}
       <div className="mb-5">
         <div className="flex items-center gap-2 mb-3">

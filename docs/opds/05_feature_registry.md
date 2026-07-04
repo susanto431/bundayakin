@@ -238,8 +238,8 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 
 | Fitur | Status | Tahap | Catatan |
 |---|---|---|---|
-| Kurva Pertumbuhan (WHO) | 📋 | 1 | Catat gratis, interpretasi khusus pelanggan |
-| Jurnal & Galeri Momen anak | 📋 | 1 | |
+| Kurva Pertumbuhan (WHO) | 🔄 | 1 | **Selesai dikoding Juli 2026, menunggu deploy.** `GrowthRecord` + kurva berat/tinggi vs median WHO; catat gratis, kurva & kategori (sesuai/perlu pantau/perlu perhatian) khusus pelanggan. ⚠️ Data referensi WHO perlu divalidasi psikolog/tenaga medis HCC sebelum diklaim akurat secara klinis (lihat `src/lib/growth-standards.ts`) |
+| Jurnal & Galeri Momen anak | 🔄 | 1 | **Selesai dikoding Juli 2026, menunggu deploy.** `ChildJournalEntry` — teks + foto opsional, gratis untuk semua akun; parent-only (nanny menyusul di Log Harian Nanny Tahap 4) |
 | Skrining Perkembangan (KPSP) | 📋 | 2 | Wajib validasi instrumen oleh psikolog HCC dulu |
 | Konsultasi Psikolog Anak (add-on/sesi) | 📋 | 2 | Harga per level: Junior Rp 500rb · Mid Rp 1jt (peluncuran) · Senior Rp 2jt; pelanggan Rp 750rb (diskon 25%) |
 | Portal Psikolog (role baru) | 📋 | 2 | Jadwal & kapasitas konsultasi (3/hari/psikolog, maks 5) + antrean review konten; kelak dipakai juga untuk Layer 3 |

@@ -301,7 +301,56 @@ model ChildProfile {
   parentProfile ParentProfile  @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
   assignments   AssignmentChild[]
 
+  // Tumbuh Kembang (PRD 13, Tahap 1)
+  growthRecords  GrowthRecord[]
+  journalEntries ChildJournalEntry[]
+
   @@index([parentProfileId])
+}
+
+// ============================================================
+// GROWTH RECORD — pencatatan berat/tinggi/lingkar kepala anak
+// Kurva Pertumbuhan (Tumbuh Kembang, PRD 13 Tahap 1)
+// Pencatatan gratis; interpretasi kurva WHO khusus pelanggan (lihat src/lib/growth-standards.ts)
+// ============================================================
+
+model GrowthRecord {
+  id                  String   @id @default(cuid())
+  childProfileId      String
+  measuredAt          DateTime
+  weightKg            Float?
+  heightCm            Float?
+  headCircumferenceCm Float?
+  notes               String?  @db.Text
+  createdAt           DateTime @default(now())
+
+  childProfile ChildProfile @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+
+  @@index([childProfileId])
+  @@index([measuredAt])
+}
+
+// ============================================================
+// CHILD JOURNAL ENTRY — jurnal momen anak (teks + foto opsional)
+// Tumbuh Kembang, PRD 13 Tahap 1. authorRole disiapkan untuk Tahap 4
+// (Log Harian Nanny) — Tahap 1 hanya diisi orang tua.
+// ============================================================
+
+model ChildJournalEntry {
+  id             String   @id @default(cuid())
+  childProfileId String
+  authorUserId   String
+  authorRole     String   // "PARENT" | "NANNY" (Tahap 4)
+  caption        String   @db.Text
+  photoUrl       String?
+  photoKey       String?  // R2 object key (untuk hapus foto nanti)
+  momentDate     DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  childProfile ChildProfile @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+
+  @@index([childProfileId])
+  @@index([momentDate])
 }
 
 // ============================================================

@@ -52,6 +52,8 @@ export const r2 = {
     avatar: (userId: string) => `users/${userId}/avatar/profile`,
     portfolioPhoto: (userId: string, slug: string) =>
       `users/${userId}/portfolio/photos/${Date.now()}-${slug}`,
+    childJournalPhoto: (userId: string, childId: string, slug: string) =>
+      `users/${userId}/children/${childId}/journal/${Date.now()}-${slug}`,
   },
 }
 

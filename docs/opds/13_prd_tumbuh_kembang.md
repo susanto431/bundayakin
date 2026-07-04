@@ -1,9 +1,11 @@
 # PRD — Pilar Tumbuh Kembang
 ## BundaYakin — Human Care Consulting
 
-> Versi 1.0 · Juli 2026 · Hasil sesi keputusan bersama Kartika (grill-with-docs)
+> Versi 1.1 · Juli 2026 · Hasil sesi keputusan bersama Kartika (grill-with-docs)
 > Keputusan strategis yang mendasari: [ADR-007 Langganan Dua Pilar](08_adr/ADR-007_langganan-dua-pilar.md)
-> Status: **Disetujui untuk direncanakan — belum mulai dibangun**
+> Status: **Tahap 1 selesai dikoding (Kurva Pertumbuhan + Jurnal Momen), menunggu deploy** — Tahap 2–4 masih rencana
+>
+> ⚠️ **Catatan penting Tahap 1:** data acuan median WHO di `src/lib/growth-standards.ts` direkonstruksi dari pengetahuan umum kesehatan anak (bukan diunduh dari tabel LMS resmi WHO), dan dihitung dengan interpolasi linear antar titik acuan — bukan kurva LMS penuh. Cukup untuk kecenderungan umum, **belum cukup presisi untuk klaim persentil klinis**. Aplikasi sengaja hanya menampilkan kategori kasar (sesuai/perlu pantau/perlu perhatian) + disclaimer "bukan alat diagnosis". **Sebelum tayang ke publik/materi marketing, validasi tabel ini dengan psikolog/tenaga medis HCC** — perlakuan sama seperti instrumen Skrining Perkembangan (KPSP) di Tahap 2.
 
 ---
 
@@ -78,7 +80,7 @@ Portal ini juga kelak dipakai untuk Layer 3 (review psikolog nanny) — satu por
 
 | Tahap | Isi | Kenapa duluan |
 |---|---|---|
-| **1** | Kurva Pertumbuhan + Jurnal Momen | Nilai terasa cepat, teknis paling ringan, langsung memakai profil anak yang sudah ada |
+| **1** ✅ | Kurva Pertumbuhan + Jurnal Momen — **selesai dikoding Juli 2026** | Nilai terasa cepat, teknis paling ringan, langsung memakai profil anak yang sudah ada |
 | **2** | Skrining Perkembangan + Konsultasi Psikolog Anak + **Portal Psikolog** (jadwal, kapasitas, review konten) | Jantung cerita "didampingi psikolog"; butuh validasi instrumen oleh psikolog HCC dulu; konsultasi tidak bisa jalan tanpa portal |
 | **3** | Edukasi Terkurasi + pengingat + Imunisasi | Butuh alur kerja review psikolog yang rutin |
 | **4** | Log Harian Nanny | Butuh desain agar tidak membebani nanny (target < 1 menit/hari) |

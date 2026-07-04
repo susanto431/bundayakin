@@ -121,8 +121,8 @@ Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan;
 
 | Fitur | Ringkas | Status |
 |---|---|---|
-| Kurva Pertumbuhan | Berat/tinggi anak diplot ke standar WHO + artinya | ❌ Tahap 1 |
-| Jurnal & Galeri Momen | Linimasa kenangan per anak | ❌ Tahap 1 |
+| Kurva Pertumbuhan | Berat/tinggi anak diplot ke standar WHO + artinya | ⚠️ Tahap 1 selesai dikoding, menunggu tayang |
+| Jurnal & Galeri Momen | Linimasa kenangan per anak | ⚠️ Tahap 1 selesai dikoding, menunggu tayang |
 | Skrining Perkembangan | Checklist milestone (KPSP) → arahan, bukan diagnosis | ❌ Tahap 2 |
 | Konsultasi Psikolog Anak | Harga per level psikolog: Junior Rp 500rb · **Mid Rp 1jt (peluncuran)** · Senior Rp 2jt; **pelanggan: Rp 750rb** (diskon 25%) | ❌ Tahap 2 |
 | Portal Psikolog | Ruang kerja psikolog: jadwal konsultasi (3 sesi/hari/psikolog, maks 5) + review konten | ❌ Tahap 2 |
