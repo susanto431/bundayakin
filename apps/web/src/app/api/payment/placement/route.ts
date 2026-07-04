@@ -97,7 +97,11 @@ export async function POST(request: Request) {
       })
 
       if (result.status === "ALREADY_ACCEPTED") {
-        return NextResponse.json({ success: false, error: "Penempatan untuk matching ini sudah dikonfirmasi" }, { status: 400 })
+        // Bukan kegagalan — biasanya double-submit setelah penempatan sudah aktif (walkthrough #2 temuan #4)
+        return NextResponse.json(
+          { success: false, error: "Penempatan ini sudah dikonfirmasi sebelumnya", code: "ALREADY_ACCEPTED" },
+          { status: 400 }
+        )
       }
       if (result.status === "NOT_FOUND") {
         return NextResponse.json({ success: false, error: "Matching request tidak valid untuk penempatan" }, { status: 400 })

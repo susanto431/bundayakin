@@ -82,12 +82,16 @@ export default function PlacementClient({
         success: boolean
         data?: { paymentUrl?: string; free?: boolean }
         error?: string
+        code?: string
       }
       if (data.success && data.data?.free) {
         // Jaminan Kecocokan: penempatan langsung aktif tanpa pembayaran
         window.location.href = "/dashboard/parent?placement=success"
       } else if (data.success && data.data?.paymentUrl) {
         window.location.href = data.data.paymentUrl
+      } else if (data.code === "ALREADY_ACCEPTED") {
+        // Bukan kegagalan — penempatan memang sudah aktif (walkthrough #2 temuan #4): arahkan ke dashboard, jangan tampilkan sebagai error
+        window.location.href = "/dashboard/parent?placement=success"
       } else {
         setErrorMsg(data.error ?? "Terjadi kesalahan. Coba lagi.")
         setLoading(false)

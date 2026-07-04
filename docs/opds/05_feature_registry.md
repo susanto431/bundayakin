@@ -136,7 +136,7 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 | Add-on psikotes payment | 📋 | 1 | Transaksi type ada (`ADDON_PSIKOTES`), flow UI belum |
 | Add-on psikolog payment | 📋 | 1 | Transaksi type ada (`ADDON_PSIKOLOG`), flow UI belum |
 | Beli akses track record | 📋 | 1 | Schema ready (`TRACK_RECORD_ACCESS`) |
-| Connection add-on (kuota extra) | 📋 | 1 | Rp 100rb/koneksi; logic ada, UI payment belum |
+| Connection add-on (kuota extra) | 📋 | 1 | Rp 100rb/koneksi; **tidak diimplementasi sama sekali** — walkthrough pembayaran (16) temuan #3: pelanggan aktif kehabisan kuota diarahkan ke CS manual sementara ini, bukan checkout mandiri |
 | Sosmed screening payment | 🗂 | 1 | Nice-to-have |
 | Auto-renewal langganan | 🗂 | 2 | Fasa 2 |
 

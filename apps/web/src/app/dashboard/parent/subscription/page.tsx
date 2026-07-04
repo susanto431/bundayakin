@@ -164,6 +164,19 @@ export default async function SubscriptionPage({
       <p className="text-center text-xs text-[#999AAA] mt-4 leading-relaxed">
         Pembayaran aman melalui Mayar · Transfer bank, QRIS, kartu kredit tersedia
       </p>
+
+      {/* Jaring pengaman CS — pembayaran adalah momen paling rawan cemas (walkthrough #2 temuan #5) */}
+      <p className="text-center text-xs text-[#999AAA] mt-2">
+        Ada kendala pembayaran?{" "}
+        <a
+          href="https://wa.me/6287888180363?text=Halo%2C%20saya%20butuh%20bantuan%20soal%20pembayaran%20langganan%20BundaYakin"
+          target="_blank"
+          rel="noreferrer"
+          className="text-[#A97CC4] underline font-semibold"
+        >
+          Hubungi CS
+        </a>
+      </p>
     </div>
   )
 }

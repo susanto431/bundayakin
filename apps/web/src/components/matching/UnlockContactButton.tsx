@@ -89,18 +89,35 @@ export default function UnlockContactButton({
 
   // Kuota habis dan kontak belum terbuka — kecuali pemegang Jaminan Kecocokan (gratis)
   if (!alreadyUnlocked && remainingQuota === 0 && !hasGuarantee) {
+    // TALENT_POOL hanya tersedia untuk pelanggan aktif — jadi kalau kuotanya habis,
+    // "upgrade langganan" adalah jalan buntu (sudah berlangganan). Arahkan ke CS,
+    // bukan ke halaman yang tidak menawarkan apa pun (walkthrough #2 temuan #3).
+    const isSubscriberOutOfQuota = flowType === "TALENT_POOL"
     return (
       <div className="bg-[#5A3A7A] rounded-[16px] p-4">
         <p className="text-[13px] font-bold text-white mb-1">Kuota koneksi habis</p>
         <p className="text-[12px] text-white/70 mb-3 leading-relaxed">
-          Semua kuota koneksi bulan ini sudah terpakai. Upgrade langganan untuk mendapatkan lebih banyak koneksi.
+          {isSubscriberOutOfQuota
+            ? "Kuota Talent Pool bulan ini sudah terpakai semua. Kuota akan terisi ulang di periode berikutnya — atau hubungi CS untuk tambahan sekarang."
+            : "Semua kuota koneksi bulan ini sudah terpakai. Upgrade langganan untuk mendapatkan lebih banyak koneksi."}
         </p>
-        <Link
-          href="/dashboard/parent/subscription"
-          className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
-        >
-          Upgrade langganan →
-        </Link>
+        {isSubscriberOutOfQuota ? (
+          <a
+            href="https://wa.me/6287888180363?text=Halo%2C%20kuota%20Talent%20Pool%20saya%20sudah%20habis%2C%20apakah%20bisa%20tambah%20koneksi%3F"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
+          >
+            Hubungi CS →
+          </a>
+        ) : (
+          <Link
+            href="/dashboard/parent/subscription"
+            className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
+          >
+            Upgrade langganan →
+          </Link>
+        )}
       </div>
     )
   }

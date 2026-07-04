@@ -10,16 +10,19 @@ type Props = {
 export default function PaymentReturnBanner({ isSubscriptionActive }: Props) {
   const router = useRouter()
   const [countdown, setCountdown] = useState(5)
+  const [autoRefreshed, setAutoRefreshed] = useState(false)
+  const [checking, setChecking] = useState(false)
 
   useEffect(() => {
     if (isSubscriptionActive) return
 
-    // Langganan belum aktif — webhook mungkin belum sampai, refresh otomatis
+    // Langganan belum aktif — webhook mungkin belum sampai, refresh otomatis sekali
     const interval = setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
           clearInterval(interval)
           router.refresh()
+          setAutoRefreshed(true)
           return 0
         }
         return c - 1
@@ -28,6 +31,13 @@ export default function PaymentReturnBanner({ isSubscriptionActive }: Props) {
 
     return () => clearInterval(interval)
   }, [isSubscriptionActive, router])
+
+  function handleManualCheck() {
+    setChecking(true)
+    router.refresh()
+    // Reset tombol agar tidak terlihat "macet" kalau webhook masih belum sampai
+    setTimeout(() => setChecking(false), 1500)
+  }
 
   if (isSubscriptionActive) {
     return (
@@ -51,11 +61,34 @@ export default function PaymentReturnBanner({ isSubscriptionActive }: Props) {
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
       </svg>
-      <div>
+      <div className="flex-1">
         <p className="text-sm font-semibold text-[#5A3A7A]">Pembayaran diterima, sedang diproses...</p>
         <p className="text-xs text-[#666666] mt-0.5">
-          Langganan akan aktif dalam beberapa saat. Memeriksa ulang dalam {countdown} detik...
+          {autoRefreshed
+            ? "Masih memproses. Konfirmasi biasanya masuk dalam 1–2 menit."
+            : `Langganan akan aktif dalam beberapa saat. Memeriksa ulang dalam ${countdown} detik...`}
         </p>
+        {/* Jaring pengaman setelah auto-refresh sekali — jangan biarkan user macet tanpa aksi (walkthrough #2 temuan #2) */}
+        {autoRefreshed && (
+          <div className="flex items-center gap-3 mt-2">
+            <button
+              type="button"
+              onClick={handleManualCheck}
+              disabled={checking}
+              className="text-xs font-semibold text-[#A97CC4] underline disabled:opacity-50"
+            >
+              {checking ? "Memeriksa..." : "Cek status pembayaran"}
+            </button>
+            <a
+              href="https://wa.me/6287888180363?text=Halo%2C%20pembayaran%20langganan%20saya%20belum%20aktif%20setelah%20beberapa%20saat"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-semibold text-[#A97CC4] underline"
+            >
+              Hubungi CS
+            </a>
+          </div>
+        )}
       </div>
     </div>
   )

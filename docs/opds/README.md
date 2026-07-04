@@ -25,7 +25,8 @@ Folder ini adalah **single source of truth** untuk seluruh dimensi produk dan te
 | 12 | [Matriks Layanan (Bahasa Sederhana)](12_matriks_layanan.md) | **Mulai dari sini jika non-teknis** — apa itu BundaYakin, alur 5 babak, matriks layanan & status |
 | 13 | [PRD — Pilar Tumbuh Kembang](13_prd_tumbuh_kembang.md) | Pilar kedua langganan (ADR-007): kurva WHO, skrining, konsultasi psikolog anak, log harian nanny |
 | 14 | [Positioning, USP & ICP](14_positioning.md) | Kanvas positioning (April Dunford): alternatif kompetitif, atribut unik, ICP, kategori pasar, USP |
-| 15 | [Usability Walkthrough](15_usability_walkthrough.md) | Skenario "user bingung klik ke mana" — 5 skenario, temuan berperingkat, panduan uji dengan user sungguhan |
+| 15 | [Usability Walkthrough #1](15_usability_walkthrough.md) | Skenario "user bingung klik ke mana" — navigasi & fitur inti, 5 temuan (semua diperbaiki) |
+| 16 | [Usability Walkthrough #2 — Pembayaran](16_usability_walkthrough_pembayaran.md) | Alur langganan/pembayaran/placement — 5 temuan; 4 diperbaiki, 1 butuh keputusan produk (Connection Add-on) |
 
 > Glossary bahasa domain kanonik ada di [`CONTEXT.md`](../../CONTEXT.md) (root repo) — gunakan istilah di sana secara konsisten di kode, dokumen, dan UI.
 

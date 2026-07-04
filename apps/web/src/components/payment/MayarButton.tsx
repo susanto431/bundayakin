@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { usePostHog } from "posthog-js/react"
 
 type Props = {
@@ -65,7 +66,20 @@ export default function MayarButton({ label = "Bayar Sekarang", className }: Pro
         )}
       </button>
 
-      {error && <p className="text-xs text-red-500 text-center">{error}</p>}
+      {error && (
+        <div className="text-center">
+          <p className="text-xs text-red-500">{error}</p>
+          {/* Error minta lengkapi profil (email/HP) — beri jalan langsung, bukan cuma instruksi (walkthrough #2 temuan #1) */}
+          {error.includes("halaman profil") && (
+            <Link
+              href="/dashboard/parent/profile"
+              className="inline-flex items-center text-xs font-semibold text-[#A97CC4] underline mt-1"
+            >
+              Lengkapi profil sekarang →
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   )
 }
