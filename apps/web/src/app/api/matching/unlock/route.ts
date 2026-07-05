@@ -1,12 +1,13 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { unlockNannyContact } from "@/lib/connection"
 import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
 // POST /api/matching/unlock
 // Body: { nannyProfileId: string, flowType: "REFERRAL" | "TALENT_POOL" }
-// Buka kontak nanny menggunakan Kuota Koneksi.
-// Add-on berbayar (CONNECTION_ADDON via Mayar) belum diimplementasi — menunggu verifikasi Mayar.
+// Buka kontak nanny menggunakan Kuota Koneksi (atau Jaminan Kecocokan).
+// Kalau kuota habis: lihat api/payment/connection-addon untuk beli koneksi tambahan berbayar.
 export async function POST(request: Request) {
   try {
     const session = await auth()
@@ -115,32 +116,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Ambil skor AI jika sudah ada
-    const matchingResult = await prisma.matchingResult.findFirst({
-      where: { nannyProfileId, matchingRequest: { parentProfileId: parentProfile.id } },
-      select: { scoreOverall: true },
-    })
-    const skorKeseluruhan = Math.round(matchingResult?.scoreOverall ?? 0)
-
-    // Buka kontak — create atau update MatchResult
-    await prisma.matchResult.upsert({
-      where: { parentProfileId_nannyProfileId: { parentProfileId: parentProfile.id, nannyProfileId } },
-      create: {
-        parentProfileId: parentProfile.id,
-        nannyProfileId,
-        skorKeseluruhan,
-        kontakTerbuka: true,
-        flowType,
-        quotaUsed: !viaGuarantee,
-        koneksiDilakukanAt: now,
-      },
-      update: {
-        kontakTerbuka: true,
-        flowType,
-        quotaUsed: !viaGuarantee,
-        koneksiDilakukanAt: now,
-      },
-    })
+    // Buka kontak — create atau update MatchResult (helper dipakai bersama dengan Connection Add-on)
+    await unlockNannyContact(parentProfile.id, nannyProfileId, flowType, { quotaUsed: !viaGuarantee, at: now })
 
     // Kurangi kuota — kecuali via Jaminan Kecocokan
     if (!viaGuarantee) {

@@ -77,7 +77,7 @@ Kenalan     →    Isi Kuesioner →   Dipertemukan →   AI Menilai &   →   D
 | Undang nanny sendiri (Jalur A) | Mengetes nanny yang sudah dikenal | Gratis (3×/30 hari) | ✅ |
 | Direktori & rekomendasi nanny (Jalur B) | Menemukan calon nanny baru | Langganan (7×/30 hari) | ✅ |
 | Langganan tahunan | Membuka Jalur B, monitoring penuh, berbagi profil anak ke nanny | Rp 500rb/tahun | ✅ |
-| Beli koneksi tambahan | Kalau kuota bulanan habis | Rp 100rb/koneksi | ⚠️ hitungannya sudah ada, halaman belinya belum |
+| Beli koneksi tambahan | Kalau kuota bulanan habis, buka kontak satu nanny tanpa menunggu kuota reset | Rp 100rb/koneksi | ⚠️ selesai dikoding Juli 2026 (checkout otomatis), menunggu tayang |
 | Laporan kecocokan PDF | Dokumen untuk dibahas berdua/keluarga | Termasuk | ✅ |
 | Monitoring & evaluasi berkala | Deteksi masalah sejak dini setelah nanny bekerja | Termasuk langganan | ✅ (PDF laporan evaluasi belum) |
 | Jaminan Kecocokan | Nanny berhenti ≤30 hari pertama → matching ulang **dan penempatan ulang gratis penuh** (1× per penempatan, tanpa placement fee kedua) | Termasuk | ⚠️ selesai dikoding Juli 2026, menunggu tayang |

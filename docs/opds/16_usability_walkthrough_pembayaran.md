@@ -61,7 +61,7 @@ Ditelusuri di seluruh `subscription/page.tsx`, `MayarButton`, `PlacementClient`:
 
 | # | Temuan | Keparahan | Sifat |
 |---|---|---|---|
-| 3 | Pelanggan aktif kehabisan kuota → jalan buntu (fitur CONNECTION_ADDON belum ada) | 🔴 | **Keputusan produk** — bukan quick win |
+| 3 | Pelanggan aktif kehabisan kuota → jalan buntu (fitur CONNECTION_ADDON belum ada) | 🔴 | ✅ Selesai — checkout otomatis dibangun (keputusan Kartika, Juli 2026) |
 | 2 | Banner "menunggu webhook" macet di 0 detik tanpa retry manual | 🔴 | Quick win |
 | 1 | Error email/nomor HP kosong tanpa link ke profil | 🔴 | Quick win |
 | 5 | Tidak ada jaring pengaman CS di halaman pembayaran | 🟠 | Quick win |
@@ -70,7 +70,7 @@ Ditelusuri di seluruh `subscription/page.tsx`, `MayarButton`, `PlacementClient`:
 **Status implementasi (Juli 2026):**
 - ✅ #1 — error email/HP kosong sekarang menautkan langsung ke halaman profil
 - ✅ #2 — banner pembayaran menampilkan tombol "Cek status pembayaran" + link CS setelah auto-refresh pertama, tidak lagi macet di "0 detik"
-- ✅ #3 (mitigasi sementara) — pelanggan aktif yang kuota Talent Pool-nya habis kini diarahkan ke CS (WhatsApp), bukan ke halaman langganan yang tidak menawarkan apa pun. **Perbaikan permanen tetap menunggu keputusan**: bangun checkout `CONNECTION_ADDON` penuh (invoice Mayar + webhook handler baru mengikuti pola `PLACEMENT_FEE`) atau resmikan CS manual sebagai proses tetap
+- ✅ #3 (selesai penuh, Juli 2026) — **checkout Connection Add-on otomatis dibangun**, menggantikan CS manual sepenuhnya (keputusan Kartika): tombol "Bayar Rp 100rb — buka kontak ini" di kedua kondisi kuota habis (pelanggan Talent Pool maupun akun gratis Referral), invoice Mayar via `api/payment/connection-addon`, webhook handler baru (`handleConnectionAddonSuccess`), dan polling otomatis pasca-redirect (5× percobaan, konsisten dengan pola temuan #2) sebelum menawarkan "Cek status pembayaran" manual
 - ✅ #4 — idempotency placement mengarahkan ke dashboard (bukan menampilkan error merah)
 - ✅ #5 — halaman langganan menambahkan link "Hubungi CS" untuk kendala pembayaran
 

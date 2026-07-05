@@ -6,6 +6,7 @@ import {
   type MayarWebhookPayload,
 } from "@/lib/mayar"
 import { activatePlacement } from "@/lib/placement"
+import { unlockNannyContact, type ConnectionFlow } from "@/lib/connection"
 import { logActivity } from "@/lib/activity"
 import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
@@ -64,6 +65,8 @@ export async function POST(request: Request) {
         await handlePlacementFeeSuccess(transaction, paidAt, paymentMethod ?? null, effectiveStatus)
       } else if (transaction.type === "SUBSCRIPTION" && transaction.subscriptionId) {
         await handleSubscriptionSuccess(transaction, paidAt, paymentMethod ?? null, effectiveStatus, now)
+      } else if (transaction.type === "CONNECTION_ADDON") {
+        await handleConnectionAddonSuccess(transaction, paidAt, paymentMethod ?? null, effectiveStatus)
       } else {
         // Tipe lain — cukup update status
         await prisma.transaction.update({
@@ -193,4 +196,55 @@ async function handlePlacementFeeSuccess(
   revalidateTag(`nanny-${result.nannyUserId}`)
 
   console.info("[WEBHOOK_PLACEMENT] Assignment created for matchingRequest:", matchingRequestId)
+}
+
+// ── CONNECTION_ADDON success handler ──────────────────────────────────────────
+
+type ConnectionAddonMeta = { nannyProfileId?: string; flowType?: ConnectionFlow }
+
+async function handleConnectionAddonSuccess(
+  transaction: { id: string; parentProfileId: string | null; metadata: unknown },
+  paidAt: Date,
+  paymentMethod: string | null,
+  effectiveStatus: string
+) {
+  const meta = (transaction.metadata ?? {}) as ConnectionAddonMeta
+  const { nannyProfileId, flowType } = meta
+
+  if (!transaction.parentProfileId || !nannyProfileId || !flowType) {
+    console.error("[WEBHOOK_CONNECTION_ADDON] metadata tidak lengkap, transactionId:", transaction.id)
+    return
+  }
+
+  const parentProfile = await prisma.parentProfile.findUnique({
+    where: { id: transaction.parentProfileId },
+    select: { userId: true },
+  })
+  if (!parentProfile) {
+    console.error("[WEBHOOK_CONNECTION_ADDON] parentProfile tidak ditemukan:", transaction.parentProfileId)
+    return
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.transaction.update({
+      where: { id: transaction.id },
+      data: { status: "SUCCESS", mayarStatus: effectiveStatus, paymentMethod, paidAt },
+    })
+  })
+
+  // quotaUsed: false — ini pembelian berbayar, bukan pemakaian kuota bulanan
+  await unlockNannyContact(transaction.parentProfileId, nannyProfileId, flowType, { quotaUsed: false, at: paidAt })
+
+  await prisma.notification.create({
+    data: {
+      userId: parentProfile.userId,
+      type: "PAYMENT",
+      title: "Kontak nanny terbuka",
+      body: "Pembayaran koneksi tambahan berhasil — kontak nanny sudah bisa dilihat.",
+    },
+  })
+
+  revalidateTag(`parent-${parentProfile.userId}`)
+
+  console.info("[WEBHOOK_CONNECTION_ADDON] Kontak terbuka:", transaction.parentProfileId, "→", nannyProfileId)
 }

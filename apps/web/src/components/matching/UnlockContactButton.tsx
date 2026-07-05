@@ -20,8 +20,13 @@ type State =
   | { kind: "idle" }
   | { kind: "loading" }
   | { kind: "unlocking" }
+  | { kind: "buying" } // membuat invoice Connection Add-on, akan redirect ke Mayar
+  | { kind: "payment_pending" } // kembali dari Mayar, webhook belum terkonfirmasi
   | { kind: "done"; contact: ContactInfo }
   | { kind: "error"; message: string }
+
+const POLL_ATTEMPTS = 5
+const POLL_INTERVAL_MS = 2500
 
 export default function UnlockContactButton({
   nannyProfileId,
@@ -34,6 +39,7 @@ export default function UnlockContactButton({
   onUnlocked,
 }: Props) {
   const [viaGuarantee, setViaGuarantee] = useState(false)
+  const [buyError, setBuyError] = useState<string | null>(null)
   const [state, setState] = useState<State>(
     alreadyUnlocked ? { kind: "loading" } : { kind: "idle" }
   )
@@ -41,27 +47,74 @@ export default function UnlockContactButton({
   useEffect(() => {
     if (alreadyUnlocked) {
       void loadContact()
+      return
+    }
+    // Kembali dari pembayaran Connection Add-on — webhook mungkin belum sampai, poll beberapa kali.
+    // Dibaca langsung dari window.location (bukan useSearchParams) agar tidak perlu Suspense boundary.
+    const params = new URLSearchParams(window.location.search)
+    if (params.get("connection") === "success") {
+      void pollAfterPayment()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  async function tryFetchContact(): Promise<ContactInfo | null> {
+    const path = contactApiPath ?? `/api/matching/${matchingRequestId}/contact`
+    const res = await fetch(path)
+    const data = (await res.json()) as { success: boolean; data?: ContactInfo; error?: string }
+    return data.success && data.data ? data.data : null
+  }
+
   async function loadContact() {
     setState({ kind: "loading" })
     try {
-      const path = contactApiPath ?? `/api/matching/${matchingRequestId}/contact`
-      const res = await fetch(path)
-      const data = (await res.json()) as {
-        success: boolean
-        data?: ContactInfo
-        error?: string
-      }
-      if (data.success && data.data) {
-        setState({ kind: "done", contact: data.data })
+      const contact = await tryFetchContact()
+      if (contact) {
+        setState({ kind: "done", contact })
       } else {
-        setState({ kind: "error", message: data.error ?? "Gagal memuat kontak" })
+        setState({ kind: "error", message: "Gagal memuat kontak" })
       }
     } catch {
       setState({ kind: "error", message: "Terjadi kesalahan. Coba lagi." })
+    }
+  }
+
+  async function pollAfterPayment() {
+    setState({ kind: "payment_pending" })
+    for (let i = 0; i < POLL_ATTEMPTS; i++) {
+      await new Promise(r => setTimeout(r, POLL_INTERVAL_MS))
+      try {
+        const contact = await tryFetchContact()
+        if (contact) {
+          setState({ kind: "done", contact })
+          return
+        }
+      } catch {
+        // coba lagi di percobaan berikutnya
+      }
+    }
+    // Tetap di "payment_pending" — tombol cek manual tersedia di render-nya
+  }
+
+  async function handleBuyAddon() {
+    setState({ kind: "buying" })
+    setBuyError(null)
+    try {
+      const res = await fetch("/api/payment/connection-addon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nannyProfileId, flowType, matchingRequestId }),
+      })
+      const data = (await res.json()) as { success: boolean; data?: { paymentUrl?: string }; error?: string }
+      if (data.success && data.data?.paymentUrl) {
+        window.location.href = data.data.paymentUrl
+      } else {
+        setBuyError(data.error ?? "Gagal membuat pembayaran")
+        setState({ kind: "idle" })
+      }
+    } catch {
+      setBuyError("Terjadi kesalahan. Coba lagi.")
+      setState({ kind: "idle" })
     }
   }
 
@@ -87,37 +140,74 @@ export default function UnlockContactButton({
     }
   }
 
-  // Kuota habis dan kontak belum terbuka — kecuali pemegang Jaminan Kecocokan (gratis)
-  if (!alreadyUnlocked && remainingQuota === 0 && !hasGuarantee) {
-    // TALENT_POOL hanya tersedia untuk pelanggan aktif — jadi kalau kuotanya habis,
-    // "upgrade langganan" adalah jalan buntu (sudah berlangganan). Arahkan ke CS,
-    // bukan ke halaman yang tidak menawarkan apa pun (walkthrough #2 temuan #3).
+// Kuota habis dan kontak belum terbuka — kecuali pemegang Jaminan Kecocokan (gratis)
+  if (!alreadyUnlocked && remainingQuota === 0 && !hasGuarantee && state.kind !== "buying") {
+    // TALENT_POOL hanya tersedia untuk pelanggan aktif — "upgrade langganan" jadi jalan
+    // buntu untuk yang sudah berlangganan. Untuk keduanya, checkout Connection Add-on
+    // (Rp 100rb, otomatis via Mayar) selalu tersedia (walkthrough #2 temuan #3).
     const isSubscriberOutOfQuota = flowType === "TALENT_POOL"
     return (
       <div className="bg-[#5A3A7A] rounded-[16px] p-4">
         <p className="text-[13px] font-bold text-white mb-1">Kuota koneksi habis</p>
         <p className="text-[12px] text-white/70 mb-3 leading-relaxed">
           {isSubscriberOutOfQuota
-            ? "Kuota Talent Pool bulan ini sudah terpakai semua. Kuota akan terisi ulang di periode berikutnya — atau hubungi CS untuk tambahan sekarang."
-            : "Semua kuota koneksi bulan ini sudah terpakai. Upgrade langganan untuk mendapatkan lebih banyak koneksi."}
+            ? "Kuota Talent Pool bulan ini sudah terpakai semua. Kuota akan terisi ulang di periode berikutnya, atau buka kontak ini sekarang dengan biaya tambahan."
+            : "Semua kuota koneksi bulan ini sudah terpakai. Upgrade langganan untuk kuota lebih banyak, atau buka kontak ini saja dengan biaya tambahan."}
         </p>
-        {isSubscriberOutOfQuota ? (
-          <a
-            href="https://wa.me/6287888180363?text=Halo%2C%20kuota%20Talent%20Pool%20saya%20sudah%20habis%2C%20apakah%20bisa%20tambah%20koneksi%3F"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
+        {buyError && <p className="text-[12px] text-red-300 mb-2" role="alert">{buyError}</p>}
+        <div className="flex flex-col gap-2">
+          {!isSubscriberOutOfQuota && (
+            <Link
+              href="/dashboard/parent/subscription"
+              className="inline-flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
+            >
+              Upgrade langganan →
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={handleBuyAddon}
+            className={`inline-flex items-center justify-center text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all ${
+              isSubscriberOutOfQuota
+                ? "bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white"
+                : "bg-transparent border-[1.5px] border-white/40 text-white hover:bg-white/10"
+            }`}
           >
-            Hubungi CS →
-          </a>
-        ) : (
-          <Link
-            href="/dashboard/parent/subscription"
-            className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
+            Bayar Rp 100rb — buka kontak ini →
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (state.kind === "buying") {
+    return (
+      <div className="w-full flex items-center justify-center gap-2 bg-[#5A3A7A] text-white font-semibold text-[14px] min-h-[48px] rounded-[10px]">
+        <Spinner />
+        Menyiapkan pembayaran...
+      </div>
+    )
+  }
+
+  if (state.kind === "payment_pending") {
+    return (
+      <div className="bg-[#F3EEF8] border border-[#C8B8DC] rounded-[16px] p-4 flex items-start gap-3">
+        <Spinner />
+        <div className="flex-1">
+          <p className="text-[13px] font-semibold text-[#5A3A7A]">Pembayaran diterima, sedang diproses...</p>
+          <p className="text-[12px] text-[#666666] mt-0.5 mb-2">Kontak akan terbuka otomatis dalam beberapa saat.</p>
+          <button
+            type="button"
+            onClick={async () => {
+              const contact = await tryFetchContact().catch(() => null)
+              if (contact) setState({ kind: "done", contact })
+              // Kalau belum, tetap di "payment_pending" — tidak dianggap gagal
+            }}
+            className="text-[12px] font-semibold text-[#A97CC4] underline"
           >
-            Upgrade langganan →
-          </Link>
-        )}
+            Cek status pembayaran
+          </button>
+        </div>
       </div>
     )
   }
