@@ -19,7 +19,7 @@ export default async function PricingPage() {
   const subscriptionFee = pricing.SUBSCRIPTION_FEE_IDR.toLocaleString("id-ID")
   const subscriptionPerMonth = Math.round(pricing.SUBSCRIPTION_FEE_IDR / 12).toLocaleString("id-ID")
   const connectionAddonFee = pricing.CONNECTION_ADDON_FEE_IDR.toLocaleString("id-ID")
-  const placementFeeLongTerm = pricing.PLACEMENT_FEE_IDR.toLocaleString("id-ID")
+  const placementFee = pricing.PLACEMENT_FEE_IDR.toLocaleString("id-ID")
 
   return (
     <main className="min-h-screen bg-[#FDFBFF] font-[var(--font-jakarta)]">
@@ -95,17 +95,9 @@ export default async function PricingPage() {
             Biaya penempatan berlaku jika nanny resmi ditempatkan melalui proses BundaYakin — bukan sekadar ditemukan lewat platform.
           </p>
 
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            <div className="bg-white border border-[#BDD0F5] rounded-[12px] p-3">
-              <div className="text-[10px] font-bold text-[#5B7EC9] uppercase tracking-wide mb-1">Jangka Panjang</div>
-              <div className="font-[var(--font-dm-serif)] text-[20px] text-[#3A5A9A]">Rp {placementFeeLongTerm}</div>
-              <div className="text-[11px] text-[#3A5A9A] mt-0.5">Kontrak ≥ 3 bulan</div>
-            </div>
-            <div className="bg-white border border-[#BDD0F5] rounded-[12px] p-3">
-              <div className="text-[10px] font-bold text-[#5B7EC9] uppercase tracking-wide mb-1">Temporer</div>
-              <div className="font-[var(--font-dm-serif)] text-[20px] text-[#3A5A9A]">Rp 600.000</div>
-              <div className="text-[11px] text-[#3A5A9A] mt-0.5">Kontrak &lt; 3 bulan</div>
-            </div>
+          <div className="bg-white border border-[#BDD0F5] rounded-[12px] p-3 mb-3">
+            <div className="text-[10px] font-bold text-[#5B7EC9] uppercase tracking-wide mb-1">Biaya Penempatan</div>
+            <div className="font-[var(--font-dm-serif)] text-[20px] text-[#3A5A9A]">Rp {placementFee}</div>
           </div>
 
           <div className="border-t border-[#BDD0F5] pt-3">

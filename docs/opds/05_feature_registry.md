@@ -130,7 +130,7 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 | Invoice via Mayar | ✅ | 1 | Akun Mayar sudah diverifikasi, production aktif |
 | Mayar webhook handler | ✅ | 1 | `api/payment/webhook` (update subscription + quota); lookup transaksi via `productId` Mayar + `lookupId` (commit b3dc710, 5625743, 373774a) |
 | Cloudflare Stream webhook handler | ✅ | 1 | `api/webhooks/cloudflare-stream` |
-| Placement fee (jangka panjang & infal) | ✅ | 1 | Rp 1.2jt / Rp 600rb; `api/payment/placement` + halaman placement |
+| Placement fee | ✅ | 1 | Rp 1,2jt — satu tarif flat, semua jenis penempatan (keputusan Juli 2026: tidak dibedakan per jenis); `api/payment/placement` + halaman placement |
 | Halaman pricing publik | ✅ | 1 | `app/pricing/page.tsx` |
 | Batalkan langganan | ✅ | 1 | `CancelSubscriptionButton` + `api/parent/subscription/cancel` |
 | Add-on psikotes payment | 📋 | 1 | Transaksi type ada (`ADDON_PSIKOTES`), flow UI belum |

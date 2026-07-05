@@ -153,7 +153,7 @@ Orang Tua buka request → nanny diundang (Flow A) atau dipilih AI (Flow B)
 | ADDON_PSIKOLOG | Rp 1.200.000–1.500.000 |
 | ADDON_TRACK_RECORD | Rp 50.000 |
 | CONNECTION_ADDON | Rp 100.000 |
-| PLACEMENT_FEE | Rp 600.000 / Rp 1.200.000 |
+| PLACEMENT_FEE | Rp 1.200.000 (satu tarif flat) |
 
 ---
 

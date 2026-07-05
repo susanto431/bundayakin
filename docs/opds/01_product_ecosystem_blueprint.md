@@ -88,7 +88,7 @@ Add-on Layer 2 (Rp 300rb)  ─► AI psikotes nanny ─► laporan detail
 Add-on Layer 3 (Rp 1.2–1.5jt) ─► psikolog HCC ─► NannyCare Profile™ PDF
 Track Record (Rp 50rb/nanny) ─► riwayat kerja dari keluarga sebelumnya
 Sosmed Screening (Rp 100–125rb) ─► AI review profil publik nanny
-Placement Fee (Rp 600rb / 1.2jt) ─► penyaluran nanny (jangka pendek / panjang)
+Placement Fee (Rp 1,2jt, satu tarif flat) ─► penyaluran nanny
 ```
 
 ---
@@ -153,8 +153,7 @@ Layer 3 — + Psikolog HCC (+Rp 1.2–1.5jt)
 | Sumber | Harga | Frekuensi |
 |---|---|---|
 | Langganan orang tua | Rp 500.000 | Per tahun |
-| Placement fee — jangka panjang | Rp 1.200.000 | Per penempatan |
-| Placement fee — infal/temporer | Rp 600.000 | Per penempatan |
+| Placement fee | Rp 1.200.000 (satu tarif flat, semua jenis penempatan) | Per penempatan |
 | Add-on Layer 2 (psikotes AI) | Rp 300.000 | Per kandidat |
 | Add-on Layer 3 (psikolog) | Rp 1.200.000–1.500.000 | Per sesi |
 | Track record nanny | Rp 50.000 | Per nanny |

@@ -54,7 +54,7 @@ Kenalan     →    Isi Kuesioner →   Dipertemukan →   AI Menilai &   →   D
 - Begitu kedua pihak selesai mengisi, AI membandingkan semua jawaban → keluar **laporan kecocokan**: skor keseluruhan (0–100), skor per kelompok A/B/C, daftar hal yang cocok, hal yang berpotensi gesekan, dan **tips negosiasi** untuk kedua pihak. Bisa diunduh sebagai PDF.
 - Skor ≥80 hijau (sangat cocok) · 60–79 oranye (cocok dengan catatan) · <60 merah (banyak yang perlu dibicarakan).
 - Orang tua punya **7 hari masa eksklusif** untuk memutuskan (bisa diperpanjang 1× +3 hari). Lewat batas tanpa keputusan → nanny bebas dilirik keluarga lain.
-- Kalau lanjut sampai nanny resmi bekerja → ada **biaya penyaluran**: Rp 1,2jt (nanny tetap) / Rp 600rb (nanny pengganti/infal).
+- Kalau lanjut sampai nanny resmi bekerja → ada **biaya penyaluran**: Rp 1,2jt (satu tarif flat untuk semua jenis penempatan).
 
 ### Babak 5 — Didampingi (Setelah Nanny Mulai Kerja)
 - Minggu ke-1 & ke-2: **check-in singkat** (5 pertanyaan ke kedua pihak: "kondisinya bagaimana? ada kendala?").
@@ -113,7 +113,7 @@ Kenalan     →    Isi Kuesioner →   Dipertemukan →   AI Menilai &   →   D
 | Bisa dibatalkan kapan saja | — | ✔ |
 
 **Yang TIDAK termasuk langganan** (dibayar terpisah, terlepas dari status langganan):
-biaya penyaluran saat nanny resmi bekerja (Rp 1,2jt/600rb), koneksi tambahan setelah kuota habis (Rp 100rb), dan add-on Psikotes/Psikolog/rekam jejak (yang tiga terakhir ini memang belum jalan — lihat 4a).
+biaya penyaluran saat nanny resmi bekerja (Rp 1,2jt), koneksi tambahan setelah kuota habis (Rp 100rb), dan add-on Psikotes/Psikolog/rekam jejak (yang tiga terakhir ini memang belum jalan — lihat 4a).
 
 ### 4d. Pilar Baru: Tumbuh Kembang (disetujui Juli 2026 — belum dibangun)
 
@@ -134,8 +134,8 @@ Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan;
 | Sumber | Nilai | Status |
 |---|---|---|
 | Langganan orang tua | Rp 500rb/tahun | ✅ jalan otomatis |
-| Biaya penyaluran (placement) | Rp 1,2jt / Rp 600rb | ✅ jalan otomatis |
-| Koneksi tambahan | Rp 100rb | ⚠️ |
+| Biaya penyaluran (placement) | Rp 1,2jt | ✅ jalan otomatis |
+| Koneksi tambahan | Rp 100rb | ⚠️ checkout otomatis selesai dikoding Juli 2026, menunggu tayang |
 | Add-on Psikotes (Layer 2) | Rp 300rb | ❌ |
 | Add-on Psikolog (Layer 3) | Rp 1,2–1,5jt | ❌ |
 | Akses rekam jejak | Rp 50rb | ❌ |

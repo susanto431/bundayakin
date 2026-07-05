@@ -68,7 +68,7 @@ Kode kunci: `src/lib/claude.ts` (prompt & parsing), `src/constants/matching-weig
 ### 3.2 Monetisasi (H2)
 
 - Langganan Rp 500rb/tahun: halaman subscription → invoice Mayar → redirect checkout → webhook `api/payment/webhook` (lookup via `productId` + `lookupId`) → status ACTIVE + kuota talent pool terbuka.
-- Placement fee Rp 1,2jt / Rp 600rb via `api/payment/placement`.
+- Placement fee Rp 1,2jt (satu tarif flat) via `api/payment/placement`; harga & kuota kini bisa diatur admin lewat Pricing Config Panel ([ADR-008](08_adr/ADR-008_pricing-config-panel.md)).
 - Kuota Koneksi rolling 30 hari (3 referral gratis; +7 talent pool bila berlangganan) — logika di `src/lib/queries/parent.ts`.
 
 ### 3.3 Profil digital nanny (H3)
