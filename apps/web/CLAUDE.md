@@ -48,6 +48,16 @@
 > - Foto upload: Cloudflare R2 via `src/lib/cloudflare.ts`
 > - Video upload: Cloudflare Stream via `src/lib/cloudflare.ts`
 
+> **Keputusan produk aktif (5 Juli 2026)** — lihat [ADR-007](../../docs/opds/08_adr/ADR-007_langganan-dua-pilar.md) & [ADR-008](../../docs/opds/08_adr/ADR-008_pricing-config-panel.md) untuk detail lengkap:
+> - **Langganan dua pilar**: nanny (sudah ada) + **Tumbuh Kembang** (kurva WHO, jurnal momen — Tahap 1 selesai dikoding)
+> - **Harga & kuota TIDAK boleh lagi di-hardcode** — semua titik charge/kuota wajib baca dari `src/lib/pricing-config.ts` (`getEffectiveValue`/`getEffectivePricing`), bukan konstanta. `src/constants/pricing.ts` sudah dihapus.
+> - Perubahan harga/kuota **effective-dated, tidak retroaktif** — transaksi & periode `ConnectionQuota` yang sudah dibuat tidak pernah berubah; hanya transaksi/periode BARU yang kena nilai baru. Jangan bangun logika "grandfather per user" — pola snapshot yang ada sudah cukup.
+> - **Placement fee = satu tarif flat Rp 1,2jt**, tidak dibedakan jangka panjang/infal (koreksi dari dokumen lama yang salah menyebut Rp 600rb untuk infal — itu tidak pernah benar-benar di-charge)
+> - **Jaminan Kecocokan**: nanny berhenti ≤30 hari pertama → matching ulang + penempatan ulang gratis penuh, 1× per penempatan
+> - **Connection Add-on** (beli koneksi tambahan setelah kuota habis): checkout otomatis via Mayar — **tidak ada lagi jalur CS manual**
+> - Konsultasi Psikolog Anak (Tahap 2, belum dibangun): harga berjenjang Junior Rp 500rb / Mid Rp 1jt (peluncuran) / Senior Rp 2jt; harga pelanggan Rp 750rb
+> - Role `ADMIN` sekarang juga berarti akses **Pricing Config Panel** (`/dashboard/admin/pricing-config`) — jangan pakai mekanisme `canSwitchRoles` untuk hal ini, itu backdoor testing terpisah
+
 ---
 
 ## 3. Struktur Folder — Wajib Diikuti
