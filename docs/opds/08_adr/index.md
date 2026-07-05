@@ -51,6 +51,7 @@
 | [ADR-006](ADR-006_pdf-service-python.md) | Service PDF terpisah (Python/ReportLab) di Railway | Accepted | Mei 2026 |
 | [ADR-007](ADR-007_langganan-dua-pilar.md) | Langganan dua pilar: nanny + Tumbuh Kembang | Accepted | Juli 2026 |
 | [ADR-008](ADR-008_pricing-config-panel.md) | Pricing Config Panel: harga & kuota effective-dated (tidak retroaktif) | Accepted | Juli 2026 |
+| [ADR-009](ADR-009_psikotes-service-terpisah.md) | Psikotes (Layer 2) sebagai service terpisah lintas produk HCC | Accepted (arah) | Juli 2026 |
 
 ---
 

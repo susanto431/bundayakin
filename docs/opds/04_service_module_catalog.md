@@ -112,9 +112,10 @@ src/
 ### Module Utama
 
 #### `lib/claude.ts` — AI Integration
-- Memanggil Claude API untuk scoring matching, psikotes AI, ringkasan evaluasi
+- Memanggil Claude API untuk scoring matching, ringkasan evaluasi
 - Menggunakan prompt templates dari `lib/prompts/`
-- Output di-cache di database (MatchingResult, MatchResult, AssessmentResult)
+- Output di-cache di database (MatchingResult, MatchResult)
+- **Psikotes AI (Layer 2) TIDAK lewat sini** — arah arsitektur (Juli 2026): service terpisah lintas produk HCC, bukan bagian `apps/web`. Lihat [ADR-009](08_adr/ADR-009_psikotes-service-terpisah.md)
 
 #### `lib/cloudflare.ts` — Media Storage
 - Upload foto ke Cloudflare R2 (signed URL upload)

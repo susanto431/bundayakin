@@ -117,7 +117,7 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 | Flow B — Talent Pool (AI rekomen) | ✅ | 1 | `TalentPoolClient`; hanya untuk pelanggan aktif |
 | Notifikasi dealbreaker (negosiasi) | 📋 | 1 | Logic ada, notifikasi ke user belum dikonfirmasi |
 | Jaminan Kecocokan (re-match gratis ≤30 hari) | 🔄 | 1 | **Selesai dikoding Juli 2026, menunggu deploy.** `MatchGuarantee` + akhiri penugasan (`api/assignment/[id]/end`) + bypass kuota di unlock + placement gratis via jaminan + UI banner/kartu |
-| Psikotes AI Layer 2 | 📋 | 1 | Schema ready (`ADDON_PSIKOTES`), UI belum |
+| Psikotes AI Layer 2 | 📋 | 1 | Schema ready (`ADDON_PSIKOTES`), UI & implementasi belum. **Arah arsitektur terkunci (Juli 2026):** akan jadi service terpisah lintas produk HCC (bukan built-in di `apps/web`) — lihat [ADR-009](08_adr/ADR-009_psikotes-service-terpisah.md). Menunggu instrumen psikotes dari psikolog HCC sebelum implementasi dimulai |
 | Review psikolog Layer 3 | 📋 | 1 | Schema ready (`ADDON_PSIKOLOG`), psikolog upload manual |
 
 ---

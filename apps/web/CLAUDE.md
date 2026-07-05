@@ -57,6 +57,8 @@
 > - **Connection Add-on** (beli koneksi tambahan setelah kuota habis): checkout otomatis via Mayar — **tidak ada lagi jalur CS manual**
 > - Konsultasi Psikolog Anak (Tahap 2, belum dibangun): harga berjenjang Junior Rp 500rb / Mid Rp 1jt (peluncuran) / Senior Rp 2jt; harga pelanggan Rp 750rb
 > - Role `ADMIN` sekarang juga berarti akses **Pricing Config Panel** (`/dashboard/admin/pricing-config`) — jangan pakai mekanisme `canSwitchRoles` untuk hal ini, itu backdoor testing terpisah
+> - **Skrining Perkembangan (KPSP, Tahap 2 Tumbuh Kembang)**: model data BARU (`DevelopmentScreeningRecord`, terikat `ChildProfile`) — JANGAN dipaksakan ke `SurveyQuestion`/`SurveyResponse` (itu punya Matching Engine, coupled ke `respondentRole`/`isDealbreaker`/`matchingRequestId`). Menunggu psikolog HCC isi teks resmi di [17_draft_instrumen_skrining_kpsp.md](../../docs/opds/17_draft_instrumen_skrining_kpsp.md) sebelum mulai dikoding.
+> - **Psikotes AI (Layer 2, untuk nanny)**: arah arsitektur terkunci — service terpisah lintas produk HCC, BUKAN API route di `apps/web`. Jangan bangun sebagai `lib/claude.ts` biasa. Lihat [ADR-009](../../docs/opds/08_adr/ADR-009_psikotes-service-terpisah.md). Implementasi belum mulai — menunggu instrumen dari psikolog HCC.
 
 ---
 
