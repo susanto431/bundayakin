@@ -1,6 +1,7 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
 import { cfStream } from "@/lib/cloudflare"
+import { getEffectiveValue } from "@/lib/pricing-config"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import UnlockContactButton from "@/components/matching/UnlockContactButton"
@@ -128,6 +129,7 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
     select: { id: true },
   })
   const hasGuarantee = guaranteeRow != null
+  const connectionAddonFeeIDR = await getEffectiveValue("CONNECTION_ADDON_FEE_IDR")
 
   if (!nanny) notFound()
 
@@ -437,6 +439,7 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
           remainingQuota={talentPoolRemaining}
           alreadyUnlocked={kontakTerbuka}
           hasGuarantee={hasGuarantee}
+          connectionAddonFeeIDR={connectionAddonFeeIDR}
         />
       </div>
 

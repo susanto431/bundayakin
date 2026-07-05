@@ -28,8 +28,11 @@ export default async function MatchingResultPage({ params }: { params: { id: str
 
   if (!request || request.parentProfile?.userId !== session.user.id) notFound()
 
+  const { getEffectivePricing } = await import("@/lib/pricing-config")
+  const defaultQuota = await getEffectivePricing()
+
   const alreadyUnlocked = matchResult?.kontakTerbuka ?? false
-  const referralRemaining = Math.max(0, (quota?.referralLimit ?? 3) - (quota?.referralUsed ?? 0))
+  const referralRemaining = Math.max(0, (quota?.referralLimit ?? defaultQuota.REFERRAL_QUOTA) - (quota?.referralUsed ?? 0))
 
   const result = request.matchingResult
   const nannyName = request.nannyProfile?.fullName ?? "Nanny"
@@ -130,6 +133,7 @@ export default async function MatchingResultPage({ params }: { params: { id: str
             remainingQuota={referralRemaining}
             alreadyUnlocked={alreadyUnlocked}
             hasGuarantee={guarantee != null}
+            connectionAddonFeeIDR={defaultQuota.CONNECTION_ADDON_FEE_IDR}
           />
         </div>
       )}

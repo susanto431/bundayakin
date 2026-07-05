@@ -1,5 +1,6 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { getParentDashboard, getParentUnreadNotificationCount } from "@/lib/queries/parent"
+import { getEffectivePricing } from "@/lib/pricing-config"
 import { d } from "@/lib/date"
 import Link from "next/link"
 import { CopyButton } from "@/components/settings/CopyButton"
@@ -26,8 +27,10 @@ export default async function ParentDashboardPage() {
     d(subscription.endDate)! > new Date()
 
   const quota = profile?.connectionQuotas?.[0]
-  const referralRemaining = Math.max(0, (quota?.referralLimit ?? 3) - (quota?.referralUsed ?? 0))
-  const talentPoolRemaining = isPaid ? Math.max(0, (quota?.talentPoolLimit ?? 7) - (quota?.talentPoolUsed ?? 0)) : 0
+  // Fallback ke kuota efektif hari ini — dipakai hanya sebelum periode ConnectionQuota pertama dibuat
+  const defaultQuota = await getEffectivePricing()
+  const referralRemaining = Math.max(0, (quota?.referralLimit ?? defaultQuota.REFERRAL_QUOTA) - (quota?.referralUsed ?? 0))
+  const talentPoolRemaining = isPaid ? Math.max(0, (quota?.talentPoolLimit ?? defaultQuota.TALENT_POOL_QUOTA) - (quota?.talentPoolUsed ?? 0)) : 0
   const matchingRemaining = referralRemaining + talentPoolRemaining
 
   const activeMatch = profile?.matchingRequests?.[0]

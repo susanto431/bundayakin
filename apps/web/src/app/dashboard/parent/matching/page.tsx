@@ -1,5 +1,6 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { getParentMatchingData } from "@/lib/queries/parent"
+import { getEffectivePricing } from "@/lib/pricing-config"
 import { prisma } from "@/lib/prisma"
 import { d } from "@/lib/date"
 import Link from "next/link"
@@ -31,8 +32,9 @@ export default async function ParentMatchingPage({
   const sub = profile?.subscription
   const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && d(sub.endDate)! > now
   const quota = profile?.connectionQuotas?.[0]
-  const referralRemaining = Math.max(0, (quota?.referralLimit ?? 3) - (quota?.referralUsed ?? 0))
-  const talentPoolRemaining = isPaid ? Math.max(0, (quota?.talentPoolLimit ?? 7) - (quota?.talentPoolUsed ?? 0)) : 0
+  const defaultQuota = await getEffectivePricing()
+  const referralRemaining = Math.max(0, (quota?.referralLimit ?? defaultQuota.REFERRAL_QUOTA) - (quota?.referralUsed ?? 0))
+  const talentPoolRemaining = isPaid ? Math.max(0, (quota?.talentPoolLimit ?? defaultQuota.TALENT_POOL_QUOTA) - (quota?.talentPoolUsed ?? 0)) : 0
   const matchingRemaining = referralRemaining + talentPoolRemaining
   const isLimitReached = matchingRemaining === 0
 

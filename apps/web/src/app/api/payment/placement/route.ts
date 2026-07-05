@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { createMayarInvoice } from "@/lib/mayar"
 import { activatePlacement, getAvailableGuarantee } from "@/lib/placement"
-import { PLACEMENT_FEE_IDR } from "@/constants/pricing"
+import { getEffectiveValue } from "@/lib/pricing-config"
 import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
@@ -140,6 +140,7 @@ export async function POST(request: Request) {
     const nannyFirstName = matchingRequest.nannyProfile?.fullName?.split(" ")[0] ?? "Nanny"
     const orderId = `PLACE-${parentProfile.id.slice(-8).toUpperCase()}-${Date.now()}`
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+    const PLACEMENT_FEE_IDR = await getEffectiveValue("PLACEMENT_FEE_IDR")
 
     const invoice = await createMayarInvoice({
       orderId,

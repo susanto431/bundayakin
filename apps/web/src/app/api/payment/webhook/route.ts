@@ -7,6 +7,7 @@ import {
 } from "@/lib/mayar"
 import { activatePlacement } from "@/lib/placement"
 import { unlockNannyContact, type ConnectionFlow } from "@/lib/connection"
+import { getEffectiveValue } from "@/lib/pricing-config"
 import { logActivity } from "@/lib/activity"
 import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
@@ -114,6 +115,9 @@ async function handleSubscriptionSuccess(
   const oneYearLater = new Date(paidAt)
   oneYearLater.setFullYear(oneYearLater.getFullYear() + 1)
 
+  // Kuota efektif HARI INI — diambil di luar transaksi DB (query cache terpisah)
+  const talentPoolQuota = await getEffectiveValue("TALENT_POOL_QUOTA")
+
   const sub = await prisma.$transaction(async (tx) => {
     await tx.transaction.update({
       where: { id: transaction.id },
@@ -134,7 +138,7 @@ async function handleSubscriptionSuccess(
     if (activePeriod && activePeriod.talentPoolLimit === 0) {
       await tx.connectionQuota.update({
         where: { id: activePeriod.id },
-        data: { talentPoolLimit: 7 },
+        data: { talentPoolLimit: talentPoolQuota },
       })
     }
 

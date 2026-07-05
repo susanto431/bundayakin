@@ -1,9 +1,8 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { createMayarInvoice } from "@/lib/mayar"
+import { getEffectiveValue } from "@/lib/pricing-config"
 import { NextResponse } from "next/server"
-
-const SUBSCRIPTION_AMOUNT = 500_000  // Rp 500.000/tahun
 
 // POST /api/payment/create
 // Membuat Transaction + Subscription pending, mengembalikan Mayar paymentUrl.
@@ -55,6 +54,9 @@ export async function POST() {
     }
 
     const orderId = `BUNDA-${parentProfile.id.slice(-8).toUpperCase()}-${Date.now()}`
+    // Harga efektif HARI INI (Pricing Config Panel) — bukan retroaktif, hanya berlaku
+    // untuk transaksi baru ini. Transaksi tersimpan permanen, tidak berubah walau harga naik nanti.
+    const SUBSCRIPTION_AMOUNT = await getEffectiveValue("SUBSCRIPTION_FEE_IDR")
 
     const invoice = await createMayarInvoice({
       orderId,

@@ -42,6 +42,7 @@ type Props = {
   flowType?: "REFERRAL" | "TALENT_POOL"
   remainingQuota?: number
   hasGuarantee?: boolean
+  connectionAddonFeeIDR?: number
   onContactUnlocked?: () => void
 }
 
@@ -83,6 +84,7 @@ export default function NannyDetailDrawer({
   remainingQuota = 0,
   onContactUnlocked,
   hasGuarantee = false,
+  connectionAddonFeeIDR,
 }: Props) {
   const [detail, setDetail] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -369,6 +371,7 @@ export default function NannyDetailDrawer({
                 remainingQuota={remainingQuota}
                 alreadyUnlocked={false}
                 hasGuarantee={hasGuarantee}
+                connectionAddonFeeIDR={connectionAddonFeeIDR}
                 onUnlocked={handleContactUnlocked}
               />
             ) : (

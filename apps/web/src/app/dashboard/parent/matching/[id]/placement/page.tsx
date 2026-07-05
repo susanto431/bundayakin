@@ -1,8 +1,8 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
 import { getAvailableGuarantee } from "@/lib/placement"
+import { getEffectiveValue } from "@/lib/pricing-config"
 import { notFound, redirect } from "next/navigation"
-import { PLACEMENT_FEE_IDR } from "@/constants/pricing"
 import PlacementClient from "./PlacementClient"
 
 export const metadata = { title: "Konfirmasi Penempatan Nanny — BundaYakin" }
@@ -49,6 +49,7 @@ export default async function PlacementFeePage({ params }: { params: { id: strin
   }
 
   const guarantee = await getAvailableGuarantee(parentProfile.id)
+  const placementFeeIDR = await getEffectiveValue("PLACEMENT_FEE_IDR")
 
   const nannyName = request.nannyProfile?.fullName ?? "Nanny"
   const nannyCity = request.nannyProfile?.city ?? null
@@ -69,7 +70,7 @@ export default async function PlacementFeePage({ params }: { params: { id: strin
         name: c.name,
         ageGroup: c.ageGroup,
       }))}
-      placementFeeIDR={PLACEMENT_FEE_IDR}
+      placementFeeIDR={placementFeeIDR}
       hasGuarantee={guarantee != null}
     />
   )

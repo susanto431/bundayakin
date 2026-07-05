@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { getEffectivePricing } from "@/lib/pricing-config"
 
 function BYLogo() {
   return (
@@ -11,7 +12,15 @@ function BYLogo() {
   )
 }
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  // Harga efektif HARI INI (Pricing Config Panel) — halaman publik ini hanya
+  // menampilkan harga yang berlaku sekarang, tidak mengumumkan jadwal ke depan.
+  const pricing = await getEffectivePricing()
+  const subscriptionFee = pricing.SUBSCRIPTION_FEE_IDR.toLocaleString("id-ID")
+  const subscriptionPerMonth = Math.round(pricing.SUBSCRIPTION_FEE_IDR / 12).toLocaleString("id-ID")
+  const connectionAddonFee = pricing.CONNECTION_ADDON_FEE_IDR.toLocaleString("id-ID")
+  const placementFeeLongTerm = pricing.PLACEMENT_FEE_IDR.toLocaleString("id-ID")
+
   return (
     <main className="min-h-screen bg-[#FDFBFF] font-[var(--font-jakarta)]">
       <div className="max-w-[480px] mx-auto px-4 py-6">
@@ -53,9 +62,9 @@ export default function PricingPage() {
             <span className="text-[11px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-2.5 py-0.5 rounded-full">Paling worth it</span>
           </div>
           <div className="font-[var(--font-dm-serif)] text-[22px] text-[#2C5F5A] mb-0.5">
-            Rp 500.000<span className="text-[13px] font-normal text-[#999AAA] font-[var(--font-jakarta)]"> / tahun</span>
+            Rp {subscriptionFee}<span className="text-[13px] font-normal text-[#999AAA] font-[var(--font-jakarta)]"> / tahun</span>
           </div>
-          <div className="text-[11px] text-[#2C5F5A] mb-2">≈ Rp 42.000/bulan · all-in</div>
+          <div className="text-[11px] text-[#2C5F5A] mb-2">≈ Rp {subscriptionPerMonth}/bulan · all-in</div>
           <ul className="text-[12px] text-[#1E4A45] pl-4 leading-[1.8] list-disc">
             <li>Pencocokan nanny sepuasnya</li>
             <li>Pantau nanny lewat pemantauan otomatis tiap bulan</li>
@@ -72,7 +81,7 @@ export default function PricingPage() {
             <div className="text-[14px] font-bold text-[#A35320]">Pilih yang dibutuhkan</div>
           </div>
           <ul className="text-[12px] text-[#7A4018] pl-4 leading-[1.8] list-disc">
-            <li>Lihat identitas nanny yang cocok → <strong>Rp 100.000</strong>/nanny</li>
+            <li>Lihat identitas nanny yang cocok → <strong>Rp {connectionAddonFee}</strong>/nanny</li>
             <li>Tes kepribadian &amp; sikap kerja → <strong>Rp 300.000</strong>/nanny</li>
             <li>Penilaian langsung psikolog → <strong>Rp 1.000.000</strong>/sesi</li>
           </ul>
@@ -89,7 +98,7 @@ export default function PricingPage() {
           <div className="grid grid-cols-2 gap-2 mb-3">
             <div className="bg-white border border-[#BDD0F5] rounded-[12px] p-3">
               <div className="text-[10px] font-bold text-[#5B7EC9] uppercase tracking-wide mb-1">Jangka Panjang</div>
-              <div className="font-[var(--font-dm-serif)] text-[20px] text-[#3A5A9A]">Rp 1.200.000</div>
+              <div className="font-[var(--font-dm-serif)] text-[20px] text-[#3A5A9A]">Rp {placementFeeLongTerm}</div>
               <div className="text-[11px] text-[#3A5A9A] mt-0.5">Kontrak ≥ 3 bulan</div>
             </div>
             <div className="bg-white border border-[#BDD0F5] rounded-[12px] p-3">

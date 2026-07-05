@@ -130,6 +130,15 @@ enum VerificationStatus {
   REJECTED
 }
 
+// Kunci konfigurasi harga & kuota yang bisa diatur admin (Pricing Config Panel)
+enum PricingConfigKey {
+  SUBSCRIPTION_FEE_IDR      // Langganan tahunan
+  PLACEMENT_FEE_IDR         // Biaya penempatan nanny
+  CONNECTION_ADDON_FEE_IDR  // Beli koneksi tambahan setelah kuota habis
+  REFERRAL_QUOTA            // Kuota undangan (Flow A) per 30 hari — berlaku semua akun
+  TALENT_POOL_QUOTA         // Kuota Talent Pool (Flow B) per 30 hari — khusus pelanggan
+}
+
 // ============================================================
 // AUTH — NextAuth v5
 // ============================================================
@@ -201,6 +210,10 @@ model User {
   // Notifications & activity
   notifications Notification[]
   activityLogs  ActivityLog[]
+
+  // Pricing Config — perubahan harga/kuota yang dijadwalkan/dibatalkan oleh admin ini
+  pricingConfigScheduled PricingConfigEntry[] @relation("PricingConfigScheduledBy")
+  pricingConfigCancelled PricingConfigEntry[] @relation("PricingConfigCancelledBy")
 
   @@index([email])
   @@index([role])
@@ -1236,4 +1249,34 @@ model OtpToken {
   createdAt DateTime @default(now())
 
   @@index([phone, type])
+}
+
+// ============================================================
+// PRICING CONFIG ENTRY — Panel Konfigurasi Harga & Kuota (ADR-008)
+// Insert-only, tidak pernah diubah/dihapus setelah effectiveFrom lewat —
+// tabel ini SEKALIGUS menjadi log audit. "cancelled" hanya boleh diisi
+// selama effectiveFrom masih di masa depan (batal sebelum berlaku).
+// Nilai efektif pada waktu T = entry non-cancelled dengan effectiveFrom
+// terbaru yang <= T. Kalau belum ada entry sama sekali untuk key tsb,
+// fallback ke DEFAULT_PRICING di src/lib/pricing-config.ts.
+// ============================================================
+
+model PricingConfigEntry {
+  id            String           @id @default(cuid())
+  key           PricingConfigKey
+  value         Int              // IDR untuk harga; jumlah untuk kuota
+  effectiveFrom DateTime         // mulai berlaku — tidak boleh di masa lalu saat dibuat
+  reason        String           @db.Text // wajib diisi
+
+  cancelled         Boolean   @default(false)
+  cancelledAt       DateTime?
+  cancelledByUserId String?
+
+  createdByUserId String
+  createdAt       DateTime @default(now())
+
+  createdBy   User  @relation("PricingConfigScheduledBy", fields: [createdByUserId], references: [id])
+  cancelledBy User? @relation("PricingConfigCancelledBy", fields: [cancelledByUserId], references: [id])
+
+  @@index([key, effectiveFrom])
 }

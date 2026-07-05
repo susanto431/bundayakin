@@ -157,6 +157,18 @@ Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan;
 
 ---
 
+## 5b. Panel Kelola Harga & Kuota (khusus role ADMIN)
+
+⚠️ Selesai dikoding Juli 2026, menunggu tayang. Akun Anda sudah dijadikan ADMIN.
+
+Buka **Menu Admin → Konfigurasi Harga & Kuota** untuk mengubah sendiri: harga langganan tahunan, biaya penempatan nanny, biaya connection add-on, kuota referral, dan kuota talent pool — **tanpa perlu minta developer ubah kode**.
+
+Prinsip yang dipakai (seperti kenaikan harga Google Workspace): setiap perubahan harus punya **tanggal mulai berlaku** dan **alasan** (wajib diisi). Perubahan **tidak pernah berlaku surut** — pelanggan yang sedang aktif tidak terpengaruh sampai masa langganannya habis dan mereka bayar lagi setelah tanggal itu. Jadwal yang belum berlaku bisa dibatalkan; yang sudah berlaku menjadi riwayat permanen (tidak bisa dihapus/diubah) — itulah log-nya.
+
+Catatan: harga Psikotes/Psikolog/Track Record belum masuk panel ini karena checkout-nya sendiri belum dibangun (menyusul di Tahap 2 Tumbuh Kembang).
+
+---
+
 ## 6. Cara Meminta Perbaikan Lewat Dokumen (untuk Bunda Kartika)
 
 Anda tidak perlu bicara teknis. Cukup rujuk dokumen + nomor bagiannya:

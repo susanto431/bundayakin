@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { createMayarInvoice } from "@/lib/mayar"
 import { connectionAddonReturnPath, type ConnectionFlow } from "@/lib/connection"
-import { EXTRA_CONNECTION_FEE_IDR } from "@/constants/pricing"
+import { getEffectiveValue } from "@/lib/pricing-config"
 import { NextResponse } from "next/server"
 
 // POST /api/payment/connection-addon
@@ -107,6 +107,7 @@ export async function POST(request: Request) {
     const orderId = `CONN-${parentProfile.id.slice(-8).toUpperCase()}-${Date.now()}`
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
     const returnPath = connectionAddonReturnPath(flowType, nannyProfileId, matchingRequestId)
+    const EXTRA_CONNECTION_FEE_IDR = await getEffectiveValue("CONNECTION_ADDON_FEE_IDR")
 
     const invoice = await createMayarInvoice({
       orderId,

@@ -1,5 +1,6 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { getParentCariNanny } from "@/lib/queries/parent"
+import { getEffectivePricing } from "@/lib/pricing-config"
 import { d } from "@/lib/date"
 import Link from "next/link"
 import TalentPoolClient from "@/components/matching/TalentPoolClient"
@@ -17,8 +18,9 @@ export default async function CariNannyPage() {
   const sub = profile?.subscription
   const isPaid = sub?.status === "ACTIVE" && sub?.endDate != null && d(sub.endDate)! > now
   const quota = profile?.connectionQuotas?.[0]
+  const defaultQuota = await getEffectivePricing()
   const talentPoolRemaining = isPaid
-    ? Math.max(0, (quota?.talentPoolLimit ?? 7) - (quota?.talentPoolUsed ?? 0))
+    ? Math.max(0, (quota?.talentPoolLimit ?? defaultQuota.TALENT_POOL_QUOTA) - (quota?.talentPoolUsed ?? 0))
     : 0
 
   if (!isPaid) {
@@ -77,5 +79,11 @@ export default async function CariNannyPage() {
       })
     : null
 
-  return <TalentPoolClient talentPoolRemaining={talentPoolRemaining} hasGuarantee={guarantee != null} />
+  return (
+    <TalentPoolClient
+      talentPoolRemaining={talentPoolRemaining}
+      hasGuarantee={guarantee != null}
+      connectionAddonFeeIDR={defaultQuota.CONNECTION_ADDON_FEE_IDR}
+    />
+  )
 }

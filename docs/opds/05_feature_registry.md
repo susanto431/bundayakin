@@ -223,6 +223,7 @@ Untuk detail implementasi tiap fitur, lihat [`apps/web/docs/FEATURES_BACKLOG.md`
 |---|---|---|---|
 | Panel admin — matching overview | ✅ | 1 | `dashboard/admin/matching-overview` — semua match per parent, skor, status |
 | Direktori nanny (browse + filter) | ✅ | 1 | `dashboard/parent/cari-nanny/direktori` — filter kota & tipe; `NannyDetailDrawer` |
+| Panel admin — Pricing Config (harga & kuota) | 🔄 | 1 | **Selesai dikoding Juli 2026, menunggu deploy.** `dashboard/admin/pricing-config` — jadwalkan perubahan harga (langganan, placement, connection add-on) & kuota (referral, talent pool), effective-dated (tidak retroaktif), log lengkap. Lihat [ADR-008](08_adr/ADR-008_pricing-config-panel.md) |
 | Panel admin — manajemen pengguna | 🔮 | 2 | |
 | Panel admin — pembayaran bonus referral | 🔮 | 2 | |
 | Profil publik nanny (tanpa auth) | 🔮 | 2 | Profil nanny saat ini hanya bisa dilihat dalam dashboard (butuh auth) |

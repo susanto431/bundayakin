@@ -1,5 +1,6 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { getParentSubscription } from "@/lib/queries/parent"
+import { getEffectiveValue } from "@/lib/pricing-config"
 import { d } from "@/lib/date"
 import MayarButton from "@/components/payment/MayarButton"
 import CancelSubscriptionButton from "@/components/payment/CancelSubscriptionButton"
@@ -44,6 +45,12 @@ export default async function SubscriptionPage({
   const isActive = subStatus === "ACTIVE"
   const isExpired = subStatus === "EXPIRED"
   const isPaymentReturn = payment === "finish"
+
+  // Harga efektif hari ini (Pricing Config Panel) — pelanggan yang sudah aktif
+  // tidak terpengaruh perubahan ini sampai masa langganannya berakhir.
+  const subscriptionFeeIDR = await getEffectiveValue("SUBSCRIPTION_FEE_IDR")
+  const feeFormatted = subscriptionFeeIDR.toLocaleString("id-ID")
+  const feePerMonth = Math.round(subscriptionFeeIDR / 12).toLocaleString("id-ID")
 
   return (
     <div className="px-4 pt-10 max-w-lg mx-auto pb-10">
@@ -117,11 +124,11 @@ export default async function SubscriptionPage({
             <div className="mb-4">
               <div className="flex items-baseline gap-1">
                 <span className="text-white/60 text-sm">Rp</span>
-                <span className="font-serif text-5xl text-white font-bold leading-none">500.000</span>
+                <span className="font-serif text-5xl text-white font-bold leading-none">{feeFormatted}</span>
               </div>
-              <p className="text-white/60 text-xs mt-1">per tahun · sekitar Rp 41.667/bulan</p>
+              <p className="text-white/60 text-xs mt-1">per tahun · sekitar Rp {feePerMonth}/bulan</p>
             </div>
-            <MayarButton label="Aktifkan Sekarang — Rp 500.000" />
+            <MayarButton label={`Aktifkan Sekarang — Rp ${feeFormatted}`} />
           </div>
         </div>
       )}

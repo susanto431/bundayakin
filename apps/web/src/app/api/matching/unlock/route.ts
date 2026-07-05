@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { unlockNannyContact } from "@/lib/connection"
+import { getEffectiveValue } from "@/lib/pricing-config"
 import { revalidateTag } from "next/cache"
 import { NextResponse } from "next/server"
 
@@ -81,13 +82,17 @@ export async function POST(request: Request) {
     if (!quota) {
       const periodEnd = new Date(now)
       periodEnd.setDate(periodEnd.getDate() + 30)
+      // Kuota efektif HARI INI (Pricing Config Panel) — periode yang sudah ada
+      // sebelumnya tidak berubah walau kuota diubah nanti (dikunci saat dibuat).
+      const referralLimit = await getEffectiveValue("REFERRAL_QUOTA")
+      const talentPoolLimit = isSubscriber ? await getEffectiveValue("TALENT_POOL_QUOTA") : 0
       quota = await prisma.connectionQuota.create({
         data: {
           parentProfileId: parentProfile.id,
           periodStart: now,
           periodEnd,
-          referralLimit: 3,
-          talentPoolLimit: isSubscriber ? 7 : 0,
+          referralLimit,
+          talentPoolLimit,
         },
       })
     }

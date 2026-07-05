@@ -11,6 +11,7 @@ type Props = {
   remainingQuota: number
   alreadyUnlocked: boolean
   hasGuarantee?: boolean // Jaminan Kecocokan aktif → unlock gratis tanpa kuota
+  connectionAddonFeeIDR?: number // harga efektif hari ini (Pricing Config Panel); default 100rb kalau tidak dipass
   onUnlocked?: () => void
 }
 
@@ -36,6 +37,7 @@ export default function UnlockContactButton({
   remainingQuota,
   alreadyUnlocked,
   hasGuarantee = false,
+  connectionAddonFeeIDR = 100_000,
   onUnlocked,
 }: Props) {
   const [viaGuarantee, setViaGuarantee] = useState(false)
@@ -173,7 +175,7 @@ export default function UnlockContactButton({
                 : "bg-transparent border-[1.5px] border-white/40 text-white hover:bg-white/10"
             }`}
           >
-            Bayar Rp 100rb — buka kontak ini →
+            Bayar Rp {connectionAddonFeeIDR.toLocaleString("id-ID")} — buka kontak ini →
           </button>
         </div>
       </div>
