@@ -27,7 +27,7 @@ Folder ini adalah **single source of truth** untuk seluruh dimensi produk dan te
 | 14 | [Positioning, USP & ICP](14_positioning.md) | Kanvas positioning (April Dunford): alternatif kompetitif, atribut unik, ICP, kategori pasar, USP |
 | 15 | [Usability Walkthrough #1](15_usability_walkthrough.md) | Skenario "user bingung klik ke mana" — navigasi & fitur inti, 5 temuan (semua diperbaiki) |
 | 16 | [Usability Walkthrough #2 — Pembayaran](16_usability_walkthrough_pembayaran.md) | Alur langganan/pembayaran/placement — 5 temuan; 4 diperbaiki, 1 butuh keputusan produk (Connection Add-on) |
-| 17 | [Draft Instrumen Skrining KPSP](17_draft_instrumen_skrining_kpsp.md) | **Butuh tindakan psikolog HCC** — kerangka & format untuk diisi teks resmi KPSP; prasyarat wajib Tahap 2 Tumbuh Kembang |
+| 17 | [Instrumen Skrining KPSP](17_draft_instrumen_skrining_kpsp.md) | ✅ **Tervalidasi** — 16 formulir/158 soal resmi (SDIDTK Depkes 2010) ditranskripsi ke kode; prasyarat Tahap 2 Tumbuh Kembang terpenuhi |
 
 > Glossary bahasa domain kanonik ada di [`CONTEXT.md`](../../CONTEXT.md) (root repo) — gunakan istilah di sana secara konsisten di kode, dokumen, dan UI.
 

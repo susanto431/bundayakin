@@ -308,15 +308,20 @@ model ChildProfile {
   doList          String[]                 // hal yang boleh/perlu dilakukan nanny
   dontList        String[]                 // hal yang tidak boleh dilakukan nanny
   sortOrder       Int            @default(0) // urutan tampil multi-anak
+
+  // Usia kehamilan saat lahir (minggu) — dipakai untuk usia koreksi KPSP jika ≤35 minggu (Tahap 2)
+  gestationalWeeksAtBirth Int?
+
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
   parentProfile ParentProfile  @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
   assignments   AssignmentChild[]
 
-  // Tumbuh Kembang (PRD 13, Tahap 1)
-  growthRecords  GrowthRecord[]
-  journalEntries ChildJournalEntry[]
+  // Tumbuh Kembang (PRD 13)
+  growthRecords         GrowthRecord[]            // Tahap 1
+  journalEntries        ChildJournalEntry[]        // Tahap 1
+  developmentScreenings DevelopmentScreeningRecord[] // Tahap 2
 
   @@index([parentProfileId])
 }
@@ -364,6 +369,31 @@ model ChildJournalEntry {
 
   @@index([childProfileId])
   @@index([momentDate])
+}
+
+// ============================================================
+// DEVELOPMENT SCREENING RECORD — Skrining Perkembangan (KPSP)
+// Tumbuh Kembang, PRD 13 Tahap 2. Instrumen & skoring resmi:
+// lihat src/lib/kpsp-instrument.ts & src/lib/kpsp-scoring.ts.
+// Model terpisah dari SurveyResponse (Matching Engine) — lihat
+// CLAUDE.md keputusan 5 Juli 2026 & ADR terkait.
+// ============================================================
+
+model DevelopmentScreeningRecord {
+  id             String   @id @default(cuid())
+  childProfileId String
+  screeningDate  DateTime
+  ageMonthsUsed  Int      // usia (bulan) setelah pembulatan/koreksi prematur — dipakai memilih formulir
+  ageBand        Int      // salah satu dari KPSP_AGE_BANDS (3,6,...,72)
+  answers        Json     // boolean[] sesuai urutan KPSP_QUESTIONNAIRES[ageBand]
+  yaCount        Int
+  category       String   // "SESUAI" | "MERAGUKAN" | "PENYIMPANGAN"
+  createdAt      DateTime @default(now())
+
+  childProfile ChildProfile @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+
+  @@index([childProfileId])
+  @@index([screeningDate])
 }
 
 // ============================================================

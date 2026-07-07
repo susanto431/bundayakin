@@ -81,7 +81,7 @@ Portal ini juga kelak dipakai untuk Layer 3 (review psikolog nanny) — satu por
 | Tahap | Isi | Kenapa duluan |
 |---|---|---|
 | **1** ✅ | Kurva Pertumbuhan + Jurnal Momen — **selesai dikoding Juli 2026** | Nilai terasa cepat, teknis paling ringan, langsung memakai profil anak yang sudah ada |
-| **2** | Skrining Perkembangan + Konsultasi Psikolog Anak + **Portal Psikolog** (jadwal, kapasitas, review konten) | Jantung cerita "didampingi psikolog"; butuh validasi instrumen oleh psikolog HCC dulu; konsultasi tidak bisa jalan tanpa portal |
+| **2** | Skrining Perkembangan (instrumen ✅ tervalidasi, siap dikoding) + Konsultasi Psikolog Anak + **Portal Psikolog** (jadwal, kapasitas, review konten) | Jantung cerita "didampingi psikolog"; konsultasi tidak bisa jalan tanpa portal |
 | **3** | Edukasi Terkurasi + pengingat + Imunisasi | Butuh alur kerja review psikolog yang rutin |
 | **4** | Log Harian Nanny | Butuh desain agar tidak membebani nanny (target < 1 menit/hari) |
 
@@ -99,7 +99,7 @@ Portal ini juga kelak dipakai untuk Layer 3 (review psikolog nanny) — satu por
 1. **Harga Konsultasi Psikolog Anak: berjenjang per level psikolog** — Junior Rp 500rb · Mid Rp 1jt · Senior Rp 2jt. Peluncuran memakai harga mid (Rp 1jt). ✔
    **Harga khusus pelanggan: Rp 750rb** (diskon 25% dari mid) ✔ — tidak ada lagi keputusan yang menggantung di dokumen ini.
 2. **Kapasitas psikolog dikelola lewat Portal Psikolog** (lihat §3b). ✔ Rasio kerja: **1 psikolog = 3 sesi konsultasi/hari** (nyaman), **maksimum 5 sesi/hari**. Kapasitas total platform = jumlah psikolog aktif × rasio tersebut, dan harus terlihat otomatis di portal.
-3. **Instrumen skrining: disetujui** — psikolog HCC memvalidasi adaptasi KPSP sebelum Tahap 2 dibangun. ✔
+3. **Instrumen skrining: TERVALIDASI (Juli 2026)** — sumber resmi (Buku Panduan KPSP FK Unhas 2018, mengacu SDIDTK Depkes 2010) diterima dari Kartika, 158 soal/16 kelompok usia ditranskripsi ke `kpsp-instrument.ts` + `kpsp-scoring.ts`. Detail: [17_draft_instrumen_skrining_kpsp.md](17_draft_instrumen_skrining_kpsp.md). ✔ Prasyarat Tahap 2 terpenuhi.
 4. **Ritme konten: dua-mingguan** untuk saat ini. ✔
 
 ## 8. Risiko yang Sudah Diantisipasi
