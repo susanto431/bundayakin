@@ -81,7 +81,7 @@ Portal ini juga kelak dipakai untuk Layer 3 (review psikolog nanny) — satu por
 | Tahap | Isi | Kenapa duluan |
 |---|---|---|
 | **1** ✅ | Kurva Pertumbuhan + Jurnal Momen — **selesai dikoding Juli 2026** | Nilai terasa cepat, teknis paling ringan, langsung memakai profil anak yang sudah ada |
-| **2** | Skrining Perkembangan (instrumen ✅ tervalidasi, siap dikoding) + Konsultasi Psikolog Anak + **Portal Psikolog** (jadwal, kapasitas, review konten) | Jantung cerita "didampingi psikolog"; konsultasi tidak bisa jalan tanpa portal |
+| **2** | Skrining Perkembangan **✅ selesai dikoding** (form + hasil + riwayat) + Konsultasi Psikolog Anak + **Portal Psikolog** (jadwal, kapasitas, review konten) — dua item terakhir belum dibangun | Jantung cerita "didampingi psikolog"; konsultasi tidak bisa jalan tanpa portal — sementara hasil "sebaiknya konsultasi" diarahkan ke CS manual |
 | **3** | Edukasi Terkurasi + pengingat + Imunisasi | Butuh alur kerja review psikolog yang rutin |
 | **4** | Log Harian Nanny | Butuh desain agar tidak membebani nanny (target < 1 menit/hari) |
 
