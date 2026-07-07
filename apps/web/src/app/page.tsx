@@ -65,7 +65,7 @@ export default async function LandingPage() {
           </div>
           <div className="text-[11px] text-[#2C5F5A] mb-2">≈ Rp 42.000/bulan · all-in</div>
           <ul className="text-[12px] text-[#1E4A45] pl-4 leading-[1.8] list-disc">
-            <li>Pencocokan nanny sepuasnya</li>
+            <li>Pencocokan nanny s.d. 10x/bulan</li>
             <li>Pantau nanny lewat pemantauan otomatis tiap bulan</li>
             <li>Catatan anak tersimpan — tidak mulai dari nol saat ganti nanny</li>
             <li>Notifikasi langsung via WA</li>
@@ -80,8 +80,14 @@ export default async function LandingPage() {
           </div>
           <ul className="text-[12px] text-[#7A4018] pl-4 leading-[1.8] list-disc">
             <li>Lihat identitas nanny yang cocok → <strong>Rp 100.000</strong>/nanny</li>
-            <li>Tes kepribadian &amp; sikap kerja → <strong>Rp 300.000</strong>/nanny</li>
-            <li>Penilaian langsung psikolog → <strong>Rp 1.000.000</strong>/sesi</li>
+            <li>
+              Tes kepribadian &amp; sikap kerja → <strong>Rp 300.000</strong>/nanny{" "}
+              <span className="text-[9px] font-semibold bg-white text-[#A35320] border border-[#F5C4A0] px-1.5 py-0.5 rounded-full whitespace-nowrap">Segera hadir</span>
+            </li>
+            <li>
+              Review psikolog untuk nanny (lanjutan tes kepribadian) → <strong>Rp 1.200.000–1.500.000</strong>/sesi{" "}
+              <span className="text-[9px] font-semibold bg-white text-[#A35320] border border-[#F5C4A0] px-1.5 py-0.5 rounded-full whitespace-nowrap">Segera hadir</span>
+            </li>
           </ul>
         </div>
 
