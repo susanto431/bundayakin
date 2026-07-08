@@ -41,8 +41,9 @@ _Avoid_: dirancukan dengan Hasil Matching
 Tiga kelompok aspek kecocokan: A Kondisi Kerja, B Nilai & Gaya Hidup, C Pengalaman & Kemampuan. Total 9 aspek, 53 pertanyaan.
 
 **Dealbreaker**:
-Pertanyaan yang ditandai "wajib cocok" oleh salah satu pihak. Ketidakcocokan memicu negosiasi, bukan penolakan otomatis. Framing selalu "perlu dibicarakan".
-_Avoid_: red flag, penolakan
+Pertanyaan yang ditandai "wajib cocok" oleh salah satu pihak, DAN kedua pihak sudah sama-sama mengisi jawabannya, tapi jawabannya berbeda. Ketidakcocokan memicu negosiasi, bukan penolakan otomatis. Framing selalu "perlu dibicarakan" (bukan "Tidak Cocok"). Orang tua tetap bisa membuka kontak nanny yang kena Dealbreaker untuk negosiasi — Kuota Koneksi tetap terpotong seperti pembukaan kontak biasa (keputusan 8 Juli 2026).
+_Avoid_: red flag, penolakan, "Tidak Cocok"
+_Catatan_: pihak yang belum mengisi Tes Kecocokan sama sekali BUKAN Dealbreaker — itu profil belum lengkap, lihat [[Talent Pool]].
 
 **Layer (1/2/3)**:
 Tingkat kedalaman assessment: Layer 1 survey kecocokan (gratis dalam langganan), Layer 2 + psikotes AI (add-on), Layer 3 + review Psikolog HCC (add-on premium).
@@ -57,7 +58,7 @@ Koneksi yang terjadi karena orang tua mengundang nanny tertentu via kode undanga
 Koneksi yang terjadi karena AI merekomendasikan nanny dari kumpulan nanny yang tersedia. Hanya untuk pelanggan aktif.
 
 **Talent Pool**:
-Kumpulan nanny yang tersedia dan bisa direkomendasikan AI ke orang tua berlangganan.
+Kumpulan nanny yang tersedia dan bisa direkomendasikan AI ke orang tua berlangganan. Syarat masuk: `openToJob`, `isAvailable`, DAN sudah menyelesaikan Tes Kecocokan (`surveyCompletedAt` terisi) — nanny yang belum isi survey tidak direkomendasikan dulu sampai profilnya lengkap (keputusan 8 Juli 2026, lihat [[Dealbreaker]]).
 _Catatan (Juli 2026)_: tidak ada jalur "admin carikan nanny secara manual" — orang tua mencari sendiri lewat Talent Pool (Flow B) atau mengundang kandidat sendiri (Flow A). Keputusan produk: opsi bantu-cari-nanny via CS sengaja tidak dibuka.
 
 **Open to Job**:
@@ -124,6 +125,10 @@ _Avoid_: grade, tier (di UI)
 **Portal Psikolog**:
 Area kerja khusus psikolog HCC di platform: jadwal & kapasitas konsultasi (3 sesi/hari/psikolog, maks 5), antrean review konten, dan catatan hasil sesi.
 _Avoid_: dashboard admin (portal psikolog bukan admin)
+
+**Slot Konsultasi**:
+Jam tetap yang tersedia tiap hari untuk Konsultasi Psikolog Anak, sama untuk semua psikolog (mis. 09:00/13:00/16:00, mengikuti kuota 3 sesi/hari). Orang tua memilih tanggal DAN slot jam saat booking, bukan hanya tanggal.
+_Avoid_: jadwal psikolog (tiap psikolog belum atur jam sendiri saat peluncuran)
 
 **Edukasi Terkurasi**:
 Konten parenting sesuai usia anak — draft ditulis AI, disetujui dan diatasnamakan psikolog HCC sebelum tayang.

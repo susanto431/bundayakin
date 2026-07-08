@@ -257,7 +257,7 @@ export default function NannyDetailDrawer({
               {/* Skor */}
               {detail.adaDealbreaker ? (
                 <div className="rounded-xl p-4" style={{ backgroundColor: "#FAEAEA" }}>
-                  <p className="font-semibold text-[#C75D5D] mb-1">Tidak Cocok — Ada Dealbreaker</p>
+                  <p className="font-semibold text-[#C75D5D] mb-1">Perlu Dibicarakan — Ada Dealbreaker</p>
                   {detail.dealbreakerFlags?.map((f, i) => (
                     <p key={i} className="text-sm text-[#C75D5D]">• {f.issue}</p>
                   ))}
@@ -361,7 +361,7 @@ export default function NannyDetailDrawer({
         </div>
 
         {/* Sticky CTA — di luar scroll area agar tidak tertutup footer */}
-        {detail && !loading && !calculating && !detail.kontakTerbuka && !detail.adaDealbreaker && (
+        {detail && !loading && !calculating && !detail.kontakTerbuka && (
           <div className="flex-shrink-0 px-5 py-4 border-t" style={{ borderColor: "#E0D0F0", backgroundColor: "#fff" }}>
             {flowType === "TALENT_POOL" ? (
               <UnlockContactButton

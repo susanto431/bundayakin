@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
     const where: Prisma.NannyProfileWhereInput = {
       openToJob: true,
       isAvailable: true,
+      surveyCompletedAt: { not: null },
       ...(kota ? { city: { contains: kota, mode: "insensitive" } } : {}),
       ...(tipe ? { nannyType: { has: tipe as NannyType } } : {}),
     }
