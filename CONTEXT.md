@@ -58,6 +58,7 @@ Koneksi yang terjadi karena AI merekomendasikan nanny dari kumpulan nanny yang t
 
 **Talent Pool**:
 Kumpulan nanny yang tersedia dan bisa direkomendasikan AI ke orang tua berlangganan.
+_Catatan (Juli 2026)_: tidak ada jalur "admin carikan nanny secara manual" — orang tua mencari sendiri lewat Talent Pool (Flow B) atau mengundang kandidat sendiri (Flow A). Keputusan produk: opsi bantu-cari-nanny via CS sengaja tidak dibuka.
 
 **Open to Job**:
 Status nanny yang aktif mencari keluarga baru (gaya LinkedIn).
@@ -73,7 +74,7 @@ Jatah membuka kontak nanny per rolling 30 hari: gratis 3 (Flow A saja); berlangg
 _Avoid_: unlock, pay-per-unlock
 
 **Placement Fee**:
-Biaya penyaluran saat nanny resmi mulai bekerja: Rp 1,2jt (jangka panjang) / Rp 600rb (infal).
+Biaya penyaluran saat nanny resmi mulai bekerja: satu tarif flat Rp 1,2jt untuk semua jenis penempatan (keputusan 5 Juli 2026 — Rp 600rb infal tidak pernah benar-benar di-charge, koreksi dari dokumen lama).
 
 **Jaminan Kecocokan**:
 Janji platform: jika nanny berhenti dalam 30 hari pertama penugasan, orang tua mendapat matching ulang dan penempatan ulang gratis penuh (tanpa kuota, tanpa placement fee kedua), berlaku satu kali per penempatan.
