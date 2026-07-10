@@ -42,7 +42,7 @@ export default function ScreeningClient({ childId, childName, isPaid, ageBand, c
   const [answers, setAnswers] = useState<(boolean | null)[]>(() => questions.map(() => null))
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [result, setResult] = useState<{ yaCount: number; category: KpspCategory } | null>(null)
+  const [result, setResult] = useState<{ id: string; yaCount: number; category: KpspCategory } | null>(null)
 
   const alreadyDoneThisBand = history.some(h => h.ageBand === ageBand)
   const allAnswered = answers.every(a => a !== null)
@@ -62,7 +62,7 @@ export default function ScreeningClient({ childId, childName, isPaid, ageBand, c
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ageBand, answers }),
       })
-      const data = await res.json() as { success: boolean; data?: { yaCount: number; category: KpspCategory }; error?: string }
+      const data = await res.json() as { success: boolean; data?: { id: string; yaCount: number; category: KpspCategory }; error?: string }
       if (data.success && data.data) {
         setResult(data.data)
         router.refresh()
@@ -99,7 +99,16 @@ export default function ScreeningClient({ childId, childName, isPaid, ageBand, c
       </p>
 
       {result ? (
-        <ResultCard firstName={firstName} category={result.category} yaCount={result.yaCount} totalQuestions={questions.length} isPaid={isPaid} ageBand={ageBand} />
+        <ResultCard
+          childId={childId}
+          screeningRecordId={result.id}
+          firstName={firstName}
+          category={result.category}
+          yaCount={result.yaCount}
+          totalQuestions={questions.length}
+          isPaid={isPaid}
+          ageBand={ageBand}
+        />
       ) : (
         <>
           {alreadyDoneThisBand && (
@@ -199,11 +208,26 @@ function Header({ childId, firstName }: { childId: string; firstName: string }) 
   )
 }
 
-function ResultCard({ firstName, category, yaCount, totalQuestions, isPaid, ageBand }: { firstName: string; category: KpspCategory; yaCount: number; totalQuestions: number; isPaid: boolean; ageBand: number }) {
+function ResultCard({
+  childId,
+  screeningRecordId,
+  firstName,
+  category,
+  yaCount,
+  totalQuestions,
+  isPaid,
+  ageBand,
+}: {
+  childId: string
+  screeningRecordId: string
+  firstName: string
+  category: KpspCategory
+  yaCount: number
+  totalQuestions: number
+  isPaid: boolean
+  ageBand: number
+}) {
   const nextDate = nextKpspScreeningDate(ageBand, new Date())
-  const konsultasiWaMessage = encodeURIComponent(
-    `Halo, hasil Skrining Perkembangan ${firstName} menunjukkan sebaiknya konsultasi psikolog. Boleh bantu jadwalkan?`
-  )
 
   if (!isPaid) {
     return (
@@ -232,14 +256,12 @@ function ResultCard({ firstName, category, yaCount, totalQuestions, isPaid, ageB
         Jadwal skrining berikutnya: <strong>{nextDate.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</strong>
       </p>
       {category === "PENYIMPANGAN" && (
-        <a
-          href={`https://wa.me/6287888180363?text=${konsultasiWaMessage}`}
-          target="_blank"
-          rel="noreferrer"
+        <Link
+          href={`/dashboard/parent/children/${childId}/consultation?screeningRecordId=${screeningRecordId}`}
           className="inline-flex items-center bg-white text-[#C75D5D] border border-[#F5AAAA] text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] mt-3 transition-all hover:bg-[#FAEAEA]"
         >
-          Hubungi kami untuk konsultasi psikolog →
-        </a>
+          Jadwalkan konsultasi psikolog →
+        </Link>
       )}
       <p className="text-[11px] mt-3 opacity-70 leading-relaxed">
         Hasil ini adalah arahan awal, bukan diagnosis. Untuk penilaian klinis, konsultasikan ke dokter anak, Posyandu, atau psikolog.

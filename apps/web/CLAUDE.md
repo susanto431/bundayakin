@@ -55,9 +55,10 @@
 > - **Placement fee = satu tarif flat Rp 1,2jt**, tidak dibedakan jangka panjang/infal (koreksi dari dokumen lama yang salah menyebut Rp 600rb untuk infal — itu tidak pernah benar-benar di-charge)
 > - **Jaminan Kecocokan**: nanny berhenti ≤30 hari pertama → matching ulang + penempatan ulang gratis penuh, 1× per penempatan
 > - **Connection Add-on** (beli koneksi tambahan setelah kuota habis): checkout otomatis via Mayar — **tidak ada lagi jalur CS manual**
-> - Konsultasi Psikolog Anak (Tahap 2, belum dibangun): harga berjenjang Junior Rp 500rb / Mid Rp 1jt (peluncuran) / Senior Rp 2jt; harga pelanggan Rp 750rb
+> - **Konsultasi Psikolog Anak** (Tahap 2, **selesai dikoding Juli 2026**): harga berjenjang Junior Rp 500rb / Mid Rp 1jt (peluncuran, satu-satunya yang dijual) / Senior Rp 2jt; harga pelanggan Rp 750rb — hanya berlaku untuk tarif Mid. 4 `PricingConfigKey` disiapkan sekaligus (`CONSULTATION_JUNIOR_FEE_IDR`/`MID`/`SENIOR`/`CUSTOMER`) walau Junior/Senior belum bisa dibeli — keputusan eksplisit Kartika, beda dari prinsip default ADR-008. Checkout via `api/consultation/book` + `lib/consultation.ts`, webhook di `handleConsultationSuccess`.
+> - **Portal Psikolog** (Tahap 2, **selesai dikoding Juli 2026**): role `PSIKOLOG` baru (lihat [ADR-010](../../docs/opds/08_adr/ADR-010_portal-psikolog-built-in.md) — built-in, bukan service terpisah, beda dari Psikotes). Akun dibuat manual admin di `/dashboard/admin/psikolog` (bukan pendaftaran mandiri). Dashboard psikolog di `/dashboard/psikolog`. Booking pakai **Slot Konsultasi tetap** (09:00/13:00/16:00, sama untuk semua psikolog — lihat `src/constants/consultation.ts`), assignment saat ini selalu ke psikolog level SENIOR (strategi peluncuran, lihat `LAUNCH_ASSIGNMENT_LEVEL` di `lib/consultation.ts`). Kapasitas 3/hari default, maks 5 — field `PsikologProfile.dailyCapacity`, BUKAN lewat Pricing Config Panel (nilainya per-psikolog, bukan config global). Antrean review konten Edukasi Terkurasi menyusul Tahap 3.
 > - Role `ADMIN` sekarang juga berarti akses **Pricing Config Panel** (`/dashboard/admin/pricing-config`) — jangan pakai mekanisme `canSwitchRoles` untuk hal ini, itu backdoor testing terpisah
-> - **Skrining Perkembangan (KPSP, Tahap 2 Tumbuh Kembang)**: instrumen **sudah tervalidasi** (158 soal/16 kelompok usia, sumber SDIDTK Depkes 2010) — lihat `src/lib/kpsp-instrument.ts` (data soal) & `src/lib/kpsp-scoring.ts` (pemilihan usia/skoring), model `DevelopmentScreeningRecord` terikat `ChildProfile`. JANGAN dipaksakan ke `SurveyQuestion`/`SurveyResponse` (itu punya Matching Engine, coupled ke `respondentRole`/`isDealbreaker`/`matchingRequestId`). Dibangun **built-in di `apps/web`** (bukan service terpisah — beda dengan Psikotes; alasan: instrumen publik Kemenkes, bukan aset lintas produk HCC, skoring deterministik sederhana). API/UI belum dibangun.
+> - **Skrining Perkembangan (KPSP, Tahap 2 Tumbuh Kembang)**: instrumen **sudah tervalidasi** (158 soal/16 kelompok usia, sumber SDIDTK Depkes 2010) — lihat `src/lib/kpsp-instrument.ts` (data soal) & `src/lib/kpsp-scoring.ts` (pemilihan usia/skoring), model `DevelopmentScreeningRecord` terikat `ChildProfile`. JANGAN dipaksakan ke `SurveyQuestion`/`SurveyResponse` (itu punya Matching Engine, coupled ke `respondentRole`/`isDealbreaker`/`matchingRequestId`). Dibangun **built-in di `apps/web`** (bukan service terpisah — beda dengan Psikotes; alasan: instrumen publik Kemenkes, bukan aset lintas produk HCC, skoring deterministik sederhana). API/UI **selesai dikoding**; tombol hasil "sebaiknya konsultasi" di `ScreeningClient.tsx` sudah terhubung ke alur booking Konsultasi Psikolog Anak (jembatan WA lama sudah dilepas).
 > - **Psikotes AI (Layer 2, untuk nanny)**: arah arsitektur terkunci — service terpisah lintas produk HCC, BUKAN API route di `apps/web`. Jangan bangun sebagai `lib/claude.ts` biasa. Lihat [ADR-009](../../docs/opds/08_adr/ADR-009_psikotes-service-terpisah.md). Implementasi belum mulai — menunggu instrumen dari psikolog HCC.
 
 ---
@@ -168,7 +169,7 @@ await fetch(`${PDF_SERVICE_URL}/generate-report`, {
 - Gunakan Next.js `NextResponse.json()` — bukan `Response.json()`
 
 ### 4.4 Auth & Role Guard
-- Role check via `session.user.role` — nilai: `"PARENT"` atau `"NANNY"` atau `"ADMIN"`
+- Role check via `session.user.role` — nilai: `"PARENT"` atau `"NANNY"` atau `"ADMIN"` atau `"PSIKOLOG"` (Portal Psikolog, Juli 2026 — akun dibuat manual admin, bukan pendaftaran mandiri)
 - Middleware di `middleware.ts` handle redirect otomatis
 - Jangan taruh role check di komponen — taruh di API route atau middleware
 
@@ -214,6 +215,7 @@ Dokumen lengkap: `docs/DESIGN_SYSTEM.md`
 - **PARENT**: bayar Rp 500rb/tahun, akses matching + monitoring + evaluasi
 - **NANNY**: gratis selamanya, isi profil + survey + terima hasil matching
 - **ADMIN**: internal HCC, akses dashboard admin
+- **PSIKOLOG**: internal HCC (dibuat manual admin), akses Portal Psikolog — jadwal & antrean Konsultasi Psikolog Anak (Juli 2026)
 
 ### 6.2 Sistem Matching — 3 Layer
 | Layer | Nama | Harga | Output |

@@ -10,6 +10,10 @@ export const PRICING_CONFIG_KEYS: PricingConfigKey[] = [
   "CONNECTION_ADDON_FEE_IDR",
   "REFERRAL_QUOTA",
   "TALENT_POOL_QUOTA",
+  "CONSULTATION_JUNIOR_FEE_IDR",
+  "CONSULTATION_MID_FEE_IDR",
+  "CONSULTATION_SENIOR_FEE_IDR",
+  "CONSULTATION_CUSTOMER_FEE_IDR",
 ]
 
 export const PRICING_CONFIG_LABEL: Record<PricingConfigKey, string> = {
@@ -18,6 +22,10 @@ export const PRICING_CONFIG_LABEL: Record<PricingConfigKey, string> = {
   CONNECTION_ADDON_FEE_IDR: "Connection Add-on (per koneksi)",
   REFERRAL_QUOTA: "Kuota Referral (per 30 hari, semua akun)",
   TALENT_POOL_QUOTA: "Kuota Talent Pool (per 30 hari, khusus pelanggan)",
+  CONSULTATION_JUNIOR_FEE_IDR: "Konsultasi Psikolog Anak — Junior (belum dijual)",
+  CONSULTATION_MID_FEE_IDR: "Konsultasi Psikolog Anak — Mid (harga peluncuran, aktif dijual)",
+  CONSULTATION_SENIOR_FEE_IDR: "Konsultasi Psikolog Anak — Senior (belum dijual)",
+  CONSULTATION_CUSTOMER_FEE_IDR: "Konsultasi Psikolog Anak — Harga Pelanggan (berlaku untuk tarif Mid)",
 }
 
 export const PRICING_CONFIG_UNIT: Record<PricingConfigKey, "IDR" | "COUNT"> = {
@@ -26,4 +34,8 @@ export const PRICING_CONFIG_UNIT: Record<PricingConfigKey, "IDR" | "COUNT"> = {
   CONNECTION_ADDON_FEE_IDR: "IDR",
   REFERRAL_QUOTA: "COUNT",
   TALENT_POOL_QUOTA: "COUNT",
+  CONSULTATION_JUNIOR_FEE_IDR: "IDR",
+  CONSULTATION_MID_FEE_IDR: "IDR",
+  CONSULTATION_SENIOR_FEE_IDR: "IDR",
+  CONSULTATION_CUSTOMER_FEE_IDR: "IDR",
 }

@@ -115,17 +115,17 @@ Kenalan     →    Isi Kuesioner →   Dipertemukan →   AI Menilai &   →   D
 **Yang TIDAK termasuk langganan** (dibayar terpisah, terlepas dari status langganan):
 biaya penyaluran saat nanny resmi bekerja (Rp 1,2jt), koneksi tambahan setelah kuota habis (Rp 100rb), dan add-on Psikotes/Psikolog/rekam jejak (yang tiga terakhir ini memang belum jalan — lihat 4a).
 
-### 4d. Pilar Baru: Tumbuh Kembang (disetujui Juli 2026 — belum dibangun)
+### 4d. Pilar Baru: Tumbuh Kembang (disetujui Juli 2026)
 
-Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan; (2) **Tumbuh Kembang** — pusat pemantauan perkembangan anak, semuanya masih ❌ (rencana). Detail lengkap: [PRD Tumbuh Kembang](13_prd_tumbuh_kembang.md).
+Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan; (2) **Tumbuh Kembang** — pusat pemantauan perkembangan anak, Tahap 1 & 2 sudah selesai dikoding. Detail lengkap: [PRD Tumbuh Kembang](13_prd_tumbuh_kembang.md).
 
 | Fitur | Ringkas | Status |
 |---|---|---|
 | Kurva Pertumbuhan | Berat/tinggi anak diplot ke standar WHO + artinya | ⚠️ Tahap 1 selesai dikoding, menunggu tayang |
 | Jurnal & Galeri Momen | Linimasa kenangan per anak | ⚠️ Tahap 1 selesai dikoding, menunggu tayang |
-| Skrining Perkembangan | Checklist milestone (KPSP resmi) → arahan, bukan diagnosis | ⚠️ selesai dikoding Juli 2026, menunggu tayang |
-| Konsultasi Psikolog Anak | Harga per level psikolog: Junior Rp 500rb · **Mid Rp 1jt (peluncuran)** · Senior Rp 2jt; **pelanggan: Rp 750rb** (diskon 25%) | ❌ Tahap 2 |
-| Portal Psikolog | Ruang kerja psikolog: jadwal konsultasi (3 sesi/hari/psikolog, maks 5) + review konten | ❌ Tahap 2 |
+| Skrining Perkembangan | Checklist milestone (KPSP resmi) → arahan, bukan diagnosis. Hasil "sebaiknya konsultasi" kini langsung terhubung ke booking Konsultasi Psikolog Anak | ⚠️ Tahap 2 selesai dikoding, menunggu tayang |
+| Konsultasi Psikolog Anak | Harga per level psikolog: Junior Rp 500rb · **Mid Rp 1jt (peluncuran, satu-satunya yang dijual sekarang)** · Senior Rp 2jt; **pelanggan: Rp 750rb** (diskon 25%). Orang tua pilih tanggal + jam (09:00/13:00/16:00), bayar otomatis lewat Mayar | ⚠️ Tahap 2 selesai dikoding, menunggu tayang |
+| Portal Psikolog | Ruang kerja psikolog: jadwal konsultasi (3 sesi/hari/psikolog, maks 5). Akun dibuat manual admin setelah screening (bukan pendaftaran sendiri). Review konten Edukasi Terkurasi menyusul Tahap 3 | ⚠️ Tahap 2 selesai dikoding, menunggu tayang |
 | Edukasi Terkurasi + Imunisasi | Artikel dua-mingguan disetujui psikolog + kalender imunisasi & pengingat | ❌ Tahap 3 |
 | Log Harian Nanny | Nanny mencatat harian → masuk rekam anak (pembeda utama) | ❌ Tahap 4 |
 
@@ -139,7 +139,7 @@ Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan;
 | Add-on Psikotes (Layer 2) | Rp 300rb | ❌ |
 | Add-on Psikolog (Layer 3) | Rp 1,2–1,5jt | ❌ |
 | Akses rekam jejak | Rp 50rb | ❌ |
-| Konsultasi Psikolog Anak | Rp 500rb–2jt/sesi sesuai level psikolog (peluncuran: Rp 1jt) | ❌ |
+| Konsultasi Psikolog Anak | Rp 1jt/sesi saat ini (peluncuran, harga pelanggan Rp 750rb); Junior/Senior belum dijual | ⚠️ checkout otomatis selesai dikoding Juli 2026, menunggu tayang |
 
 > **Cara pembayaran:** semua lewat **Mayar** (transfer/QRIS). Orang tua klik bayar → diarahkan ke halaman Mayar → begitu lunas, sistem otomatis mengaktifkan layanannya. Tidak ada campur tangan manual.
 
@@ -161,11 +161,11 @@ Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan;
 
 ⚠️ Selesai dikoding Juli 2026, menunggu tayang. Akun Anda sudah dijadikan ADMIN.
 
-Buka **Menu Admin → Konfigurasi Harga & Kuota** untuk mengubah sendiri: harga langganan tahunan, biaya penempatan nanny, biaya connection add-on, kuota referral, dan kuota talent pool — **tanpa perlu minta developer ubah kode**.
+Buka **Menu Admin → Konfigurasi Harga & Kuota** untuk mengubah sendiri: harga langganan tahunan, biaya penempatan nanny, biaya connection add-on, kuota referral, kuota talent pool, dan **4 harga Konsultasi Psikolog Anak** (Junior/Mid/Senior/Pelanggan — Junior & Senior sudah tersedia di panel walau belum dibuka untuk dibeli user) — **tanpa perlu minta developer ubah kode**.
 
 Prinsip yang dipakai (seperti kenaikan harga Google Workspace): setiap perubahan harus punya **tanggal mulai berlaku** dan **alasan** (wajib diisi). Perubahan **tidak pernah berlaku surut** — pelanggan yang sedang aktif tidak terpengaruh sampai masa langganannya habis dan mereka bayar lagi setelah tanggal itu. Jadwal yang belum berlaku bisa dibatalkan; yang sudah berlaku menjadi riwayat permanen (tidak bisa dihapus/diubah) — itulah log-nya.
 
-Catatan: harga Psikotes/Psikolog/Track Record belum masuk panel ini karena checkout-nya sendiri belum dibangun (menyusul di Tahap 2 Tumbuh Kembang).
+Catatan: harga Psikotes/Psikolog (Layer 2/3)/Track Record belum masuk panel ini karena checkout-nya sendiri belum dibangun.
 
 ---
 

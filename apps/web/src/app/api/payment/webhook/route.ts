@@ -68,6 +68,8 @@ export async function POST(request: Request) {
         await handleSubscriptionSuccess(transaction, paidAt, paymentMethod ?? null, effectiveStatus, now)
       } else if (transaction.type === "CONNECTION_ADDON") {
         await handleConnectionAddonSuccess(transaction, paidAt, paymentMethod ?? null, effectiveStatus)
+      } else if (transaction.type === "CONSULTATION_PSIKOLOG_ANAK") {
+        await handleConsultationSuccess(transaction, paidAt, paymentMethod ?? null, effectiveStatus)
       } else {
         // Tipe lain — cukup update status
         await prisma.transaction.update({
@@ -85,6 +87,15 @@ export async function POST(request: Request) {
           mayarStatus: effectiveStatus,
         },
       })
+
+      if (transaction.type === "CONSULTATION_PSIKOLOG_ANAK") {
+        // Bebaskan slot yang sempat ditahan booking ini — pembayaran gagal/expired
+        await prisma.consultationBooking.updateMany({
+          where: { transactionId: transaction.id, status: "PENDING_PAYMENT" },
+          data: { status: "CANCELLED" },
+        })
+      }
+
       console.info("[WEBHOOK] Payment FAILED:", lookupId, effectiveStatus)
     } else {
       await prisma.transaction.update({
@@ -251,4 +262,67 @@ async function handleConnectionAddonSuccess(
   revalidateTag(`parent-${parentProfile.userId}`)
 
   console.info("[WEBHOOK_CONNECTION_ADDON] Kontak terbuka:", transaction.parentProfileId, "→", nannyProfileId)
+}
+
+// ── CONSULTATION_PSIKOLOG_ANAK success handler ────────────────────────────────
+
+async function handleConsultationSuccess(
+  transaction: { id: string; parentProfileId: string | null; metadata: unknown },
+  paidAt: Date,
+  paymentMethod: string | null,
+  effectiveStatus: string
+) {
+  const booking = await prisma.consultationBooking.findUnique({
+    where: { transactionId: transaction.id },
+    select: {
+      id: true,
+      status: true,
+      psikolog: { select: { userId: true } },
+      childProfile: { select: { name: true } },
+      parentProfile: { select: { userId: true } },
+    },
+  })
+  if (!booking) {
+    console.error("[WEBHOOK_CONSULTATION] booking tidak ditemukan untuk transactionId:", transaction.id)
+    await prisma.transaction.update({
+      where: { id: transaction.id },
+      data: { status: "SUCCESS", mayarStatus: effectiveStatus, paymentMethod, paidAt },
+    })
+    return
+  }
+
+  await prisma.$transaction([
+    prisma.transaction.update({
+      where: { id: transaction.id },
+      data: { status: "SUCCESS", mayarStatus: effectiveStatus, paymentMethod, paidAt },
+    }),
+    prisma.consultationBooking.update({
+      where: { id: booking.id },
+      data: { status: "CONFIRMED" },
+    }),
+  ])
+
+  const childFirstName = booking.childProfile.name.split(" ")[0]
+
+  await prisma.notification.createMany({
+    data: [
+      {
+        userId: booking.parentProfile.userId,
+        type: "PAYMENT",
+        title: "Konsultasi terjadwal",
+        body: `Pembayaran berhasil — sesi Konsultasi Psikolog Anak untuk ${childFirstName} sudah terjadwal.`,
+      },
+      {
+        userId: booking.psikolog.userId,
+        type: "CONSULTATION_BOOKING",
+        title: "Sesi konsultasi baru",
+        body: `Ada sesi konsultasi baru untuk ${childFirstName} yang perlu didampingi.`,
+        link: "/dashboard/psikolog",
+      },
+    ],
+  })
+
+  revalidateTag(`parent-${booking.parentProfile.userId}`)
+
+  console.info("[WEBHOOK_CONSULTATION] Booking dikonfirmasi:", booking.id)
 }

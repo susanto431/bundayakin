@@ -21,6 +21,21 @@ enum UserRole {
   PARENT
   NANNY
   ADMIN
+  PSIKOLOG
+}
+
+// Jenjang psikolog HCC — menentukan harga sesi Konsultasi Psikolog Anak (PRD 13 §4)
+enum PsikologLevel {
+  JUNIOR
+  MID
+  SENIOR
+}
+
+enum ConsultationBookingStatus {
+  PENDING_PAYMENT  // slot dipegang sementara menunggu pembayaran Mayar
+  CONFIRMED        // pembayaran sukses, sesi terjadwal
+  COMPLETED        // sesi selesai dilakukan psikolog
+  CANCELLED        // pembayaran gagal/expired, atau dibatalkan
 }
 
 enum SubscriptionStatus {
@@ -84,6 +99,7 @@ enum TransactionType {
   ADDON_TRACK_RECORD    // akses rekam jejak — Rp 50rb
   CONNECTION_ADDON      // Rp 100rb — buka koneksi setelah kuota habis (via Mayar)
   PLACEMENT_FEE         // fee penyaluran nanny
+  CONSULTATION_PSIKOLOG_ANAK // Konsultasi Psikolog Anak (Tumbuh Kembang Tahap 2) — harga per level, lihat PRD 13 §4/§7b
 }
 
 enum NannyMediaType {
@@ -137,6 +153,14 @@ enum PricingConfigKey {
   CONNECTION_ADDON_FEE_IDR  // Beli koneksi tambahan setelah kuota habis
   REFERRAL_QUOTA            // Kuota undangan (Flow A) per 30 hari — berlaku semua akun
   TALENT_POOL_QUOTA         // Kuota Talent Pool (Flow B) per 30 hari — khusus pelanggan
+
+  // Konsultasi Psikolog Anak (PRD 13 §7b, 8 Juli 2026) — 4 key disiapkan sekaligus
+  // walau Junior & Senior belum dibuka untuk dibeli (keputusan Kartika eksplisit,
+  // beda dari prinsip default ADR-008); hanya admin yang melihat panel ini.
+  CONSULTATION_JUNIOR_FEE_IDR   // belum dijual saat peluncuran
+  CONSULTATION_MID_FEE_IDR      // harga peluncuran — satu-satunya yang dijual saat ini
+  CONSULTATION_SENIOR_FEE_IDR   // belum dijual saat peluncuran
+  CONSULTATION_CUSTOMER_FEE_IDR // harga khusus pelanggan, hanya berlaku untuk tarif Mid saat ini
 }
 
 // ============================================================
@@ -204,8 +228,9 @@ model User {
   sessions Session[]
 
   // Role-specific profiles (1-to-1)
-  parentProfile ParentProfile?
-  nannyProfile  NannyProfile?
+  parentProfile   ParentProfile?
+  nannyProfile    NannyProfile?
+  psikologProfile PsikologProfile?
 
   // Notifications & activity
   notifications Notification[]
@@ -281,6 +306,9 @@ model ParentProfile {
   // Rekam jejak yang ditulis parent ini
   trackRecordsWritten TrackRecordEntry[]
 
+  // Konsultasi Psikolog Anak (Tumbuh Kembang Tahap 2)
+  consultationBookings ConsultationBooking[]
+
   @@index([userId])
 }
 
@@ -322,6 +350,7 @@ model ChildProfile {
   growthRecords         GrowthRecord[]            // Tahap 1
   journalEntries        ChildJournalEntry[]        // Tahap 1
   developmentScreenings DevelopmentScreeningRecord[] // Tahap 2
+  consultationBookings  ConsultationBooking[]        // Tahap 2
 
   @@index([parentProfileId])
 }
@@ -394,6 +423,77 @@ model DevelopmentScreeningRecord {
 
   @@index([childProfileId])
   @@index([screeningDate])
+}
+
+// ============================================================
+// PSIKOLOG PROFILE — Portal Psikolog (PRD 13 §3b/§7b, ADR-010)
+// Akun dibuat manual oleh tim HCC (bukan pendaftaran mandiri) setelah
+// screening — pola sama seperti akun ADMIN.
+// ============================================================
+
+model PsikologProfile {
+  id            String        @id @default(cuid())
+  userId        String        @unique
+  fullName      String
+  level         PsikologLevel
+  isActive      Boolean       @default(true)
+  // Kapasitas sesi/hari — default 3 (nyaman), maksimum 5 (PRD 13 §7 keputusan 2).
+  // Nilai per-psikolog, bukan config global — tidak lewat Pricing Config Panel.
+  dailyCapacity Int           @default(3)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  consultationBookings ConsultationBooking[]
+
+  @@index([userId])
+  @@index([level])
+  @@index([isActive])
+}
+
+// ============================================================
+// CONSULTATION BOOKING — Konsultasi Psikolog Anak (PRD 13 §3b/§7b)
+// Booking pakai Slot Konsultasi tetap (lihat CONTEXT.md) — jam sama untuk
+// semua psikolog. Unique constraint [psikologId, bookingDate, slotTime]
+// mencegah dua booking rebutan slot yang sama (race condition dua parent
+// booking bersamaan — lihat catatan review di handoff).
+// ============================================================
+
+model ConsultationBooking {
+  id             String                    @id @default(cuid())
+  parentProfileId String
+  childProfileId String
+  psikologId     String
+  transactionId  String?                   @unique
+
+  // Snapshot harga saat booking dibuat — tidak berubah walau config di-update nanti
+  level          PsikologLevel
+  priceIDR       Int
+
+  bookingDate    DateTime                  @db.Date
+  slotTime       String                    // "09:00", "13:00", "16:00" — lihat CONSULTATION_SLOT_TIMES
+  status         ConsultationBookingStatus @default(PENDING_PAYMENT)
+
+  // Asal eskalasi dari Skrining Perkembangan (opsional — booking bisa juga dibuat langsung)
+  sourceScreeningId String?
+
+  // Catatan hasil sesi dari psikolog untuk orang tua — tidak boleh diubah/diparafrase sistem
+  psychologistNotes String?                @db.Text
+  completedAt       DateTime?
+
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+
+  parentProfile ParentProfile   @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+  childProfile  ChildProfile    @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+  psikolog      PsikologProfile @relation(fields: [psikologId], references: [id])
+
+  @@unique([psikologId, bookingDate, slotTime])
+  @@index([parentProfileId])
+  @@index([childProfileId])
+  @@index([psikologId, bookingDate])
+  @@index([status])
 }
 
 // ============================================================

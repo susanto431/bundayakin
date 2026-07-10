@@ -1,9 +1,9 @@
 # PRD — Pilar Tumbuh Kembang
 ## BundaYakin — Human Care Consulting
 
-> Versi 1.1 · Juli 2026 · Hasil sesi keputusan bersama Kartika (grill-with-docs)
+> Versi 1.2 · Juli 2026 · Hasil sesi keputusan bersama Kartika (grill-with-docs) — §7b ditambahkan 8 Juli 2026
 > Keputusan strategis yang mendasari: [ADR-007 Langganan Dua Pilar](08_adr/ADR-007_langganan-dua-pilar.md)
-> Status: **Tahap 1 selesai dikoding (Kurva Pertumbuhan + Jurnal Momen), menunggu deploy** — Tahap 2–4 masih rencana
+> Status: **Tahap 1 & 2 selesai dikoding, menunggu deploy** (Kurva Pertumbuhan, Jurnal Momen, Skrining Perkembangan, Konsultasi Psikolog Anak, Portal Psikolog) — Tahap 3–4 masih rencana
 >
 > ⚠️ **Catatan penting Tahap 1:** data acuan median WHO di `src/lib/growth-standards.ts` direkonstruksi dari pengetahuan umum kesehatan anak (bukan diunduh dari tabel LMS resmi WHO), dan dihitung dengan interpolasi linear antar titik acuan — bukan kurva LMS penuh. Cukup untuk kecenderungan umum, **belum cukup presisi untuk klaim persentil klinis**. Aplikasi sengaja hanya menampilkan kategori kasar (sesuai/perlu pantau/perlu perhatian) + disclaimer "bukan alat diagnosis". **Sebelum tayang ke publik/materi marketing, validasi tabel ini dengan psikolog/tenaga medis HCC** — perlakuan sama seperti instrumen Skrining Perkembangan (KPSP) di Tahap 2.
 
@@ -81,7 +81,7 @@ Portal ini juga kelak dipakai untuk Layer 3 (review psikolog nanny) — satu por
 | Tahap | Isi | Kenapa duluan |
 |---|---|---|
 | **1** ✅ | Kurva Pertumbuhan + Jurnal Momen — **selesai dikoding Juli 2026** | Nilai terasa cepat, teknis paling ringan, langsung memakai profil anak yang sudah ada |
-| **2** | Skrining Perkembangan **✅ selesai dikoding** (form + hasil + riwayat) + Konsultasi Psikolog Anak + **Portal Psikolog** (jadwal, kapasitas, review konten) — dua item terakhir belum dibangun | Jantung cerita "didampingi psikolog"; konsultasi tidak bisa jalan tanpa portal — sementara hasil "sebaiknya konsultasi" diarahkan ke CS manual |
+| **2** ✅ | Skrining Perkembangan + Konsultasi Psikolog Anak + **Portal Psikolog** (jadwal, kapasitas) — **selesai dikoding Juli 2026, menunggu deploy.** Antrean review konten Edukasi Terkurasi di Portal Psikolog menyusul Tahap 3 (butuh fitur Edukasi Terkurasi ada dulu) | Jantung cerita "didampingi psikolog"; hasil "sebaiknya konsultasi" kini langsung terhubung ke booking sungguhan, bukan lagi CS manual |
 | **3** | Edukasi Terkurasi + pengingat + Imunisasi | Butuh alur kerja review psikolog yang rutin |
 | **4** | Log Harian Nanny | Butuh desain agar tidak membebani nanny (target < 1 menit/hari) |
 
@@ -101,6 +101,14 @@ Portal ini juga kelak dipakai untuk Layer 3 (review psikolog nanny) — satu por
 2. **Kapasitas psikolog dikelola lewat Portal Psikolog** (lihat §3b). ✔ Rasio kerja: **1 psikolog = 3 sesi konsultasi/hari** (nyaman), **maksimum 5 sesi/hari**. Kapasitas total platform = jumlah psikolog aktif × rasio tersebut, dan harus terlihat otomatis di portal.
 3. **Instrumen skrining: TERVALIDASI (Juli 2026)** — sumber resmi (Buku Panduan KPSP FK Unhas 2018, mengacu SDIDTK Depkes 2010) diterima dari Kartika, 158 soal/16 kelompok usia ditranskripsi ke `kpsp-instrument.ts` + `kpsp-scoring.ts`. Detail: [17_draft_instrumen_skrining_kpsp.md](17_draft_instrumen_skrining_kpsp.md). ✔ Prasyarat Tahap 2 terpenuhi.
 4. **Ritme konten: dua-mingguan** untuk saat ini. ✔
+
+## 7b. Keputusan Portal Psikolog & Konsultasi (Kartika, 8 Juli 2026 — sesi grill-with-docs)
+
+1. **Akun psikolog**: jenis akun baru ("Psikolog") ditambahkan ke sistem. Dibuat **manual oleh tim HCC** setelah proses screening — sama seperti pola akun Admin, bukan pendaftaran mandiri lewat form publik. ✔
+2. **Dibangun menyatu di `apps/web`** (bukan service terpisah) — lihat [ADR-010](08_adr/ADR-010_portal-psikolog-built-in.md). Rencana psikolog lintas-produk HCC (assessment center, psikogram, interview psikotes) masih rencana jangka panjang belum pasti; kalau nanti terwujud, keputusan ini di-revisit. ✔
+3. **Diskon pelanggan hanya berlaku untuk tarif Mid** (Rp750rb) — Junior & Senior belum dijual sama sekali saat peluncuran (konsisten dengan §4/§5), jadi belum perlu mekanisme diskon untuk level lain. Didiskusikan lagi saat Junior/Senior resmi dibuka. ✔
+4. **Panel Pengaturan Harga menyiapkan 4 harga sekaligus** (Junior/Mid/Senior/harga Pelanggan) walau Junior & Senior belum bisa dibeli user — hanya admin yang bisa melihat/mengatur ke-4 nya; orang tua hanya melihat pilihan yang sudah dibuka (saat ini: Mid & harga Pelanggan). Satu jenis transaksi umum untuk semua level, jumlah dicatat sesuai level yang dipilih saat itu. ✔
+5. **Booking pakai slot jam tetap** ("Slot Konsultasi" — lihat glossary [CONTEXT.md](../../CONTEXT.md)): jam yang sama untuk semua psikolog (mis. 09:00/13:00/16:00, mengikuti kuota 3 sesi/hari). Orang tua memilih tanggal DAN slot jam saat booking. Psikolog belum atur jadwal masing-masing sendiri saat peluncuran. ✔
 
 ## 8. Risiko yang Sudah Diantisipasi
 

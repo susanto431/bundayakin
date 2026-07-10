@@ -14,11 +14,13 @@ export default auth(function middleware(req) {
   const isParentRoute = pathname.startsWith("/dashboard/parent")
   const isNannyRoute = pathname.startsWith("/dashboard/nanny")
   const isAdminRoute = pathname.startsWith("/dashboard/admin")
+  const isPsikologRoute = pathname.startsWith("/dashboard/psikolog")
 
   // Redirect logged-in users away from auth pages
   if (isAuthPage && session) {
     if (role === "PARENT") return NextResponse.redirect(new URL("/dashboard/parent", req.url))
     if (role === "NANNY") return NextResponse.redirect(new URL("/dashboard/nanny", req.url))
+    if (role === "PSIKOLOG") return NextResponse.redirect(new URL("/dashboard/psikolog", req.url))
     if (role === "ADMIN" || canSwitchRoles) return NextResponse.redirect(new URL("/dashboard/admin", req.url))
   }
 
@@ -35,6 +37,9 @@ export default auth(function middleware(req) {
     return NextResponse.redirect(new URL("/auth/login", req.url))
   }
   if (isAdminRoute && role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/auth/login", req.url))
+  }
+  if (isPsikologRoute && role !== "PSIKOLOG") {
     return NextResponse.redirect(new URL("/auth/login", req.url))
   }
 
