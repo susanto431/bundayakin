@@ -5,7 +5,6 @@ import Image from "next/image"
 import Link from "next/link"
 import PaymentModal from "./PaymentModal"
 import UnlockContactButton from "./UnlockContactButton"
-import type { CaptureWorkStyleDimension } from "@/lib/capture-work-style-instrument"
 
 type MatchDetail = {
   id: string
@@ -26,7 +25,7 @@ type MatchDetail = {
     available: boolean
     unlocked: boolean
     priceIDR: number | null
-    dimensionRaw: Record<CaptureWorkStyleDimension, number> | null
+    categories: Array<{ id: string; label: string; narratives: string[] }> | null
   }
   nannyProfile: {
     id: string
@@ -306,19 +305,27 @@ export default function NannyDetailDrawer({
                 <div className="rounded-xl p-4 border" style={{ backgroundColor: "#F3EEF8", borderColor: "#E0D0F0" }}>
                   <p className="font-semibold text-[#5A3A7A] mb-2">🧠 Psikotes AI — Sikap Kerja</p>
                   {detail.psikotes.unlocked ? (
-                    // Sengaja TIDAK menampilkan kode dimensi/istilah psikologi mentah ke orang tua —
-                    // lihat aturan larangan di CLAUDE.md §5. Data lengkap (raw + 8 aspek) sudah
-                    // tersimpan di database, ringkasan bahasa awam menyusul begitu narasinya siap.
-                    <div className="rounded-lg p-3" style={{ backgroundColor: "#E5F6F4" }}>
-                      <p className="text-sm font-semibold text-[#2C5F5A] mb-1">✓ Hasil sudah terbuka</p>
-                      <p className="text-xs text-[#2C5F5A]">
-                        Ringkasan gaya kerja nanny ini sedang disiapkan dalam bahasa yang mudah dipahami. Akan muncul di sini begitu siap.
-                      </p>
+                    // Narasi bahasa awam per kategori — TIDAK menampilkan kode dimensi/istilah
+                    // Inggris/angka mentah ke orang tua (aturan larangan CLAUDE.md §5).
+                    <div className="space-y-2">
+                      {detail.psikotes.categories?.map(cat => (
+                        <details key={cat.id} className="group rounded-lg" style={{ backgroundColor: "#FFFFFF" }}>
+                          <summary className="cursor-pointer list-none px-3 py-2.5 flex items-center justify-between text-sm font-semibold text-[#5A3A7A]">
+                            {cat.label}
+                            <span className="text-[#A97CC4] text-xs group-open:rotate-180 transition-transform">▾</span>
+                          </summary>
+                          <div className="px-3 pb-3 space-y-2">
+                            {cat.narratives.map((text, i) => (
+                              <p key={i} className="text-sm text-[#666666] leading-relaxed">{text}</p>
+                            ))}
+                          </div>
+                        </details>
+                      ))}
                     </div>
                   ) : (
                     <>
                       <p className="text-sm text-[#666666] mb-3">
-                        Nanny ini sudah mengisi Tes Sikap Kerja. Buka hasilnya untuk lihat skor detail per dimensi kepribadian.
+                        Nanny ini sudah mengisi Tes Sikap Kerja. Buka hasilnya untuk lihat gambaran gaya kerja & kepribadiannya.
                       </p>
                       {psikotesError && <p className="text-sm text-[#C75D5D] mb-2">{psikotesError}</p>}
                       <button

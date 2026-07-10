@@ -61,8 +61,10 @@ export type CaptureWorkStyleResult = {
 // Kartika: tampilkan skor mentah 0–9 per dimensi langsung (bukan dikonversi ke
 // 0–100), dikelompokkan sesuai contoh laporan "Sikap Kerja.pdf" — bukan sistem
 // 8 aspek NannyCare Profile di atas (itu tetap dihitung & disimpan untuk Layer 3
-// nanti, hanya tidak ditampilkan sebagai hasil Layer 2 sekarang). Belum ada bank
-// narasi per skor — untuk sekarang tampilkan angkanya saja.
+// nanti). Label kategori di bawah PAKAI BAHASA INDONESIA POLOS (bukan bilingual
+// dengan istilah Inggris) — ini yang aman ditampilkan ke orang tua bersama narasi
+// dari capture-work-style-interpretation.ts. Sumber label & pengelompokan:
+// docs/opds/sumber-instrumen/06-attitude-test-interpretation.md (milik & lisensi HCC).
 
 export type CaptureWorkStyleCategory = {
   id: string
@@ -71,13 +73,13 @@ export type CaptureWorkStyleCategory = {
 }
 
 export const CAPTURE_WORK_STYLE_CATEGORIES: CaptureWorkStyleCategory[] = [
-  { id: "work_direction", label: "Energi dan Dinamika Kerja (Work Direction)", dimensions: ["N", "G", "A"] },
-  { id: "leadership", label: "Kepemimpinan (Leadership)", dimensions: ["L", "P", "I"] },
-  { id: "activity", label: "Kecepatan dan Ketahanan (Activity)", dimensions: ["T", "V"] },
-  { id: "followership", label: "Followership", dimensions: ["F", "W"] },
-  { id: "social_nature", label: "Social Nature", dimensions: ["X", "S", "B", "O"] },
-  { id: "work_style", label: "Work Style", dimensions: ["R", "D", "C"] },
-  { id: "temperament", label: "Temperament", dimensions: ["Z", "E", "K"] },
+  { id: "work_direction", label: "Energi dan Dinamika Kerja", dimensions: ["N", "G", "A"] },
+  { id: "leadership", label: "Kepemimpinan", dimensions: ["L", "P", "I"] },
+  { id: "activity", label: "Tempo Kerja", dimensions: ["T", "V"] },
+  { id: "followership", label: "Kebutuhan untuk Mengikuti Arahan", dimensions: ["F", "W"] },
+  { id: "social_nature", label: "Dorongan Sosial", dimensions: ["X", "S", "B", "O"] },
+  { id: "work_style", label: "Gaya Kerja", dimensions: ["R", "D", "C"] },
+  { id: "temperament", label: "Temperamen", dimensions: ["Z", "E", "K"] },
 ]
 
 export const DIMENSION_FULL_NAME: Record<CaptureWorkStyleDimension, string> = {

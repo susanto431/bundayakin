@@ -1,9 +1,10 @@
 # Product Requirements Document (PRD)
 ## BundaYakin — Human Care Consulting
 
-> Versi 1.1 · Diperbarui Juli 2026 (audit kode vs dokumen) · Dokumen Internal OPDS
+> Versi 1.2 · Diperbarui 10 Juli 2026 (audit kode vs dokumen) · Dokumen Internal OPDS
 > Scope: Fasa 1 — Platform Kecocokan & Pemantauan
 > Changelog v1.1: status Mayar diperbarui (production aktif), direktori nanny internal masuk scope shipped, auto-login pasca registrasi, profil anak dibuka untuk akun free
+> Changelog v1.2: **Layer 2 (Psikotes AI) selesai dikoding** — lihat §5 & §8; Layer 3 (psikolog) SOP-nya sudah final walau belum dikoding
 > **Juli 2026:** langganan kini dua pilar ([ADR-007](08_adr/ADR-007_langganan-dua-pilar.md)) — pilar kedua "Tumbuh Kembang" punya PRD sendiri: [13_prd_tumbuh_kembang.md](13_prd_tumbuh_kembang.md)
 
 ---
@@ -112,7 +113,7 @@ Akibatnya:
 - Direktori nanny internal (browse + filter dalam dashboard, skor kecocokan via cache `MatchResult`)
 - **Jaminan Kecocokan** (diputuskan Juli 2026, belum dibangun): jika nanny berhenti dalam **30 hari pertama** penugasan → **matching ulang gratis tanpa memakai Kuota Koneksi DAN penempatan ulang gratis penuh (tanpa placement fee kedua)**. Pagar pengaman: (1) berlaku 1× per penempatan; (2) hanya jika berhenti ≤30 hari; (3) alasan berhenti terekam via check-in minggu 1 & 2. Senjata melawan "garansi ganti orang" penyalur tradisional — garansi mereka menjamin ketersediaan, garansi kami menjamin kecocokan; risiko rendah karena kecocokan sudah diukur di awal.
 - Profil anak bisa diisi akun free (keputusan 22 Mei 2026 — yang premium adalah *berbagi ke nanny*, bukan datanya)
-- Matching Engine Layer 2 (psikotes AI) — schema ready, UI menyusul
+- Matching Engine Layer 2 (Psikotes AI — instrumen Capture Work Style) — **selesai dikoding 10 Juli 2026, menunggu deploy**: nanny isi tes gratis, orang tua bayar Rp300rb/nanny untuk buka hasil (interpretasi bahasa awam, bukan skor mentah — lihat [ADR-011](08_adr/ADR-011_capture-work-style-built-in.md))
 - Placement fee flow (jangka panjang + infal)
 - Profil anak multi-anak
 - Media portfolio nanny (foto + video)
@@ -127,7 +128,7 @@ Akibatnya:
 
 - Direktori nanny publik (Fasa 2)
 - Log aktivitas harian nanny (Fasa 2)
-- Review psikolog Layer 3 — backend ready, operasional menyusul
+- Review psikolog Layer 3 (Nanny Care Profile™) — keputusan produk & SOP sudah final (10 Juli 2026, lihat [18_spec_nanny_care_profile_layer3.md](18_spec_nanny_care_profile_layer3.md)), implementasi belum dikoding, bergantung Layer 2 yang sudah selesai
 - Track record dua arah yang lengkap (sebagian Fasa 1, penuh Fasa 2)
 - Babysitter on-demand / hourly (Fasa 3)
 - Mobile app native (web-only untuk Fasa 1)
@@ -204,7 +205,7 @@ Akibatnya:
 
 - Tim sangat kecil — tidak ada QA engineer, tidak ada dedicated DevOps
 - Mayar sudah diverifikasi dan production aktif (per akhir Mei 2026) — webhook lookup memakai `productId` Mayar
-- Layer 3 (psikolog) belum fully operasional — menunggu SOP psikolog HCC
+- Layer 3 (psikolog) belum dikoding — SOP sudah final (Tester/Admin pandu sesi grafis, Psikolog HCC tulis catatan di atas skor Layer 2), tinggal diimplementasikan
 
 ---
 

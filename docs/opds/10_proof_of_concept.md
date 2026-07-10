@@ -1,9 +1,10 @@
 # Proof of Concept (POC)
 ## BundaYakin — Platform Kecocokan & Pemantauan Nanny
 
-> Versi 1.0 · Juli 2026 · Dokumen Internal OPDS
+> Versi 1.1 · Diperbarui 10 Juli 2026 · Dokumen Internal OPDS
 > Disusun dari audit kode aktual (commit terakhir 22 Mei 2026) — bukan dari rencana.
 > Fungsi dokumen: bukti bahwa konsep inti **sudah terbukti berjalan end-to-end**, sebagai baseline pengembangan lanjutan.
+> **Catatan pembaruan:** §1/§6 sudah direvisi mengikuti kode Juli 2026 (Layer 2 Psikotes AI, pilar Tumbuh Kembang Tahap 1–2); §2–§5 tetap potret arsitektur per commit 22 Mei 2026 kecuali disebutkan lain.
 
 ---
 
@@ -18,7 +19,7 @@ POC ini menjawab empat pertanyaan konsep yang menjadi taruhan produk:
 | H3 | Nanny mau/bisa punya profil digital multimedia (foto, video, portfolio) | ✅ Terbukti secara teknis | Upload R2 + Cloudflare Stream jalan; adopsi user riil belum diukur |
 | H4 | Pemantauan pasca-penempatan bisa dijadwalkan & diringkas AI | ✅ Terbukti | Check-in W1/W2 + Evaluasi M1/M3/kuartalan + `aiSummary` |
 
-Yang **belum** dibuktikan (bukan kegagalan — belum dikerjakan): Layer 2 psikotes AI, Layer 3 review psikolog operasional, konversi berbayar di pasar riil. Lihat §6.
+Yang **belum** dibuktikan (bukan kegagalan — belum dikerjakan): Layer 3 review psikolog operasional, konversi berbayar di pasar riil. **Layer 2 psikotes AI selesai dikoding 10 Juli 2026** (lihat §6) — dipindah dari daftar ini. Lihat §6.
 
 ---
 
@@ -117,7 +118,7 @@ Produksi: Vercel (root `apps/web`) + Railway (root `apps/pdf-service`), domain b
 
 Hal yang **belum terbukti** dan menjadi pekerjaan fase berikutnya:
 
-1. **Layer 2 & 3 belum operasional** — schema dan tipe transaksi siap, UI psikotes dan SOP psikolog belum ada. Ini pembeda utama vs kompetitor, prioritas tinggi.
+1. **Layer 3 belum operasional** — Layer 2 (Psikotes AI, instrumen Capture Work Style) **selesai dikoding 10 Juli 2026** (nanny isi tes, orang tua bayar Rp300rb buka interpretasi bahasa awam per nanny — lihat [ADR-011](08_adr/ADR-011_capture-work-style-built-in.md)). Layer 3 (review psikolog, Nanny Care Profile™) SOP-nya sudah final tapi belum dikoding — lihat [18_spec_nanny_care_profile_layer3.md](18_spec_nanny_care_profile_layer3.md). Ini pembeda utama vs kompetitor, prioritas tinggi.
 2. **Monetisasi belum teruji pasar** — semua pipa pembayaran jalan, tetapi target 100 pelanggan berbayar (PRD §7) belum tervalidasi dengan user riil.
 3. **Loop reputasi belum tertutup** — Track Record & badge Terpercaya baru schema; tanpa UI input rekam jejak, janji "rekam jejak dua arah" belum terwujud.
 4. **Notifikasi belum simetris** — nanny punya halaman notifikasi, parent belum (baru placeholder di settings).
@@ -127,7 +128,14 @@ Hal yang **belum terbukti** dan menjadi pekerjaan fase berikutnya:
 
 Rekomendasi arah UI/UX untuk fase berikutnya: lihat [11_ui_ux_review.md](11_ui_ux_review.md).
 
-**Arah pengembangan terbaru (Juli 2026):** langganan kini dua pilar — pilar kedua "Tumbuh Kembang" (kurva WHO, skrining KPSP, Konsultasi Psikolog Anak Rp 1jt/sesi, Portal Psikolog, log harian nanny) sudah diputuskan di [ADR-007](08_adr/ADR-007_langganan-dua-pilar.md) dan dispesifikasikan di [PRD Tumbuh Kembang](13_prd_tumbuh_kembang.md). Positioning & USP resmi ada di [14_positioning.md](14_positioning.md), termasuk keputusan **Jaminan Kecocokan** (matching ulang gratis jika nanny berhenti ≤30 hari — lihat PRD §5). Belum ada satu pun yang dibangun — POC ini tetap potret sistem per commit terakhir 22 Mei 2026.
+**Arah pengembangan terbaru (Juli 2026):** langganan kini dua pilar — pilar kedua "Tumbuh Kembang" (kurva WHO, skrining KPSP, Konsultasi Psikolog Anak, Portal Psikolog, log harian nanny) sudah diputuskan di [ADR-007](08_adr/ADR-007_langganan-dua-pilar.md) dan dispesifikasikan di [PRD Tumbuh Kembang](13_prd_tumbuh_kembang.md). Positioning & USP resmi ada di [14_positioning.md](14_positioning.md), termasuk keputusan **Jaminan Kecocokan** (matching ulang gratis jika nanny berhenti ≤30 hari — lihat PRD §5).
+
+**Update status per 10 Juli 2026 (sudah dibangun, di luar snapshot 22 Mei di atas):**
+- Tumbuh Kembang Tahap 1 (Kurva Pertumbuhan, Jurnal Momen) & Tahap 2 (Skrining Perkembangan/KPSP, Konsultasi Psikolog Anak, Portal Psikolog) — selesai dikoding, menunggu deploy. Lihat [13_prd_tumbuh_kembang.md](13_prd_tumbuh_kembang.md) §7b, [ADR-010](08_adr/ADR-010_portal-psikolog-built-in.md).
+- Matching Engine Layer 2 (Psikotes AI) — selesai dikoding, menunggu deploy. Lihat [ADR-011](08_adr/ADR-011_capture-work-style-built-in.md).
+- Layer 3 (review psikolog, Nanny Care Profile™) — keputusan produk & SOP final, belum dikoding. Lihat [18_spec_nanny_care_profile_layer3.md](18_spec_nanny_care_profile_layer3.md).
+
+POC arsitektur (§2–§5) tetap potret sistem per commit terakhir 22 Mei 2026 — status fitur terkini selalu rujuk [Feature Registry](05_feature_registry.md).
 
 ---
 
