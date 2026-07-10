@@ -53,6 +53,7 @@
 | [ADR-008](ADR-008_pricing-config-panel.md) | Pricing Config Panel: harga & kuota effective-dated (tidak retroaktif) | Accepted | Juli 2026 |
 | [ADR-009](ADR-009_psikotes-service-terpisah.md) | Psikotes (Layer 2) sebagai service terpisah lintas produk HCC | Accepted (arah) | Juli 2026 |
 | [ADR-010](ADR-010_portal-psikolog-built-in.md) | Portal Psikolog & Konsultasi Psikolog Anak built-in di `apps/web` | Accepted | Juli 2026 |
+| [ADR-011](ADR-011_capture-work-style-built-in.md) | Capture Work Style (instrumen Layer 2) built-in di `apps/web`, deviasi terkontrol dari ADR-009 | Accepted | Juli 2026 |
 
 ---
 

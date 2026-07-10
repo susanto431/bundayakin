@@ -82,8 +82,8 @@ Kenalan     →    Isi Kuesioner →   Dipertemukan →   AI Menilai &   →   D
 | Monitoring & evaluasi berkala | Deteksi masalah sejak dini setelah nanny bekerja | Termasuk langganan | ✅ (PDF laporan evaluasi belum) |
 | Jaminan Kecocokan | Nanny berhenti ≤30 hari pertama → matching ulang **dan penempatan ulang gratis penuh** (1× per penempatan, tanpa placement fee kedua) | Termasuk | ⚠️ selesai dikoding Juli 2026, menunggu tayang |
 | Tulis rekam jejak nanny | Setelah penugasan berakhir, orang tua menilai nanny (bintang + cerita, anonim kecuali izin) — terverifikasi platform | Gratis | ⚠️ selesai dikoding Juli 2026, menunggu tayang |
-| **Psikotes AI (Layer 2)** | Nanny dites psikotes, hasil lebih dalam per aspek | +Rp 300rb | ❌ pondasi ada, layar & alurnya belum dibuat |
-| **Review Psikolog HCC (Layer 3)** | Psikolog mewawancara nanny, keluar dokumen NannyCare Profile™ | +Rp 1,2–1,5jt | ❌ menunggu SOP psikolog |
+| **Psikotes AI (Layer 2 — Capture Work Style)** | Nanny isi 90 soal singkat (instrumen milik HCC sendiri), orang tua buka hasil detail per aspek — dihitung otomatis | +Rp 300rb | ⚠️ selesai dikoding Juli 2026, menunggu tayang |
+| **Review Psikolog HCC (Layer 3 — Nanny Care Profile™)** | Tester HCC bantu sesi Zoom tes gambar nanny, psikolog baca hasilnya + tulis catatan di atas skor Layer 2, keluar laporan PDF untuk orang tua + 1 sesi konsultasi hasil | **Rp 1,2jt flat** (termasuk interview + 1 sesi konsultasi hasil) | ❌ keputusan produk sudah lengkap, belum dikoding — Layer 2 sudah selesai, tinggal Layer 3 |
 | Beli akses rekam jejak nanny | Melihat riwayat & ulasan dari keluarga sebelumnya | Rp 50rb | ❌ baru rangka |
 | Halaman notifikasi | Pengingat evaluasi jatuh tempo, hasil matching siap, dll | — | ❌ nanny sudah punya, orang tua belum |
 | Referral (ajak teman) | Bonus kalau mengajak orang tua/nanny baru | — | ✅ (pembayaran bonus masih manual oleh admin) |
@@ -136,8 +136,8 @@ Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan;
 | Langganan orang tua | Rp 500rb/tahun | ✅ jalan otomatis |
 | Biaya penyaluran (placement) | Rp 1,2jt | ✅ jalan otomatis |
 | Koneksi tambahan | Rp 100rb | ⚠️ checkout otomatis selesai dikoding Juli 2026, menunggu tayang |
-| Add-on Psikotes (Layer 2) | Rp 300rb | ❌ |
-| Add-on Psikolog (Layer 3) | Rp 1,2–1,5jt | ❌ |
+| Add-on Psikotes (Layer 2 — Capture Work Style) | Rp 300rb | ⚠️ checkout otomatis selesai dikoding Juli 2026, menunggu tayang |
+| Add-on Psikolog (Layer 3 — Nanny Care Profile™) | Rp 1,2jt flat (interview + 1 sesi konsultasi hasil) | ❌ keputusan produk selesai, belum dikoding — menunggu Layer 2 |
 | Akses rekam jejak | Rp 50rb | ❌ |
 | Konsultasi Psikolog Anak | Rp 1jt/sesi saat ini (peluncuran, harga pelanggan Rp 750rb); Junior/Senior belum dijual | ⚠️ checkout otomatis selesai dikoding Juli 2026, menunggu tayang |
 
@@ -161,11 +161,11 @@ Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan;
 
 ⚠️ Selesai dikoding Juli 2026, menunggu tayang. Akun Anda sudah dijadikan ADMIN.
 
-Buka **Menu Admin → Konfigurasi Harga & Kuota** untuk mengubah sendiri: harga langganan tahunan, biaya penempatan nanny, biaya connection add-on, kuota referral, kuota talent pool, dan **4 harga Konsultasi Psikolog Anak** (Junior/Mid/Senior/Pelanggan — Junior & Senior sudah tersedia di panel walau belum dibuka untuk dibeli user) — **tanpa perlu minta developer ubah kode**.
+Buka **Menu Admin → Konfigurasi Harga & Kuota** untuk mengubah sendiri: harga langganan tahunan, biaya penempatan nanny, biaya connection add-on, kuota referral, kuota talent pool, **4 harga Konsultasi Psikolog Anak** (Junior/Mid/Senior/Pelanggan — Junior & Senior sudah tersedia di panel walau belum dibuka untuk dibeli user), dan **harga Psikotes AI (Layer 2)** — **tanpa perlu minta developer ubah kode**.
 
 Prinsip yang dipakai (seperti kenaikan harga Google Workspace): setiap perubahan harus punya **tanggal mulai berlaku** dan **alasan** (wajib diisi). Perubahan **tidak pernah berlaku surut** — pelanggan yang sedang aktif tidak terpengaruh sampai masa langganannya habis dan mereka bayar lagi setelah tanggal itu. Jadwal yang belum berlaku bisa dibatalkan; yang sudah berlaku menjadi riwayat permanen (tidak bisa dihapus/diubah) — itulah log-nya.
 
-Catatan: harga Psikotes/Psikolog (Layer 2/3)/Track Record belum masuk panel ini karena checkout-nya sendiri belum dibangun.
+Catatan: harga Psikolog (Layer 3)/Track Record belum masuk panel ini karena checkout-nya sendiri belum dibangun.
 
 ---
 

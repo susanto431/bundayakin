@@ -70,6 +70,8 @@ export async function POST(request: Request) {
         await handleConnectionAddonSuccess(transaction, paidAt, paymentMethod ?? null, effectiveStatus)
       } else if (transaction.type === "CONSULTATION_PSIKOLOG_ANAK") {
         await handleConsultationSuccess(transaction, paidAt, paymentMethod ?? null, effectiveStatus)
+      } else if (transaction.type === "ADDON_PSIKOTES") {
+        await handlePsikotesAddonSuccess(transaction, paidAt, paymentMethod ?? null, effectiveStatus)
       } else {
         // Tipe lain — cukup update status
         await prisma.transaction.update({
@@ -325,4 +327,56 @@ async function handleConsultationSuccess(
   revalidateTag(`parent-${booking.parentProfile.userId}`)
 
   console.info("[WEBHOOK_CONSULTATION] Booking dikonfirmasi:", booking.id)
+}
+
+// ── ADDON_PSIKOTES (Layer 2) success handler ──────────────────────────────────
+
+type PsikotesAddonMeta = { nannyProfileId?: string }
+
+async function handlePsikotesAddonSuccess(
+  transaction: { id: string; parentProfileId: string | null; metadata: unknown },
+  paidAt: Date,
+  paymentMethod: string | null,
+  effectiveStatus: string
+) {
+  const meta = (transaction.metadata ?? {}) as PsikotesAddonMeta
+  const { nannyProfileId } = meta
+
+  if (!transaction.parentProfileId || !nannyProfileId) {
+    console.error("[WEBHOOK_PSIKOTES_ADDON] metadata tidak lengkap, transactionId:", transaction.id)
+    return
+  }
+
+  const parentProfile = await prisma.parentProfile.findUnique({
+    where: { id: transaction.parentProfileId },
+    select: { userId: true },
+  })
+  if (!parentProfile) {
+    console.error("[WEBHOOK_PSIKOTES_ADDON] parentProfile tidak ditemukan:", transaction.parentProfileId)
+    return
+  }
+
+  await prisma.$transaction([
+    prisma.transaction.update({
+      where: { id: transaction.id },
+      data: { status: "SUCCESS", mayarStatus: effectiveStatus, paymentMethod, paidAt },
+    }),
+    prisma.matchResult.update({
+      where: { parentProfileId_nannyProfileId: { parentProfileId: transaction.parentProfileId, nannyProfileId } },
+      data: { psikotesUnlocked: true, psikotesUnlockedAt: paidAt },
+    }),
+  ])
+
+  await prisma.notification.create({
+    data: {
+      userId: parentProfile.userId,
+      type: "PAYMENT",
+      title: "Hasil Psikotes AI terbuka",
+      body: "Pembayaran berhasil — hasil detail Tes Sikap Kerja nanny ini sudah bisa dilihat.",
+    },
+  })
+
+  revalidateTag(`parent-${parentProfile.userId}`)
+
+  console.info("[WEBHOOK_PSIKOTES_ADDON] Terbuka:", transaction.parentProfileId, "→", nannyProfileId)
 }

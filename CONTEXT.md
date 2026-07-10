@@ -46,7 +46,15 @@ _Avoid_: red flag, penolakan, "Tidak Cocok"
 _Catatan_: pihak yang belum mengisi Tes Kecocokan sama sekali BUKAN Dealbreaker — itu profil belum lengkap, lihat [[Talent Pool]].
 
 **Layer (1/2/3)**:
-Tingkat kedalaman assessment: Layer 1 survey kecocokan (gratis dalam langganan), Layer 2 + psikotes AI (add-on), Layer 3 + review Psikolog HCC (add-on premium).
+Tingkat kedalaman assessment: Layer 1 survey kecocokan (gratis dalam langganan), Layer 2 + psikotes AI (add-on), Layer 3 + review Psikolog HCC (add-on premium). Layer 3 dibangun DI ATAS hasil Layer 2 (skor Capture Work Style), bukan proses terpisah — psikolog menambahkan bacaan tes grafis + catatan klinis di atas skor otomatis Layer 2.
+
+**Capture Work Style**:
+Instrumen kepribadian milik HCC sendiri (revisi dari PAPI Kostick, item & kunci jawaban buatan HCC) — dasar skoring otomatis Layer 2 (Psikotes AI). Skoring deterministik (rumus tetap), dibangun built-in di `apps/web` sebagai deviasi terkontrol dari ADR-009 (lihat [ADR-011](docs/opds/08_adr/ADR-011_capture-work-style-built-in.md)).
+_Avoid_: PAPI Kostick (nama instrumen asli — bukan nama produk HCC yang dipakai user-facing)
+
+**Tester HCC**:
+Admin HCC yang memandu sesi Zoom pengambilan tes grafis (DAP+BAUM) dengan nanny untuk Layer 3, lalu meng-upload hasil gambarnya ke sistem. Bukan peran/akun baru — memakai akun ADMIN yang sudah ada.
+_Avoid_: psikolog (Tester bukan yang menginterpretasi hasil — itu tugas Psikolog HCC)
 
 **Periode Eksklusif**:
 Masa 7 hari (bisa diperpanjang 1× +3 hari) saat nanny terikat pada satu orang tua selama Sesi Matching. Lewat tanpa keputusan → nanny kembali ke Talent Pool.

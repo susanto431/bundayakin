@@ -1,0 +1,113 @@
+// Instrumen Capture Work Style (Layer 2 — Psikotes AI)
+// Sumber & rekonsiliasi: docs/opds/19_instrumen_capture_work_style.md
+// JANGAN ubah data ini tanpa instruksi eksplisit Kartika — instrumen resmi HCC.
+
+export const CAPTURE_WORK_STYLE_DIMENSIONS = [
+  "N", "G", "L", "P", "I", "T", "V", "F", "W", "X",
+  "S", "B", "O", "Z", "E", "K", "R", "D", "C", "A",
+] as const
+
+export type CaptureWorkStyleDimension = (typeof CAPTURE_WORK_STYLE_DIMENSIONS)[number]
+
+export type CaptureWorkStyleBlock = {
+  no: number
+  statementA: string
+  dimensionA: CaptureWorkStyleDimension
+  statementB: string
+  dimensionB: CaptureWorkStyleDimension
+}
+
+// 90 blok soal forced-choice — nanny pilih pernyataan yang lebih menggambarkan dirinya.
+export const CAPTURE_WORK_STYLE_ITEMS: CaptureWorkStyleBlock[] = [
+  { no: 1, statementA: "Saya seorang pekerja keras.", dimensionA: "G", statementB: "Saya bukan seorang pemurung.", dimensionB: "E" },
+  { no: 2, statementA: "Saya suka bekerja lebih baik dari orang lain.", dimensionA: "A", statementB: "Saya suka menekuni pekerjaan yang saya lakukan sampai selesai.", dimensionB: "N" },
+  { no: 3, statementA: "Saya suka memberi petunjuk kepada orang bagaimana melakukan sesuatu.", dimensionA: "P", statementB: "Saya ingin bekerja sebaik mungkin.", dimensionB: "A" },
+  { no: 4, statementA: "Saya senang memberitahu orang apa yang harus dikerjakannya.", dimensionA: "P", statementB: "Saya suka melakukan hal-hal yang lucu.", dimensionB: "X" },
+  { no: 5, statementA: "Saya suka bergabung dalam kelompok.", dimensionA: "B", statementB: "Saya senang diperhatikan oleh kelompok.", dimensionB: "X" },
+  { no: 6, statementA: "Saya suka berteman dengan suatu kelompok.", dimensionA: "B", statementB: "Saya senang bersahabat akrab dengan seseorang.", dimensionB: "O" },
+  { no: 7, statementA: "Saya cepat berubah jika hal itu diperlukan.", dimensionA: "Z", statementB: "Saya berusaha membina hubungan yang akrab dengan teman saya.", dimensionB: "O" },
+  { no: 8, statementA: "Saya ingin mencoba sesuatu yang baru dan bervariasi.", dimensionA: "Z", statementB: "Saya ingin membalas bila disakiti.", dimensionB: "K" },
+  { no: 9, statementA: "Saya ingin atasan saya menyukai saya.", dimensionA: "F", statementB: "Saya suka memberitahu orang lain jika mereka salah.", dimensionB: "K" },
+  { no: 10, statementA: "Saya suka menyenangkan hati orang yang memimpin saya.", dimensionA: "F", statementB: "Saya suka mengikuti petunjuk kerja yang diberikan pada saya.", dimensionB: "W" },
+  { no: 11, statementA: "Saya mencoba sekuat tenaga.", dimensionA: "G", statementB: "Saya menempatkan semua barang pada tempatnya.", dimensionB: "C" },
+  { no: 12, statementA: "Saya dapat membuat orang mau bekerja keras.", dimensionA: "L", statementB: "Saya tidak mudah marah.", dimensionB: "E" },
+  { no: 13, statementA: "Saya suka memberitahu kelompok apa yang harus dikerjakan.", dimensionA: "P", statementB: "Saya selalu menekuni suatu pekerjaan sampai selesai.", dimensionB: "N" },
+  { no: 14, statementA: "Saya ingin tampil menarik dan menakjubkan.", dimensionA: "X", statementB: "Saya ingin menjadi sangat sukses.", dimensionB: "A" },
+  { no: 15, statementA: "Saya ingin diterima dalam kelompok.", dimensionA: "B", statementB: "Saya suka membantu orang lain dalam mengambil sikap.", dimensionB: "P" },
+  { no: 16, statementA: "Saya cemas jika seseorang tidak menyukai saya.", dimensionA: "O", statementB: "Saya suka orang memperhatikan saya.", dimensionB: "X" },
+  { no: 17, statementA: "Saya suka mencoba sesuatu yang baru.", dimensionA: "Z", statementB: "Saya lebih suka bekerja bersama orang lain daripada sendiri.", dimensionB: "B" },
+  { no: 18, statementA: "Saya menyalahkan orang lain atas kesalahan yang mereka lakukan.", dimensionA: "K", statementB: "Saya merasa terganggu jika ada orang yang tidak menyukai saya.", dimensionB: "O" },
+  { no: 19, statementA: "Saya suka mendukung pendapat atasan saya.", dimensionA: "F", statementB: "Saya suka mencoba tugas-tugas yang baru dan berbeda.", dimensionB: "Z" },
+  { no: 20, statementA: "Saya suka petunjuk terperinci untuk menyelesaikan permasalahan.", dimensionA: "W", statementB: "Saya suka mengatakan langsung kepada orang lain bila mereka membuat saya kesal.", dimensionB: "K" },
+  { no: 21, statementA: "Saya selalu berusaha keras.", dimensionA: "G", statementB: "Saya senang bekerja dengan cermat dan hati-hati.", dimensionB: "D" },
+  { no: 22, statementA: "Saya adalah pemimpin yang baik.", dimensionA: "L", statementB: "Saya mengorganisir tugas-tugas dengan baik.", dimensionB: "C" },
+  { no: 23, statementA: "Saya mudah mengambil keputusan.", dimensionA: "I", statementB: "Saya pandai mengendalikan diri.", dimensionB: "E" },
+  { no: 24, statementA: "Saya suka menceritakan keberhasilan saya dalam mengerjakan tugas.", dimensionA: "X", statementB: "Saya tidak suka mengerjakan beberapa pekerjaan sekaligus.", dimensionB: "N" },
+  { no: 25, statementA: "Saya ingin menyelaraskan diri dengan kelompok.", dimensionA: "B", statementB: "Saya ingin melakukan sesuatu lebih baik dari orang lain.", dimensionB: "A" },
+  { no: 26, statementA: "Saya suka membina hubungan yang akrab dengan teman-teman saya.", dimensionA: "O", statementB: "Saya suka menasehati orang lain.", dimensionB: "P" },
+  { no: 27, statementA: "Saya suka melakukan hal yang baru dan berbeda.", dimensionA: "Z", statementB: "Saya suka menceritakan bagaimana saya berhasil melakukan sesuatu.", dimensionB: "X" },
+  { no: 28, statementA: "Jika saya benar, saya akan mempertahankannya.", dimensionA: "K", statementB: "Saya ingin diterima dan diakui dalam suatu kelompok.", dimensionB: "B" },
+  { no: 29, statementA: "Saya suka menyenangkan hati orang yang menjadi atasan saya.", dimensionA: "F", statementB: "Saya cemas kalau orang lain tidak menyukai saya.", dimensionB: "O" },
+  { no: 30, statementA: "Saya senang diberitahu bagaimana melakukan suatu pekerjaan.", dimensionA: "W", statementB: "Saya mudah merasa bosan.", dimensionB: "Z" },
+  { no: 31, statementA: "Saya bekerja keras.", dimensionA: "G", statementB: "Saya banyak berpikir dan berencana.", dimensionB: "R" },
+  { no: 32, statementA: "Saya memimpin kelompok.", dimensionA: "L", statementB: "Hal-hal kecil (detail) menarik bagi saya.", dimensionB: "D" },
+  { no: 33, statementA: "Saya cepat mengambil keputusan.", dimensionA: "I", statementB: "Saya seorang yang teratur dalam bekerja.", dimensionB: "C" },
+  { no: 34, statementA: "Biasanya saya bekerja dengan tergesa-gesa.", dimensionA: "T", statementB: "Saya jarang marah atau bersedih.", dimensionB: "E" },
+  { no: 35, statementA: "Saya ingin menjadi bagian dari kelompok.", dimensionA: "B", statementB: "Saya ingin menyelesaikan pekerjaan satu per satu.", dimensionB: "N" },
+  { no: 36, statementA: "Saya berusaha berteman secara akrab.", dimensionA: "O", statementB: "Saya berusaha keras untuk menjadi yang terbaik.", dimensionB: "A" },
+  { no: 37, statementA: "Saya menyukai kegiatan yang bervariasi dan berbeda.", dimensionA: "Z", statementB: "Saya ingin menjadi penanggung jawab bagi orang-orang lain.", dimensionB: "P" },
+  { no: 38, statementA: "Saya menyukai perdebatan mengenai suatu topik.", dimensionA: "K", statementB: "Saya suka mendapatkan perhatian.", dimensionB: "X" },
+  { no: 39, statementA: "Saya suka mendukung orang yang menjadi atasan saya.", dimensionA: "F", statementB: "Saya tertarik menjadi bagian dari kelompok.", dimensionB: "B" },
+  { no: 40, statementA: "Saya senang mengikuti peraturan secara tertib.", dimensionA: "W", statementB: "Saya suka orang mengenal saya dengan baik.", dimensionB: "O" },
+  { no: 41, statementA: "Saya berusaha keras sekali.", dimensionA: "G", statementB: "Saya sangat hangat kepada orang lain.", dimensionB: "S" },
+  { no: 42, statementA: "Orang lain beranggapan bahwa saya adalah seorang pemimpin yang baik.", dimensionA: "L", statementB: "Saya berpikir panjang dan hati-hati.", dimensionB: "R" },
+  { no: 43, statementA: "Saya sering mengambil risiko atau coba-coba.", dimensionA: "I", statementB: "Saya senang mengurus hal-hal kecil atau detail.", dimensionB: "D" },
+  { no: 44, statementA: "Orang lain berpendapat bahwa saya bekerja dengan cepat.", dimensionA: "T", statementB: "Orang lain menganggap saya dapat mengelola segala sesuatunya dengan rapi dan teratur.", dimensionB: "C" },
+  { no: 45, statementA: "Saya senang berolahraga rutin.", dimensionA: "V", statementB: "Saya mempunyai pribadi yang menyenangkan.", dimensionB: "E" },
+  { no: 46, statementA: "Saya senang bila orang-orang dapat intim dan bersahabat.", dimensionA: "O", statementB: "Saya selalu berusaha menyelesaikan apa yang sudah saya mulai.", dimensionB: "N" },
+  { no: 47, statementA: "Saya senang bereksperimen dan mencoba hal-hal baru.", dimensionA: "Z", statementB: "Saya suka mengerjakan tugas-tugas yang sulit dengan baik.", dimensionB: "A" },
+  { no: 48, statementA: "Saya ingin diperlakukan secara adil.", dimensionA: "K", statementB: "Saya suka mengajari orang lain bagaimana cara melakukan sesuatu.", dimensionB: "P" },
+  { no: 49, statementA: "Saya suka melakukan apa yang diharapkan atasan dari saya.", dimensionA: "F", statementB: "Saya suka menarik perhatian.", dimensionB: "X" },
+  { no: 50, statementA: "Saya suka petunjuk terperinci untuk melaksanakan suatu tugas.", dimensionA: "W", statementB: "Saya senang berada bersama dengan orang-orang lain.", dimensionB: "B" },
+  { no: 51, statementA: "Saya selalu berusaha menyelesaikan tugas secara sempurna.", dimensionA: "G", statementB: "Orang lain menganggap saya tidak mengenal lelah dalam bekerja.", dimensionB: "V" },
+  { no: 52, statementA: "Saya tergolong tipe seorang pemimpin.", dimensionA: "L", statementB: "Saya mudah mendapat kawan baru.", dimensionB: "S" },
+  { no: 53, statementA: "Saya mengambil peluang yang muncul dengan cepat.", dimensionA: "I", statementB: "Saya banyak mempertimbangkan konsep dan ide-ide.", dimensionB: "R" },
+  { no: 54, statementA: "Saya bekerja dengan cepat.", dimensionA: "T", statementB: "Saya senang mengerjakan hal-hal yang detail.", dimensionB: "D" },
+  { no: 55, statementA: "Saya memiliki banyak energi untuk beraktivitas dan berolahraga.", dimensionA: "V", statementB: "Saya suka menata segala sesuatunya dengan rapi dan teratur.", dimensionB: "C" },
+  { no: 56, statementA: "Saya dapat bergaul baik dengan semua orang.", dimensionA: "S", statementB: "Saya adalah seorang yang mempunyai pembawaan tenang.", dimensionB: "E" },
+  { no: 57, statementA: "Saya ingin mengerjakan hal-hal baru.", dimensionA: "Z", statementB: "Saya selalu ingin menyelesaikan pekerjaan yang telah saya mulai.", dimensionB: "N" },
+  { no: 58, statementA: "Saya biasanya mempertahankan pendapat yang saya yakini.", dimensionA: "K", statementB: "Saya ingin menjadi orang yang berhasil.", dimensionB: "A" },
+  { no: 59, statementA: "Saya menyukai saran-saran dari orang yang saya kagumi.", dimensionA: "F", statementB: "Saya senang diserahi tanggung jawab atas sekelompok orang.", dimensionB: "P" },
+  { no: 60, statementA: "Saya suka diberitahu tentang apa yang perlu dilakukan.", dimensionA: "W", statementB: "Saya suka menerima banyak perhatian.", dimensionB: "X" },
+  { no: 61, statementA: "Saya berusaha bekerja keras.", dimensionA: "G", statementB: "Saya mengerjakan sesuatu dengan cepat.", dimensionB: "T" },
+  { no: 62, statementA: "Bila saya berbicara, kelompok akan mendengarkan.", dimensionA: "L", statementB: "Saya terampil menggunakan berbagai peralatan kerja.", dimensionB: "V" },
+  { no: 63, statementA: "Bagi saya, mengambil keputusan adalah hal yang mudah.", dimensionA: "I", statementB: "Saya sangat menyenangkan dalam bergaul dengan banyak orang.", dimensionB: "S" },
+  { no: 64, statementA: "Biasanya saya melakukan berbagai aktivitas dengan cepat.", dimensionA: "T", statementB: "Saya senang bekerja berdasarkan teori atau konsep tertentu.", dimensionB: "R" },
+  { no: 65, statementA: "Saya menyukai pekerjaan dimana saya banyak bergerak.", dimensionA: "V", statementB: "Saya menyukai pekerjaan yang harus dilakukan secara teliti.", dimensionB: "D" },
+  { no: 66, statementA: "Saya mencari teman sebanyak mungkin.", dimensionA: "S", statementB: "Apa yang sudah saya simpan akan mudah saya temukan kembali.", dimensionB: "C" },
+  { no: 67, statementA: "Perencanaan saya jauh ke masa depan.", dimensionA: "R", statementB: "Saya dapat tampil tenang dalam berbagai situasi.", dimensionB: "E" },
+  { no: 68, statementA: "Saya biasanya bersikeras mengenai apa yang saya yakini.", dimensionA: "K", statementB: "Saya terus menekuni suatu masalah sampai terselesaikan.", dimensionB: "N" },
+  { no: 69, statementA: "Saya suka menyenangkan hati orang-orang yang saya kagumi.", dimensionA: "F", statementB: "Saya ingin sukses.", dimensionB: "A" },
+  { no: 70, statementA: "Saya menyukai prosedur dan aturan kerja yang jelas.", dimensionA: "W", statementB: "Saya suka membantu kelompok dalam mengambil sikap.", dimensionB: "P" },
+  { no: 71, statementA: "Saya selalu berusaha bekerja keras.", dimensionA: "G", statementB: "Saya mengambil keputusan secara mudah.", dimensionB: "I" },
+  { no: 72, statementA: "Kelompok biasanya melakukan apa yang saya inginkan.", dimensionA: "L", statementB: "Saya biasa terburu-buru.", dimensionB: "T" },
+  { no: 73, statementA: "Saya tidak banyak pertimbangan dalam membuat keputusan.", dimensionA: "I", statementB: "Saya tidak mengenal lelah dalam bekerja.", dimensionB: "V" },
+  { no: 74, statementA: "Saya bekerja secara cepat.", dimensionA: "T", statementB: "Saya mudah berteman.", dimensionB: "S" },
+  { no: 75, statementA: "Biasanya saya bersemangat dan penuh energi.", dimensionA: "V", statementB: "Sebagian besar waktu saya gunakan untuk berpikir.", dimensionB: "R" },
+  { no: 76, statementA: "Saya sangat ramah kepada orang-orang.", dimensionA: "S", statementB: "Saya menyukai pekerjaan yang menuntut ketepatan.", dimensionB: "D" },
+  { no: 77, statementA: "Saya banyak berpikir dan merencanakan.", dimensionA: "R", statementB: "Saya menyimpan segala sesuatu pada tempatnya.", dimensionB: "C" },
+  { no: 78, statementA: "Saya suka pekerjaan yang harus memperhatikan hal-hal kecil (detail).", dimensionA: "D", statementB: "Saya tidak cepat marah.", dimensionB: "E" },
+  { no: 79, statementA: "Saya senang mengikuti orang-orang yang saya kagumi.", dimensionA: "F", statementB: "Saya selalu menyelesaikan pekerjaan yang telah saya mulai.", dimensionB: "N" },
+  { no: 80, statementA: "Saya menyukai petunjuk kerja yang jelas.", dimensionA: "W", statementB: "Saya suka menjadi orang yang sukses.", dimensionB: "A" },
+  { no: 81, statementA: "Saya mengejar apa yang saya inginkan.", dimensionA: "G", statementB: "Saya adalah pemimpin yang baik.", dimensionB: "L" },
+  { no: 82, statementA: "Saya membuat orang lain bekerja keras.", dimensionA: "L", statementB: "Saya adalah seorang yang tidak banyak pertimbangan dalam mengambil keputusan.", dimensionB: "I" },
+  { no: 83, statementA: "Saya bicara dengan cepat.", dimensionA: "T", statementB: "Saya membuat keputusan dengan cepat.", dimensionB: "I" },
+  { no: 84, statementA: "Saya biasanya tergesa-gesa dalam bekerja.", dimensionA: "T", statementB: "Saya berolahraga secara teratur.", dimensionB: "V" },
+  { no: 85, statementA: "Saya berteman dengan sebanyak mungkin orang.", dimensionA: "S", statementB: "Orang mengatakan bahwa saya tidak mengenal lelah.", dimensionB: "V" },
+  { no: 86, statementA: "Saya mempunyai banyak sekali teman.", dimensionA: "S", statementB: "Saya banyak menghabiskan waktu untuk berpikir.", dimensionB: "R" },
+  { no: 87, statementA: "Saya suka bekerja dengan hal-hal yang terperinci.", dimensionA: "D", statementB: "Saya bekerja dengan teori.", dimensionB: "R" },
+  { no: 88, statementA: "Saya menikmati pekerjaan yang melibatkan hal detail.", dimensionA: "D", statementB: "Saya suka mengorganisir pekerjaan saya.", dimensionB: "C" },
+  { no: 89, statementA: "Orang lain tidak mudah mengetahui apa yang saya rasakan.", dimensionA: "E", statementB: "Saya meletakkan segala sesuatu pada tempatnya.", dimensionB: "C" },
+  { no: 90, statementA: "Saya senang diberi petunjuk mengenai apa yang harus saya lakukan.", dimensionA: "W", statementB: "Saya harus menyelesaikan apa yang sudah saya mulai.", dimensionB: "N" },
+]
+

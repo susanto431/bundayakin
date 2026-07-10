@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import PaymentModal from "./PaymentModal"
 import UnlockContactButton from "./UnlockContactButton"
+import type { CaptureWorkStyleDimension } from "@/lib/capture-work-style-instrument"
 
 type MatchDetail = {
   id: string
@@ -21,6 +22,12 @@ type MatchDetail = {
   adaDealbreaker: boolean
   dealbreakerFlags: Array<{ questionId: string; issue: string }> | null
   kontakTerbuka: boolean
+  psikotes: {
+    available: boolean
+    unlocked: boolean
+    priceIDR: number | null
+    dimensionRaw: Record<CaptureWorkStyleDimension, number> | null
+  }
   nannyProfile: {
     id: string
     fullName: string
@@ -91,6 +98,8 @@ export default function NannyDetailDrawer({
   const [error, setError] = useState("")
   const [showPayment, setShowPayment] = useState(false)
   const [calculating, setCalculating] = useState(false)
+  const [unlockingPsikotes, setUnlockingPsikotes] = useState(false)
+  const [psikotesError, setPsikotesError] = useState("")
 
   const fetchDetail = useCallback(async () => {
     setLoading(true)
@@ -164,6 +173,24 @@ export default function NannyDetailDrawer({
   function handleContactUnlocked() {
     onContactUnlocked?.()
     fetchDetail()
+  }
+
+  async function handleUnlockPsikotes() {
+    setUnlockingPsikotes(true)
+    setPsikotesError("")
+    try {
+      const res = await fetch("/api/payment/psikotes-addon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nannyProfileId }),
+      })
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error)
+      window.location.href = json.data.paymentUrl
+    } catch (e) {
+      setPsikotesError(e instanceof Error ? e.message : "Gagal membuat pembayaran")
+      setUnlockingPsikotes(false)
+    }
   }
 
   const nanny = detail?.nannyProfile
@@ -271,6 +298,41 @@ export default function NannyDetailDrawer({
                   <DomainBar label="A — Kondisi Kerja" skor={detail.skorDomainA} />
                   <DomainBar label="B — Nilai & Gaya Hidup" skor={detail.skorDomainB} />
                   <DomainBar label="C — Pengalaman & Kemampuan" skor={detail.skorDomainC} />
+                </div>
+              )}
+
+              {/* Psikotes AI (Layer 2 — Capture Work Style) */}
+              {detail.psikotes.available && (
+                <div className="rounded-xl p-4 border" style={{ backgroundColor: "#F3EEF8", borderColor: "#E0D0F0" }}>
+                  <p className="font-semibold text-[#5A3A7A] mb-2">🧠 Psikotes AI — Sikap Kerja</p>
+                  {detail.psikotes.unlocked ? (
+                    // Sengaja TIDAK menampilkan kode dimensi/istilah psikologi mentah ke orang tua —
+                    // lihat aturan larangan di CLAUDE.md §5. Data lengkap (raw + 8 aspek) sudah
+                    // tersimpan di database, ringkasan bahasa awam menyusul begitu narasinya siap.
+                    <div className="rounded-lg p-3" style={{ backgroundColor: "#E5F6F4" }}>
+                      <p className="text-sm font-semibold text-[#2C5F5A] mb-1">✓ Hasil sudah terbuka</p>
+                      <p className="text-xs text-[#2C5F5A]">
+                        Ringkasan gaya kerja nanny ini sedang disiapkan dalam bahasa yang mudah dipahami. Akan muncul di sini begitu siap.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm text-[#666666] mb-3">
+                        Nanny ini sudah mengisi Tes Sikap Kerja. Buka hasilnya untuk lihat skor detail per dimensi kepribadian.
+                      </p>
+                      {psikotesError && <p className="text-sm text-[#C75D5D] mb-2">{psikotesError}</p>}
+                      <button
+                        onClick={handleUnlockPsikotes}
+                        disabled={unlockingPsikotes}
+                        className="w-full py-2.5 rounded-lg font-semibold text-white text-sm disabled:opacity-50 transition-opacity hover:opacity-90"
+                        style={{ backgroundColor: "#A97CC4" }}
+                      >
+                        {unlockingPsikotes
+                          ? "Memproses..."
+                          : `Buka Hasil — Rp ${(detail.psikotes.priceIDR ?? 0).toLocaleString("id-ID")}`}
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
 

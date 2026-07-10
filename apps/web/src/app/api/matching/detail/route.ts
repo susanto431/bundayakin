@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { getPsikotesInfo } from "@/lib/psikotes"
 
 export async function GET(req: NextRequest) {
   try {
@@ -53,7 +54,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Hasil matching tidak ditemukan" }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true, data: matchResult })
+    const psikotes = await getPsikotesInfo(nannyProfileId, matchResult.psikotesUnlocked)
+
+    return NextResponse.json({ success: true, data: { ...matchResult, psikotes } })
   } catch (error) {
     console.error("[MATCHING_DETAIL]", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })

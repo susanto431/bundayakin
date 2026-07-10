@@ -1,5 +1,6 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { getNannyDashboard } from "@/lib/queries/nanny"
+import { prisma } from "@/lib/prisma"
 import { AGE_GROUP_LABEL } from "@/constants/children"
 import { d } from "@/lib/date"
 import Link from "next/link"
@@ -34,6 +35,17 @@ export default async function NannyDashboardPage() {
 
   const assignment = profile?.nannyAssignments?.[0] ?? null
   const isWorking = !!assignment
+
+  const captureWorkStyleDone = session?.user?.id
+    ? await prisma.assessmentResult.findFirst({
+        where: {
+          nannyProfile: { userId: session.user.id },
+          layer: "LAYER_2",
+          testType: "Capture Work Style",
+        },
+        select: { id: true },
+      })
+    : null
 
   // Score: ambil dari match yang terkait assignment aktif. Jika belum ada assignment,
   // ambil dari match paling baru yang sudah punya skor.
@@ -289,6 +301,28 @@ export default async function NannyDashboardPage() {
               className="inline-flex items-center bg-[#A97CC4] hover:bg-[#5A3A7A] text-white font-semibold text-[14px] px-4 py-2.5 rounded-[10px] min-h-[48px] transition-all"
             >
               Isi Tes Kecocokan →
+            </Link>
+          </div>
+        </>
+      )}
+
+      {/* Tes Sikap Kerja nudge (Layer 2 — Capture Work Style) */}
+      {profile?.surveyCompletedAt && !captureWorkStyleDone && (
+        <>
+          <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
+            Tes Sikap Kerja — belum diisi
+          </p>
+          <div className="bg-[#F3EEF8] border-[1.5px] border-[#E0D0F0] rounded-[14px] p-3.5 mb-3">
+            <p className="text-[14px] font-bold text-[#5A3A7A] mb-1.5">Tunjukkan gaya kerja {honorific} lebih dalam</p>
+            <ul className="text-[13px] text-[#666666] pl-4 leading-[1.8] list-disc mb-2.5">
+              <li>90 pertanyaan singkat, tidak dibatasi waktu</li>
+              <li>Hasilnya bisa dilihat keluarga yang tertarik pada {honorific}</li>
+            </ul>
+            <Link
+              href="/dashboard/nanny/tes-sikap-kerja"
+              className="inline-flex items-center bg-[#A97CC4] hover:bg-[#5A3A7A] text-white font-semibold text-[14px] px-4 py-2.5 rounded-[10px] min-h-[48px] transition-all"
+            >
+              Isi Tes Sikap Kerja →
             </Link>
           </div>
         </>

@@ -11,6 +11,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Anthropic from "@anthropic-ai/sdk"
 import { buildMatchingPrompt, type MatchingPromptResult } from "@/lib/prompts/matching"
+import { getPsikotesInfo } from "@/lib/psikotes"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -61,7 +62,8 @@ export async function POST(req: NextRequest) {
       },
     })
     if (existing) {
-      return NextResponse.json({ success: true, data: existing })
+      const psikotes = await getPsikotesInfo(nannyProfileId, existing.psikotesUnlocked)
+      return NextResponse.json({ success: true, data: { ...existing, psikotes } })
     }
 
     // Ambil nannyProfile
@@ -204,7 +206,8 @@ export async function POST(req: NextRequest) {
     })
 
     console.info("[MATCHING_CALCULATE]", parentProfile.id, nannyProfileId, `skor=${result.skor_keseluruhan}`)
-    return NextResponse.json({ success: true, data: matchResult })
+    const psikotes = matchResult ? await getPsikotesInfo(nannyProfileId, matchResult.psikotesUnlocked) : null
+    return NextResponse.json({ success: true, data: matchResult ? { ...matchResult, psikotes } : matchResult })
   } catch (error) {
     console.error("[MATCHING_CALCULATE]", error)
     const raw = error instanceof Error ? error.message : String(error)

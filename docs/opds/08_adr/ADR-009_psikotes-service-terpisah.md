@@ -1,8 +1,10 @@
 # ADR-009 — Psikotes (Layer 2) sebagai Service Terpisah Lintas Produk HCC
 
-**Status:** Accepted (arah arsitektur — implementasi belum dimulai)
+**Status:** Accepted (prinsip umum) — **pengecualian untuk instrumen Capture Work Style, lihat [ADR-011](ADR-011_capture-work-style-built-in.md)**
 **Tanggal:** 2026-07-05
 **Decider:** Kartika
+
+> **Catatan 10 Juli 2026:** instrumen yang ditunggu (§ "Belum ada tanggal mulai pengerjaan") kini ada — namanya **Capture Work Style** (revisi HCC dari PAPI Kostick). Kartika memutuskan instrumen ini dibangun **built-in di `apps/web` dulu** (bukan service terpisah), sebagai deviasi terkontrol dan sadar dari arah ADR ini — lihat [ADR-011](ADR-011_capture-work-style-built-in.md) untuk alasannya. Prinsip umum ADR-009 (instrumen aset lintas produk HCC → service terpisah) tetap berlaku untuk instrumen HCC lain di masa depan.
 
 ---
 

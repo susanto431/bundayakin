@@ -161,6 +161,8 @@ enum PricingConfigKey {
   CONSULTATION_MID_FEE_IDR      // harga peluncuran — satu-satunya yang dijual saat ini
   CONSULTATION_SENIOR_FEE_IDR   // belum dijual saat peluncuran
   CONSULTATION_CUSTOMER_FEE_IDR // harga khusus pelanggan, hanya berlaku untuk tarif Mid saat ini
+
+  ADDON_PSIKOTES_FEE_IDR // Layer 2 — buka hasil Psikotes AI (Capture Work Style) untuk 1 nanny
 }
 
 // ============================================================
@@ -1355,6 +1357,10 @@ model MatchResult {
   flowType              ConnectionFlowType?  // REFERRAL atau TALENT_POOL
   quotaUsed             Boolean            @default(false)  // pakai kuota (true) atau bayar langsung (false)
   koneksiDilakukanAt    DateTime?
+
+  // Psikotes AI (Layer 2) — orang tua bayar sekali untuk buka hasil detail nanny ini (permanen, tidak expire)
+  psikotesUnlocked      Boolean            @default(false)
+  psikotesUnlockedAt    DateTime?
 
   // Cache — tidak perlu hit Claude API tiap kali
   generatedAt     DateTime  @default(now())

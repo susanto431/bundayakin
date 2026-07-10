@@ -14,6 +14,7 @@ export const PRICING_CONFIG_KEYS: PricingConfigKey[] = [
   "CONSULTATION_MID_FEE_IDR",
   "CONSULTATION_SENIOR_FEE_IDR",
   "CONSULTATION_CUSTOMER_FEE_IDR",
+  "ADDON_PSIKOTES_FEE_IDR",
 ]
 
 export const PRICING_CONFIG_LABEL: Record<PricingConfigKey, string> = {
@@ -26,6 +27,7 @@ export const PRICING_CONFIG_LABEL: Record<PricingConfigKey, string> = {
   CONSULTATION_MID_FEE_IDR: "Konsultasi Psikolog Anak — Mid (harga peluncuran, aktif dijual)",
   CONSULTATION_SENIOR_FEE_IDR: "Konsultasi Psikolog Anak — Senior (belum dijual)",
   CONSULTATION_CUSTOMER_FEE_IDR: "Konsultasi Psikolog Anak — Harga Pelanggan (berlaku untuk tarif Mid)",
+  ADDON_PSIKOTES_FEE_IDR: "Psikotes AI (Layer 2) — buka hasil per nanny",
 }
 
 export const PRICING_CONFIG_UNIT: Record<PricingConfigKey, "IDR" | "COUNT"> = {
@@ -38,4 +40,5 @@ export const PRICING_CONFIG_UNIT: Record<PricingConfigKey, "IDR" | "COUNT"> = {
   CONSULTATION_MID_FEE_IDR: "IDR",
   CONSULTATION_SENIOR_FEE_IDR: "IDR",
   CONSULTATION_CUSTOMER_FEE_IDR: "IDR",
+  ADDON_PSIKOTES_FEE_IDR: "IDR",
 }
