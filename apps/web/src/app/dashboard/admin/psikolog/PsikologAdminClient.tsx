@@ -62,6 +62,8 @@ export default function PsikologAdminClient({ initialPsikologs }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [createdCredential, setCreatedCredential] = useState<{ email: string; tempPassword: string } | null>(null)
+  const [resetCredential, setResetCredential] = useState<{ id: string; email: string; tempPassword: string } | null>(null)
+  const [resettingId, setResettingId] = useState<string | null>(null)
 
   async function handleCreate() {
     if (submitting) return
@@ -95,6 +97,25 @@ export default function PsikologAdminClient({ initialPsikologs }: Props) {
       setErrorMsg("Koneksi bermasalah. Coba lagi.")
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function handleResetPassword(id: string, fullName: string) {
+    if (resettingId) return
+    if (!confirm(`Buat password sementara baru untuk ${fullName}? Password lama langsung tidak berlaku.`)) return
+    setResettingId(id)
+    try {
+      const res = await fetch(`/api/admin/psikolog/${id}/reset-password`, { method: "POST" })
+      const data = (await res.json()) as { success: boolean; data?: { email: string; tempPassword: string }; error?: string }
+      if (data.success && data.data) {
+        setResetCredential({ id, email: data.data.email, tempPassword: data.data.tempPassword })
+      } else {
+        alert(data.error ?? "Gagal membuat password baru")
+      }
+    } catch {
+      alert("Koneksi bermasalah. Coba lagi.")
+    } finally {
+      setResettingId(null)
     }
   }
 
@@ -235,6 +256,31 @@ export default function PsikologAdminClient({ initialPsikologs }: Props) {
                 />
               </div>
             </div>
+
+            {resetCredential?.id === p.id ? (
+              <div className="mt-3 bg-[#FEF0E7] border border-[#F5C4A0] rounded-[10px] p-3">
+                <p className="text-[11px] font-bold text-[#A35320]">Password baru dibuat</p>
+                <p className="text-[11px] text-[#A35320] mt-0.5">Sampaikan ke psikolog secara pribadi — hanya ditampilkan sekali.</p>
+                <div className="flex items-center gap-2 bg-white rounded-[8px] p-2 mt-1.5">
+                  <span className="text-[12px] font-mono text-[#5A3A7A] break-all flex-1">
+                    {resetCredential.email} / {resetCredential.tempPassword}
+                  </span>
+                  <CopyCredentialButton text={`${resetCredential.email} / ${resetCredential.tempPassword}`} />
+                </div>
+                <button type="button" onClick={() => setResetCredential(null)} className="text-[11px] text-[#A35320] underline mt-1.5">
+                  Tutup
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleResetPassword(p.id, p.fullName)}
+                disabled={resettingId === p.id}
+                className="text-[11px] font-semibold text-[#A97CC4] hover:text-[#5A3A7A] mt-3 disabled:opacity-50 transition-colors"
+              >
+                {resettingId === p.id ? "Membuat password baru..." : "Reset password →"}
+              </button>
+            )}
           </div>
         ))}
         {psikologs.length === 0 && !showForm && (
