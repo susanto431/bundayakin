@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { IconCopy, IconCheck } from "@tabler/icons-react"
 import { CONSULTATION_MAX_DAILY_CAPACITY } from "@/constants/consultation"
 
 type PsikologLevel = "JUNIOR" | "MID" | "SENIOR"
@@ -20,6 +21,34 @@ type Psikolog = {
 type Props = { initialPsikologs: Psikolog[] }
 
 const LEVEL_LABEL: Record<PsikologLevel, string> = { JUNIOR: "Junior", MID: "Mid", SENIOR: "Senior" }
+
+function CopyCredentialButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      return
+    }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      aria-label={copied ? "Tersalin ke clipboard" : "Salin kredensial ke clipboard"}
+      className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-[8px] border transition-colors ${
+        copied ? "bg-[#E5F6F4] border-[#A8DDD8]" : "bg-white border-[#E0D0F0] hover:border-[#A97CC4]"
+      }`}
+    >
+      {copied ? <IconCheck size={16} stroke={2.5} color="#2C5F5A" /> : <IconCopy size={16} stroke={1.75} color="#5A3A7A" />}
+      <span className="sr-only" aria-live="polite">{copied ? "Tersalin" : ""}</span>
+    </button>
+  )
+}
 
 export default function PsikologAdminClient({ initialPsikologs }: Props) {
   const router = useRouter()
@@ -109,8 +138,11 @@ export default function PsikologAdminClient({ initialPsikologs }: Props) {
           <p className="text-[12px] text-[#A35320] mt-1">
             Sampaikan kredensial ini ke psikolog secara pribadi — password sementara ini hanya ditampilkan sekali.
           </p>
-          <div className="bg-white rounded-[8px] p-2 mt-2 text-[12px] font-mono text-[#5A3A7A]">
-            {createdCredential.email} / {createdCredential.tempPassword}
+          <div className="flex items-center gap-2 bg-white rounded-[8px] p-2 mt-2">
+            <span className="text-[12px] font-mono text-[#5A3A7A] break-all flex-1">
+              {createdCredential.email} / {createdCredential.tempPassword}
+            </span>
+            <CopyCredentialButton text={`${createdCredential.email} / ${createdCredential.tempPassword}`} />
           </div>
           <button type="button" onClick={() => setCreatedCredential(null)} className="text-[11px] text-[#A35320] underline mt-2">
             Tutup

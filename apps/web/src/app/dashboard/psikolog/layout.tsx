@@ -1,5 +1,6 @@
 import { cachedAuth } from "@/lib/auth-server"
 import { redirect } from "next/navigation"
+import Link from "next/link"
 import { LogoutButton } from "@/components/settings/LogoutButton"
 
 export default async function PsikologDashboardLayout({ children }: { children: React.ReactNode }) {
@@ -16,7 +17,12 @@ export default async function PsikologDashboardLayout({ children }: { children: 
           <span className="text-xs font-bold text-[#5A3A7A] tracking-wider uppercase">Portal Psikolog</span>
           <span className="ml-2 text-xs text-[#999AAA]">{session?.user?.name}</span>
         </div>
-        <LogoutButton />
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard/psikolog/settings/password" className="text-xs font-semibold text-[#A97CC4] hover:text-[#5A3A7A] transition-colors">
+            Ganti kata sandi
+          </Link>
+          <LogoutButton />
+        </div>
       </div>
       <div className="pb-16">{children}</div>
     </div>
