@@ -1,19 +1,14 @@
 import Link from "next/link"
+import { ADMIN_MENU } from "@/constants/admin-menu"
 
 export const metadata = { title: "Admin — BundaYakin" }
-
-const MENU = [
-  { href: "/dashboard/admin/matching-overview", label: "Matching Overview", desc: "Semua sesi matching, skor, dan status" },
-  { href: "/dashboard/admin/pricing-config", label: "Konfigurasi Harga & Kuota", desc: "Atur harga langganan, biaya, dan kuota koneksi" },
-  { href: "/dashboard/admin/psikolog", label: "Kelola Psikolog", desc: "Buat akun psikolog, atur level & kapasitas konsultasi" },
-]
 
 export default function AdminPage() {
   return (
     <div className="max-w-[640px] mx-auto px-4 pt-6 pb-16">
       <h1 className="text-[18px] font-bold text-[#5A3A7A] mb-4">Menu Admin</h1>
       <div className="space-y-2">
-        {MENU.map(item => (
+        {ADMIN_MENU.map(item => (
           <Link
             key={item.href}
             href={item.href}

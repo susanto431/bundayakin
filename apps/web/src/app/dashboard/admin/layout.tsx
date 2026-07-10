@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import RoleSwitcher from "@/components/settings/RoleSwitcher"
+import AdminNav from "@/components/layout/AdminNav"
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -19,6 +20,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
         </div>
         <RoleSwitcher compact />
       </div>
+      <AdminNav />
       <div className="pb-8">{children}</div>
     </div>
   )
