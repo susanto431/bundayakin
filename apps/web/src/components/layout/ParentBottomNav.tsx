@@ -26,7 +26,7 @@ const navItems = [
   },
   {
     href: "/dashboard/parent/children",
-    label: "Catatan",
+    label: "Anak Saya",
     exact: false,
     Icon: IconNotebook,
     activePaths: [] as string[],

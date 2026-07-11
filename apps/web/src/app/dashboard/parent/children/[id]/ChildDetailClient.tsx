@@ -61,7 +61,61 @@ function SaveButton({ saving, saved }: { saving: boolean; saved: boolean }) {
   )
 }
 
+// Tanda kecil di pojok card untuk memberi sinyal "bisa disentuh, ada halaman lanjutan"
+function ChevronHint() {
+  return (
+    <svg
+      className="absolute top-2.5 right-2.5"
+      width="13" height="13" viewBox="0 0 24 24" fill="none"
+      stroke="#C8B8DC" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+    >
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  )
+}
+
+type SectionKey = "profil" | "dev" | "rules"
+
+function SectionHeader({
+  emoji, bg, title, filled, open, onToggle,
+}: {
+  emoji: string
+  bg: string
+  title: string
+  filled: boolean
+  open: boolean
+  onToggle: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      className="w-full flex items-center gap-2 py-1 min-h-[48px] text-left"
+    >
+      <div className={`w-8 h-8 ${bg} rounded-[8px] flex items-center justify-center text-[16px] border border-[#E0D0F0] flex-shrink-0`}>{emoji}</div>
+      <p className="flex-1 text-[14px] font-bold text-[#5A3A7A]">{title}</p>
+      <span className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full ${
+        filled ? "bg-[#E5F6F4] text-[#2C5F5A]" : "bg-[#F3EEF8] text-[#999AAA]"
+      }`}>
+        {filled ? "Terisi" : "Kosong"}
+      </span>
+      <svg
+        className={`flex-shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+        width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999AAA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      >
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </button>
+  )
+}
+
 export default function ChildDetailClient({ child }: { child: Child }) {
+  // Section mana yang sedang terbuka — default: Profil dasar (paling sering diisi lebih dulu)
+  const [openSection, setOpenSection] = useState<SectionKey | null>("profil")
+  const toggleSection = (key: SectionKey) =>
+    setOpenSection(prev => (prev === key ? null : key))
+
   // Section 1 — Profil
   const [name, setName] = useState(child.name)
   const [ageLabel, setAgeLabel] = useState(AGE_GROUP_TO_LABEL[child.ageGroup] ?? "1–3 thn")
@@ -165,8 +219,9 @@ export default function ChildDetailClient({ child }: { child: Child }) {
       <div className="grid grid-cols-3 gap-2 mb-5">
         <Link
           href={`/dashboard/parent/children/${child.id}/growth`}
-          className="bg-white border border-[#E0D0F0] rounded-[14px] p-3 hover:border-[#5BBFB0] transition-all"
+          className="relative bg-white border border-[#E0D0F0] rounded-[14px] p-3 shadow-sm active:scale-95 active:shadow-none hover:border-[#5BBFB0] hover:shadow-md transition-all"
         >
+          <ChevronHint />
           <div className="w-8 h-8 bg-[#E5F6F4] rounded-[8px] flex items-center justify-center mb-1.5">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2C5F5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 3v18h18" />
@@ -178,8 +233,9 @@ export default function ChildDetailClient({ child }: { child: Child }) {
         </Link>
         <Link
           href={`/dashboard/parent/children/${child.id}/journal`}
-          className="bg-white border border-[#E0D0F0] rounded-[14px] p-3 hover:border-[#A97CC4] transition-all"
+          className="relative bg-white border border-[#E0D0F0] rounded-[14px] p-3 shadow-sm active:scale-95 active:shadow-none hover:border-[#A97CC4] hover:shadow-md transition-all"
         >
+          <ChevronHint />
           <div className="w-8 h-8 bg-[#F3EEF8] rounded-[8px] flex items-center justify-center mb-1.5">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A3A7A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -192,8 +248,9 @@ export default function ChildDetailClient({ child }: { child: Child }) {
         </Link>
         <Link
           href={`/dashboard/parent/children/${child.id}/screening`}
-          className="bg-white border border-[#E0D0F0] rounded-[14px] p-3 hover:border-[#5BBFB0] transition-all"
+          className="relative bg-white border border-[#E0D0F0] rounded-[14px] p-3 shadow-sm active:scale-95 active:shadow-none hover:border-[#5BBFB0] hover:shadow-md transition-all"
         >
+          <ChevronHint />
           <div className="w-8 h-8 bg-[#E5F6F4] rounded-[8px] flex items-center justify-center mb-1.5">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2C5F5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 11l3 3L22 4" />
@@ -205,117 +262,119 @@ export default function ChildDetailClient({ child }: { child: Child }) {
         </Link>
       </div>
 
-      {/* SECTION 1 — Profil */}
-      <div className="mb-5">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 bg-[#F3EEF8] rounded-[8px] flex items-center justify-center text-[16px] border border-[#E0D0F0]">👶</div>
-          <p className="text-[14px] font-bold text-[#5A3A7A]">Profil dasar</p>
-        </div>
-        <form onSubmit={handleSaveProfil} className="space-y-3.5">
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Nama *</label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} required className={inputCls()} />
-          </div>
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Usia</label>
-            <div className="flex flex-wrap gap-2">
-              {AGE_OPTIONS.map(opt => (
-                <button key={opt.label} type="button" onClick={() => setAgeLabel(opt.label)} className={pillCls(ageLabel === opt.label)}>
-                  {opt.label}
-                </button>
-              ))}
+      {/* SECTION 1 — Profil (accordion) */}
+      <div className="border border-[#E0D0F0] rounded-[14px] px-3.5 mb-3 bg-white">
+        <SectionHeader
+          emoji="👶" bg="bg-[#F3EEF8]" title="Profil dasar"
+          filled={allergies.trim().length > 0 || caraMenenangkan.trim().length > 0}
+          open={openSection === "profil"} onToggle={() => toggleSection("profil")}
+        />
+        {openSection === "profil" && (
+          <form onSubmit={handleSaveProfil} className="space-y-3.5 pt-1 pb-4">
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Nama *</label>
+              <input type="text" value={name} onChange={e => setName(e.target.value)} required className={inputCls()} />
             </div>
-          </div>
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Jenis kelamin</label>
-            <div className="flex gap-2">
-              <button type="button" onClick={() => setGender("FEMALE")} className={pillCls(gender === "FEMALE")}>Perempuan</button>
-              <button type="button" onClick={() => setGender("MALE")} className={pillCls(gender === "MALE")}>Laki-laki</button>
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Usia</label>
+              <div className="flex flex-wrap gap-2">
+                {AGE_OPTIONS.map(opt => (
+                  <button key={opt.label} type="button" onClick={() => setAgeLabel(opt.label)} className={pillCls(ageLabel === opt.label)}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Alergi &amp; kondisi kesehatan <span className="font-normal text-[#999AAA]">(opsional)</span></label>
-            <p className="text-[11px] text-[#999AAA] mb-1.5">Alergi makanan, obat, atau kondisi medis yang perlu diketahui nanny.</p>
-            <textarea value={allergies} onChange={e => setAllergies(e.target.value)} placeholder="Mis: alergi susu sapi, kacang tanah..." className={textareaCls()} />
-          </div>
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Cara menenangkan saat rewel <span className="font-normal text-[#999AAA]">(opsional)</span></label>
-            <textarea value={caraMenenangkan} onChange={e => setCaraMenenangkan(e.target.value)} placeholder="Mis: dipeluk sambil digoyang pelan, diajak lihat pohon di luar..." className={textareaCls()} />
-          </div>
-          {errorProfil && <p className="text-[12px] text-red-600">{errorProfil}</p>}
-          <SaveButton saving={savingProfil} saved={savedProfil} />
-        </form>
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Jenis kelamin</label>
+              <div className="flex gap-2">
+                <button type="button" onClick={() => setGender("FEMALE")} className={pillCls(gender === "FEMALE")}>Perempuan</button>
+                <button type="button" onClick={() => setGender("MALE")} className={pillCls(gender === "MALE")}>Laki-laki</button>
+              </div>
+            </div>
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Alergi &amp; kondisi kesehatan <span className="font-normal text-[#999AAA]">(opsional)</span></label>
+              <p className="text-[11px] text-[#999AAA] mb-1.5">Alergi makanan, obat, atau kondisi medis yang perlu diketahui nanny.</p>
+              <textarea value={allergies} onChange={e => setAllergies(e.target.value)} placeholder="Mis: alergi susu sapi, kacang tanah..." className={textareaCls()} />
+            </div>
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Cara menenangkan saat rewel <span className="font-normal text-[#999AAA]">(opsional)</span></label>
+              <textarea value={caraMenenangkan} onChange={e => setCaraMenenangkan(e.target.value)} placeholder="Mis: dipeluk sambil digoyang pelan, diajak lihat pohon di luar..." className={textareaCls()} />
+            </div>
+            {errorProfil && <p className="text-[12px] text-red-600">{errorProfil}</p>}
+            <SaveButton saving={savingProfil} saved={savedProfil} />
+          </form>
+        )}
       </div>
 
-      <div className="h-px bg-[#E0D0F0] mb-5" />
-
-      {/* SECTION 2 — Perkembangan */}
-      <div className="mb-5">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 bg-[#FEF0E7] rounded-[8px] flex items-center justify-center text-[16px] border border-[#E0D0F0]">📈</div>
-          <p className="text-[14px] font-bold text-[#5A3A7A]">Perkembangan</p>
-        </div>
-        <form onSubmit={handleSaveDev} className="space-y-3.5">
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Catatan kesehatan &amp; tumbuh kembang <span className="font-normal text-[#999AAA]">(opsional)</span></label>
-            <p className="text-[11px] text-[#999AAA] mb-1.5">Milestone, kondisi kesehatan, catatan dari dokter, atau hal yang perlu nanny perhatikan.</p>
-            <textarea value={medicalNotes} onChange={e => setMedicalNotes(e.target.value)} placeholder="Mis: sudah bisa berjalan 10 langkah, sedang terapi wicara, rutin cek Sp.A tiap bulan..." className={textareaCls()} />
-          </div>
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Nama sekolah / daycare <span className="font-normal text-[#999AAA]">(opsional)</span></label>
-            <input type="text" value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="Mis: TK Bintang Kecil, Playgroup Happy Kids..." className={inputCls()} />
-          </div>
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Jadwal sekolah <span className="font-normal text-[#999AAA]">(opsional)</span></label>
-            <textarea value={schoolSchedule} onChange={e => setSchoolSchedule(e.target.value)} placeholder="Mis: Senin–Jumat pukul 08.00–11.00, nanny antar jemput dengan motor..." className={textareaCls()} />
-          </div>
-          {errorDev && <p className="text-[12px] text-red-600">{errorDev}</p>}
-          <SaveButton saving={savingDev} saved={savedDev} />
-        </form>
+      {/* SECTION 2 — Perkembangan (accordion) */}
+      <div className="border border-[#E0D0F0] rounded-[14px] px-3.5 mb-3 bg-white">
+        <SectionHeader
+          emoji="📈" bg="bg-[#FEF0E7]" title="Perkembangan"
+          filled={medicalNotes.trim().length > 0 || schoolName.trim().length > 0 || schoolSchedule.trim().length > 0}
+          open={openSection === "dev"} onToggle={() => toggleSection("dev")}
+        />
+        {openSection === "dev" && (
+          <form onSubmit={handleSaveDev} className="space-y-3.5 pt-1 pb-4">
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Catatan kesehatan &amp; tumbuh kembang <span className="font-normal text-[#999AAA]">(opsional)</span></label>
+              <p className="text-[11px] text-[#999AAA] mb-1.5">Milestone, kondisi kesehatan, catatan dari dokter, atau hal yang perlu nanny perhatikan.</p>
+              <textarea value={medicalNotes} onChange={e => setMedicalNotes(e.target.value)} placeholder="Mis: sudah bisa berjalan 10 langkah, sedang terapi wicara, rutin cek Sp.A tiap bulan..." className={textareaCls()} />
+            </div>
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Nama sekolah / daycare <span className="font-normal text-[#999AAA]">(opsional)</span></label>
+              <input type="text" value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="Mis: TK Bintang Kecil, Playgroup Happy Kids..." className={inputCls()} />
+            </div>
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1.5">Jadwal sekolah <span className="font-normal text-[#999AAA]">(opsional)</span></label>
+              <textarea value={schoolSchedule} onChange={e => setSchoolSchedule(e.target.value)} placeholder="Mis: Senin–Jumat pukul 08.00–11.00, nanny antar jemput dengan motor..." className={textareaCls()} />
+            </div>
+            {errorDev && <p className="text-[12px] text-red-600">{errorDev}</p>}
+            <SaveButton saving={savingDev} saved={savedDev} />
+          </form>
+        )}
       </div>
 
-      <div className="h-px bg-[#E0D0F0] mb-5" />
-
-      {/* SECTION 3 — Aturan Rumah */}
-      <div className="mb-2">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 bg-[#FEF0E7] rounded-[8px] flex items-center justify-center text-[16px] border border-[#E0D0F0]">🏠</div>
-          <p className="text-[14px] font-bold text-[#5A3A7A]">Aturan rumah</p>
-        </div>
-        <form onSubmit={handleSaveRules} className="space-y-3.5">
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Pantangan makanan &amp; aktivitas <span className="font-normal text-[#999AAA]">(opsional)</span></label>
-            <textarea value={pantangan} onChange={e => setPantangan(e.target.value)} placeholder="Mis: tidak boleh makan permen sebelum makan siang, hindari mainan berukuran kecil..." className={textareaCls()} />
-          </div>
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Rutinitas harian <span className="font-normal text-[#999AAA]">(opsional)</span></label>
-            <textarea value={schedule} onChange={e => setSchedule(e.target.value)} placeholder="Mis: bangun 06.30, sarapan 07.00, tidur siang 13.00–15.00, mandi sore 16.00..." className={textareaCls()} />
-          </div>
-          <div>
-            <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Aturan rumah lainnya <span className="font-normal text-[#999AAA]">(opsional)</span></label>
-            <p className="text-[11px] text-[#999AAA] mb-1.5">Area yang boleh/tidak boleh diakses, tamu, dan hal lain yang perlu nanny tahu.</p>
-            <textarea value={additionalNotes} onChange={e => setAdditionalNotes(e.target.value)} placeholder="Mis: tidak ada tamu tanpa izin, kamar utama tidak boleh dimasuki..." className={textareaCls()} />
-          </div>
-          {errorRules && <p className="text-[12px] text-red-600">{errorRules}</p>}
-          <SaveButton saving={savingRules} saved={savedRules} />
-        </form>
+      {/* SECTION 3 — Aturan Rumah (accordion) */}
+      <div className="border border-[#E0D0F0] rounded-[14px] px-3.5 mb-5 bg-white">
+        <SectionHeader
+          emoji="🏠" bg="bg-[#FEF0E7]" title="Aturan rumah"
+          filled={pantangan.trim().length > 0 || schedule.trim().length > 0 || additionalNotes.trim().length > 0}
+          open={openSection === "rules"} onToggle={() => toggleSection("rules")}
+        />
+        {openSection === "rules" && (
+          <form onSubmit={handleSaveRules} className="space-y-3.5 pt-1 pb-4">
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Pantangan makanan &amp; aktivitas <span className="font-normal text-[#999AAA]">(opsional)</span></label>
+              <textarea value={pantangan} onChange={e => setPantangan(e.target.value)} placeholder="Mis: tidak boleh makan permen sebelum makan siang, hindari mainan berukuran kecil..." className={textareaCls()} />
+            </div>
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Rutinitas harian <span className="font-normal text-[#999AAA]">(opsional)</span></label>
+              <textarea value={schedule} onChange={e => setSchedule(e.target.value)} placeholder="Mis: bangun 06.30, sarapan 07.00, tidur siang 13.00–15.00, mandi sore 16.00..." className={textareaCls()} />
+            </div>
+            <div>
+              <label className="block text-[12px] font-semibold text-[#5A3A7A] mb-1">Aturan rumah lainnya <span className="font-normal text-[#999AAA]">(opsional)</span></label>
+              <p className="text-[11px] text-[#999AAA] mb-1.5">Area yang boleh/tidak boleh diakses, tamu, dan hal lain yang perlu nanny tahu.</p>
+              <textarea value={additionalNotes} onChange={e => setAdditionalNotes(e.target.value)} placeholder="Mis: tidak ada tamu tanpa izin, kamar utama tidak boleh dimasuki..." className={textareaCls()} />
+            </div>
+            {errorRules && <p className="text-[12px] text-red-600">{errorRules}</p>}
+            <SaveButton saving={savingRules} saved={savedRules} />
+          </form>
+        )}
       </div>
 
       {/* Catatan dari nanny — read-only */}
       {nannyNotes && (
-        <>
-          <div className="h-px bg-[#E0D0F0] mb-5" />
-          <div className="mb-2">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-[#EEF2FC] rounded-[8px] flex items-center justify-center text-[16px] border border-[#E0D0F0]">📋</div>
-              <p className="text-[14px] font-bold text-[#5A3A7A]">Catatan dari nanny</p>
-            </div>
-            <div className="bg-[#EEF2FC] border border-[#B5C8EF] rounded-[12px] px-3.5 py-3">
-              <p className="text-[11px] text-[#5B7EC9] font-semibold mb-2 uppercase tracking-wide">Diisi oleh nanny · tidak bisa diedit Bunda</p>
-              <p className="text-[13px] text-[#3A5A9A] leading-relaxed whitespace-pre-line">{nannyNotes}</p>
-            </div>
+        <div className="mb-2">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 bg-[#EEF2FC] rounded-[8px] flex items-center justify-center text-[16px] border border-[#E0D0F0]">📋</div>
+            <p className="text-[14px] font-bold text-[#5A3A7A]">Catatan dari nanny</p>
           </div>
-        </>
+          <div className="bg-[#EEF2FC] border border-[#B5C8EF] rounded-[12px] px-3.5 py-3">
+            <p className="text-[11px] text-[#5B7EC9] font-semibold mb-2 uppercase tracking-wide">Diisi oleh nanny · tidak bisa diedit Bunda</p>
+            <p className="text-[13px] text-[#3A5A9A] leading-relaxed whitespace-pre-line">{nannyNotes}</p>
+          </div>
+        </div>
       )}
 
     </div>

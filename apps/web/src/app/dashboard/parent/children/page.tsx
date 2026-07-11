@@ -6,7 +6,7 @@ import { d } from "@/lib/date"
 import Link from "next/link"
 import ChildrenListClient from "./ChildrenListClient"
 
-export const metadata = { title: "Catatan Anak — BundaYakin" }
+export const metadata = { title: "Anak Saya — BundaYakin" }
 
 export default async function ChildrenPage() {
   const session = await cachedAuth()
@@ -36,7 +36,7 @@ export default async function ChildrenPage() {
 
       {/* Header */}
       <div className="border-b border-[#E0D0F0] pb-3 mb-4">
-        <h1 className="text-[16px] font-bold text-[#5A3A7A]">Catatan Anak</h1>
+        <h1 className="text-[16px] font-bold text-[#5A3A7A]">Anak Saya</h1>
         <p className="text-[12px] text-[#999AAA] mt-0.5">
           {children.length === 0
             ? "Belum ada profil anak"
