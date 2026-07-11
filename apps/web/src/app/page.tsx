@@ -5,8 +5,12 @@ import Image from "next/image"
 
 export default async function LandingPage() {
   const session = await auth()
-  if (session?.user?.role === "PARENT") redirect("/dashboard/parent")
-  if (session?.user?.role === "NANNY") redirect("/dashboard/nanny")
+  const role = session?.user?.role
+  const canSwitchRoles = session?.user?.canSwitchRoles
+  if (role === "PARENT") redirect("/dashboard/parent")
+  if (role === "NANNY") redirect("/dashboard/nanny")
+  if (role === "PSIKOLOG") redirect("/dashboard/psikolog")
+  if (role === "ADMIN" || canSwitchRoles) redirect("/dashboard/admin")
 
   return (
     <main className="min-h-screen bg-[#FDFBFF] font-[var(--font-jakarta)]">
