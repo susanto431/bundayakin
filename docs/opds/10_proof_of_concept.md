@@ -135,6 +135,10 @@ Rekomendasi arah UI/UX untuk fase berikutnya: lihat [11_ui_ux_review.md](11_ui_u
 - Matching Engine Layer 2 (Psikotes AI) — selesai dikoding, menunggu deploy. Lihat [ADR-011](08_adr/ADR-011_capture-work-style-built-in.md).
 - Layer 3 (review psikolog, Nanny Care Profile™) — keputusan produk & SOP final, belum dikoding. Lihat [18_spec_nanny_care_profile_layer3.md](18_spec_nanny_care_profile_layer3.md).
 
+**Update status per 11 Juli 2026:**
+- **Bug diperbaiki**: booking Konsultasi Psikolog Anak sempat selalu tampil "Penuh" karena kode salah mencari psikolog level Senior, padahal peluncuran seharusnya level Mid — sudah dikoreksi.
+- **Fitur baru selesai dikoding, menunggu deploy**: orang tua sekarang bisa pilih psikolog spesifik (untuk kontinuitas & lihat Jam Terbang/pengalaman psikolog), psikolog atur Jadwal Psikolog sendiri (pola mingguan + cuti) di Portal Psikolog, tampilan kalender booking jadi bulan/minggu berwarna, dan ada Ulasan Psikolog (internal-only, untuk pemantauan kualitas HCC — tidak pernah tampil ke orang tua lain). Lihat [ADR-012](08_adr/ADR-012_pilih-psikolog-dan-jadwal-individual.md) & [PRD §7c](13_prd_tumbuh_kembang.md).
+
 POC arsitektur (§2–§5) tetap potret sistem per commit terakhir 22 Mei 2026 — status fitur terkini selalu rujuk [Feature Registry](05_feature_registry.md).
 
 ---

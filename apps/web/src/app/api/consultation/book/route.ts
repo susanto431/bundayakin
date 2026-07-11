@@ -6,9 +6,11 @@ import { isValidSlotTime } from "@/constants/consultation"
 import { NextResponse } from "next/server"
 
 // POST /api/consultation/book
-// Body: { childProfileId, bookingDate (YYYY-MM-DD), slotTime, screeningRecordId? }
+// Body: { childProfileId, psikologId, bookingDate (YYYY-MM-DD), slotTime, screeningRecordId? }
 // Checkout otomatis via Mayar untuk Konsultasi Psikolog Anak — mengikuti pola
-// checkout add-on lain (lihat api/payment/connection-addon).
+// checkout add-on lain (lihat api/payment/connection-addon). psikologId sekarang
+// wajib — kedua entry point booking (pilih psikolog dulu / pilih tanggal dulu)
+// sama-sama sudah tahu psikolog mana sebelum konfirmasi (ADR-012, 11 Juli 2026).
 export async function POST(request: Request) {
   try {
     const session = await auth()
@@ -21,13 +23,14 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as {
       childProfileId?: string
+      psikologId?: string
       bookingDate?: string
       slotTime?: string
       screeningRecordId?: string
     }
-    const { childProfileId, bookingDate: bookingDateStr, slotTime, screeningRecordId } = body
+    const { childProfileId, psikologId, bookingDate: bookingDateStr, slotTime, screeningRecordId } = body
 
-    if (!childProfileId || !bookingDateStr || !slotTime) {
+    if (!childProfileId || !psikologId || !bookingDateStr || !slotTime) {
       return NextResponse.json({ success: false, error: "Data booking tidak lengkap" }, { status: 400 })
     }
     if (!isValidSlotTime(slotTime)) {
@@ -79,6 +82,7 @@ export async function POST(request: Request) {
       where: {
         parentProfileId: parentProfile.id,
         childProfileId: child.id,
+        psikologId,
         bookingDate,
         slotTime,
         status: "PENDING_PAYMENT",
@@ -104,6 +108,7 @@ export async function POST(request: Request) {
     const bookingResult = await createConsultationBooking({
       parentProfileId: parentProfile.id,
       childProfileId: child.id,
+      psikologId,
       bookingDate,
       slotTime,
       priceIDR,

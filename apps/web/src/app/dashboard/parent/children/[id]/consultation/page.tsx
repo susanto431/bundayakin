@@ -26,6 +26,8 @@ export default async function ChildConsultationPage({ params }: { params: Promis
           slotTime: true,
           status: true,
           psychologistNotes: true,
+          psikolog: { select: { fullName: true } },
+          review: { select: { id: true } },
         },
       },
     },
@@ -43,6 +45,8 @@ export default async function ChildConsultationPage({ params }: { params: Promis
         slotTime: b.slotTime,
         status: b.status as "CONFIRMED" | "COMPLETED",
         psychologistNotes: b.psychologistNotes,
+        psikologName: b.psikolog.fullName,
+        hasReview: b.review !== null,
       }))}
     />
   )

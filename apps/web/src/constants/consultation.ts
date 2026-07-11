@@ -1,6 +1,7 @@
-// Slot Konsultasi Psikolog Anak — jam tetap, sama untuk semua psikolog
-// (keputusan Kartika, PRD 13 §7b poin 5). Psikolog belum atur jadwal
-// masing-masing sendiri saat peluncuran.
+// Slot Konsultasi Psikolog Anak — 3 jam baku, sama untuk semua psikolog sebagai
+// pilihan jam (PRD 13 §7b poin 5). Mana yang benar-benar dibuka tiap psikolog
+// diatur lewat Jadwal Psikolog masing-masing (PRD 13 §7c, 11 Juli 2026, belum
+// dikoding — lihat ADR-012).
 export const CONSULTATION_SLOT_TIMES = ["09:00", "13:00", "16:00"] as const
 
 export type ConsultationSlotTime = (typeof CONSULTATION_SLOT_TIMES)[number]

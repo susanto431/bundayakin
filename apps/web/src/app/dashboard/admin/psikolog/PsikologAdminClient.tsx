@@ -57,7 +57,7 @@ export default function PsikologAdminClient({ initialPsikologs }: Props) {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
-  const [level, setLevel] = useState<PsikologLevel>("SENIOR")
+  const [level, setLevel] = useState<PsikologLevel>("MID")
   const [dailyCapacity, setDailyCapacity] = useState(3)
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -85,7 +85,7 @@ export default function PsikologAdminClient({ initialPsikologs }: Props) {
         setFullName("")
         setEmail("")
         setPhone("")
-        setLevel("SENIOR")
+        setLevel("MID")
         setDailyCapacity(3)
         setShowForm(false)
         router.refresh()
@@ -289,8 +289,8 @@ export default function PsikologAdminClient({ initialPsikologs }: Props) {
       </div>
 
       <p className="text-[11px] text-[#999AAA] mt-4 leading-relaxed">
-        Strategi peluncuran: sesi dikerjakan/disupervisi psikolog level Senior — pastikan minimal satu psikolog Senior
-        aktif agar Konsultasi Psikolog Anak bisa dibooking. Level Junior/Mid belum menerima booking otomatis.
+        Strategi peluncuran: sesi dikerjakan langsung oleh psikolog level Mid — pastikan minimal satu psikolog Mid
+        aktif dan atur jadwalnya (lewat Portal Psikolog) agar Konsultasi Psikolog Anak bisa dibooking. Level Junior/Senior belum menerima booking otomatis.
       </p>
     </div>
   )

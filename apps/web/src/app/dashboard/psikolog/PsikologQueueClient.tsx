@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 
 type Booking = {
   id: string
@@ -32,11 +33,19 @@ export default function PsikologQueueClient({ psikologName, level, dailyCapacity
 
   return (
     <div className="max-w-[640px] mx-auto px-4 pt-6">
-      <div className="mb-5">
-        <h1 className="text-[18px] font-bold text-[#5A3A7A]">Halo, {psikologName.split(" ")[0]}</h1>
-        <p className="text-[12px] text-[#999AAA] mt-1">
-          Level {LEVEL_LABEL[level] ?? level} · Kapasitas {dailyCapacity} sesi/hari
-        </p>
+      <div className="mb-5 flex items-start justify-between">
+        <div>
+          <h1 className="text-[18px] font-bold text-[#5A3A7A]">Halo, {psikologName.split(" ")[0]}</h1>
+          <p className="text-[12px] text-[#999AAA] mt-1">
+            Level {LEVEL_LABEL[level] ?? level} · Kapasitas {dailyCapacity} sesi/hari
+          </p>
+        </div>
+        <Link
+          href="/dashboard/psikolog/jadwal"
+          className="min-h-[36px] flex items-center px-3 rounded-[8px] border-[1.5px] border-[#A97CC4] text-[#A97CC4] text-[12px] font-semibold whitespace-nowrap"
+        >
+          Atur Jadwal
+        </Link>
       </div>
 
       <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">Sesi Terjadwal ({upcoming.length})</p>

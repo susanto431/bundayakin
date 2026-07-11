@@ -310,6 +310,7 @@ model ParentProfile {
 
   // Konsultasi Psikolog Anak (Tumbuh Kembang Tahap 2)
   consultationBookings ConsultationBooking[]
+  consultationReviews  ConsultationReview[]
 
   @@index([userId])
 }
@@ -448,10 +449,47 @@ model PsikologProfile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   consultationBookings ConsultationBooking[]
+  weeklySchedule       PsikologWeeklySchedule[]
+  cutiDates            PsikologCuti[]
+  reviews              ConsultationReview[]
 
   @@index([userId])
   @@index([level])
   @@index([isActive])
+}
+
+// ============================================================
+// JADWAL PSIKOLOG — pola mingguan berulang per psikolog (ADR-012, 11 Juli 2026)
+// Tidak ada baris = tutup. Kombinasi hari (0-6) x 3 Slot Konsultasi baku,
+// maks 21 baris/psikolog. Cuti (PsikologCuti) menang mutlak atas pola ini.
+// ============================================================
+
+model PsikologWeeklySchedule {
+  id         String   @id @default(cuid())
+  psikologId String
+  dayOfWeek  Int      // 0=Minggu..6=Sabtu (JS Date.getUTCDay())
+  slotTime   String   // "09:00" | "13:00" | "16:00" — lihat CONSULTATION_SLOT_TIMES
+  isOpen     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  psikolog PsikologProfile @relation(fields: [psikologId], references: [id], onDelete: Cascade)
+
+  @@unique([psikologId, dayOfWeek, slotTime])
+  @@index([psikologId])
+}
+
+model PsikologCuti {
+  id         String   @id @default(cuid())
+  psikologId String
+  cutiDate   DateTime @db.Date
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  psikolog PsikologProfile @relation(fields: [psikologId], references: [id], onDelete: Cascade)
+
+  @@unique([psikologId, cutiDate])
+  @@index([psikologId])
 }
 
 // ============================================================
@@ -490,12 +528,37 @@ model ConsultationBooking {
   parentProfile ParentProfile   @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
   childProfile  ChildProfile    @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
   psikolog      PsikologProfile @relation(fields: [psikologId], references: [id])
+  review        ConsultationReview?
 
   @@unique([psikologId, bookingDate, slotTime])
   @@index([parentProfileId])
   @@index([childProfileId])
   @@index([psikologId, bookingDate])
+  @@index([psikologId, status])
   @@index([status])
+}
+
+// ============================================================
+// ULASAN PSIKOLOG — internal-only, pemantauan kualitas HCC (ADR-012, 11 Juli 2026)
+// JANGAN PERNAH select field-field di sini dari endpoint yang bisa diakses
+// PARENT/PSIKOLOG — hanya boolean "punya review atau tidak" boleh bocor ke situ.
+// ============================================================
+
+model ConsultationReview {
+  id              String   @id @default(cuid())
+  bookingId       String   @unique
+  parentProfileId String
+  psikologId      String
+  isGood          Boolean
+  scores          Json?    // { kejelasan_penjelasan: "Baik", empati: "Cukup", ... }
+  narrative       String?  @db.Text
+  createdAt       DateTime @default(now())
+
+  booking       ConsultationBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  parentProfile ParentProfile       @relation(fields: [parentProfileId], references: [id], onDelete: Cascade)
+  psikolog      PsikologProfile     @relation(fields: [psikologId], references: [id])
+
+  @@index([psikologId])
 }
 
 // ============================================================

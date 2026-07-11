@@ -131,12 +131,24 @@ Jenjang psikolog HCC yang menentukan harga sesi: Junior (Rp 500rb), Mid (Rp 1jt 
 _Avoid_: grade, tier (di UI)
 
 **Portal Psikolog**:
-Area kerja khusus psikolog HCC di platform: jadwal & kapasitas konsultasi (3 sesi/hari/psikolog, maks 5), antrean review konten, dan catatan hasil sesi.
+Area kerja khusus psikolog HCC di platform: atur [[Jadwal Psikolog]] & kapasitas konsultasi (3 sesi/hari/psikolog, maks 5), antrean review konten, dan catatan hasil sesi.
 _Avoid_: dashboard admin (portal psikolog bukan admin)
 
 **Slot Konsultasi**:
-Jam tetap yang tersedia tiap hari untuk Konsultasi Psikolog Anak, sama untuk semua psikolog (mis. 09:00/13:00/16:00, mengikuti kuota 3 sesi/hari). Orang tua memilih tanggal DAN slot jam saat booking, bukan hanya tanggal.
-_Avoid_: jadwal psikolog (tiap psikolog belum atur jam sendiri saat peluncuran)
+Tiga jam baku yang tersedia tiap hari untuk Konsultasi Psikolog Anak: 09:00/13:00/16:00 — sama untuk semua psikolog sebagai pilihan jam, tidak ada jam bebas/rentang. Orang tua memilih tanggal DAN slot jam saat booking, bukan hanya tanggal. Mana dari 3 jam ini yang benar-benar dibuka tiap psikolog diatur lewat [[Jadwal Psikolog]] masing-masing (keputusan 11 Juli 2026 — sebelumnya sama untuk semua psikolog tanpa pilihan individual).
+
+**Jadwal Psikolog**:
+Pola jam kerja mingguan berulang milik satu psikolog — psikolog menyalakan/mematikan mana dari 3 [[Slot Konsultasi]] baku yang ia buka di tiap hari-dalam-minggu, berlaku otomatis tiap minggu sampai diubah. Psikolog menandai tanggal cuti untuk mengecualikan tanggal tertentu dari pola ini. Diatur psikolog sendiri di Portal Psikolog (keputusan 11 Juli 2026 — sebelumnya tidak ada, semua psikolog dianggap buka jam yang sama).
+_Avoid_: jam bebas, rentang jam (psikolog tidak isi rentang jam sendiri, hanya menyalakan/mematikan dari 3 jam baku)
+
+**Ulasan Psikolog**:
+Penilaian orang tua atas satu sesi Konsultasi Psikolog Anak (pilihan ganda + esai bebas), diisi opsional setelah sesi selesai — sistem mengajak dengan pesan yang mendorong (bukan mewajibkan). Hanya untuk pemantauan kualitas internal HCC (dilihat lewat Portal Admin) — TIDAK pernah ditampilkan ke orang tua lain.
+_Avoid_: Evaluasi (istilah itu khusus pemantauan dua arah orang tua ↔ nanny, lihat [[Evaluasi]] — Ulasan Psikolog satu arah dan konteksnya beda)
+_Avoid_: rating publik, ulasan publik, bintang (tidak pernah tampil ke orang tua lain)
+
+**Jam Terbang Psikolog**:
+Total pengalaman seorang psikolog HCC, dihitung dari jumlah sesi Konsultasi Psikolog Anak yang sudah ia selesaikan (1 sesi selesai = 1 jam). Ditampilkan publik ke orang tua saat memilih psikolog — beda dari [[Ulasan Psikolog]] yang internal.
+_Avoid_: rating, skor kualitas (ini murni akumulasi pengalaman, bukan penilaian mutu)
 
 **Edukasi Terkurasi**:
 Konten parenting sesuai usia anak — draft ditulis AI, disetujui dan diatasnamakan psikolog HCC sebelum tayang.
