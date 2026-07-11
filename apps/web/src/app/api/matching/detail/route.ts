@@ -8,6 +8,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { getPsikotesInfo } from "@/lib/psikotes"
 import { getKomparasiPreferensi } from "@/lib/preference-comparison"
+import { isMatchResultStale } from "@/lib/matching-cache"
 
 export async function GET(req: NextRequest) {
   try {
@@ -67,7 +68,13 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: { ...matchResult, nannyProfile: { ...nannyRest, phone }, psikotes, komparasiPreferensi },
+      data: {
+        ...matchResult,
+        nannyProfile: { ...nannyRest, phone },
+        psikotes,
+        komparasiPreferensi,
+        isStale: isMatchResultStale(matchResult.generatedAt),
+      },
     })
   } catch (error) {
     console.error("[MATCHING_DETAIL]", error)

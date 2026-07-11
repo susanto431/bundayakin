@@ -161,6 +161,11 @@ export default function NannyDetailDrawer({
         }
         const json = await res.json()
         if (!json.success) throw new Error(json.error)
+        // Hasil sudah lewat MATCH_RESULT_STALE_DAYS — refresh sekali via AI, lalu cache lagi
+        if (json.data.isStale) {
+          await calculateMatch()
+          return
+        }
         setDetail(json.data)
       } catch (e) {
         setError(e instanceof Error ? e.message : "Gagal memuat data")

@@ -13,6 +13,7 @@ import Anthropic from "@anthropic-ai/sdk"
 import { buildMatchingPrompt, type MatchingPromptResult } from "@/lib/prompts/matching"
 import { getPsikotesInfo } from "@/lib/psikotes"
 import { getKomparasiPreferensi } from "@/lib/preference-comparison"
+import { isMatchResultStale } from "@/lib/matching-cache"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -49,7 +50,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Profil orang tua tidak ditemukan" }, { status: 404 })
     }
 
-    // Cek cache MatchResult — jika sudah ada, kembalikan selamanya tanpa re-calculate
+    // Cek cache MatchResult — dipakai ulang selama belum lewat MATCH_RESULT_STALE_DAYS,
+    // supaya tidak buang biaya AI tiap kali profil dibuka.
     const existing = await prisma.matchResult.findUnique({
       where: { parentProfileId_nannyProfileId: { parentProfileId: parentProfile.id, nannyProfileId } },
       include: {
@@ -62,7 +64,7 @@ export async function POST(req: NextRequest) {
         },
       },
     })
-    if (existing) {
+    if (existing && !isMatchResultStale(existing.generatedAt)) {
       const [psikotes, komparasiPreferensi] = await Promise.all([
         getPsikotesInfo(nannyProfileId, existing.psikotesUnlocked),
         getKomparasiPreferensi(parentProfile.id, nannyProfileId),
