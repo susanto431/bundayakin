@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import KpspVisualAid from "@/components/screening/KpspVisualAid"
@@ -31,6 +31,19 @@ const CATEGORY_STYLE: Record<KpspCategory, string> = {
   PENYIMPANGAN: "bg-[#FAEAEA] text-[#C75D5D] border-[#F5AAAA]",
 }
 
+// Soft-selling Konsultasi Psikolog Anak: tetap ditawarkan di semua kategori hasil
+// (bukan cuma PENYIMPANGAN), framing disesuaikan supaya tidak terkesan "hasil buruk".
+const CONSULTATION_CTA_COPY: Record<KpspCategory, string> = {
+  SESUAI: "Ingin ngobrol lebih lanjut soal tumbuh kembang si kecil?",
+  MERAGUKAN: "Diskusikan hasil ini dengan psikolog anak untuk arahan lebih lanjut.",
+  PENYIMPANGAN: "Sebaiknya diskusikan hasil ini dengan psikolog anak.",
+}
+const CONSULTATION_CTA_STYLE: Record<KpspCategory, string> = {
+  SESUAI: "text-[#2C5F5A] border-[#A8DDD8] hover:bg-[#E5F6F4]",
+  MERAGUKAN: "text-[#A35320] border-[#F5C4A0] hover:bg-[#FEF0E7]",
+  PENYIMPANGAN: "text-[#C75D5D] border-[#F5AAAA] hover:bg-[#FAEAEA]",
+}
+
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
 }
@@ -43,6 +56,9 @@ export default function ScreeningClient({ childId, childName, isPaid, ageBand, c
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [result, setResult] = useState<{ id: string; yaCount: number; category: KpspCategory } | null>(null)
+  // Guard sinkron terhadap disabled={loading}: dua tap cepat (umum di mobile) bisa lolos
+  // sebelum re-render menonaktifkan tombol, menyebabkan 2 record tersimpan dari 1 pengisian.
+  const submittingRef = useRef(false)
 
   const alreadyDoneThisBand = history.some(h => h.ageBand === ageBand)
   const allAnswered = answers.every(a => a !== null)
@@ -53,7 +69,8 @@ export default function ScreeningClient({ childId, childName, isPaid, ageBand, c
   }
 
   async function handleSubmit() {
-    if (!allAnswered || loading || ageBand == null) return
+    if (!allAnswered || ageBand == null || submittingRef.current) return
+    submittingRef.current = true
     setLoading(true)
     setErrorMsg(null)
     try {
@@ -68,9 +85,11 @@ export default function ScreeningClient({ childId, childName, isPaid, ageBand, c
         router.refresh()
       } else {
         setErrorMsg(data.error ?? "Gagal menyimpan. Coba lagi.")
+        submittingRef.current = false
       }
     } catch {
       setErrorMsg("Koneksi bermasalah. Coba lagi.")
+      submittingRef.current = false
     } finally {
       setLoading(false)
     }
@@ -237,12 +256,20 @@ function ResultCard({
         <p className="text-[13px] leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.7)" }}>
           Pelanggan mendapat hasil lengkap: kategori perkembangan, saran stimulasi, dan pengingat skrining berikutnya.
         </p>
-        <Link
-          href="/dashboard/parent/subscription"
-          className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
-        >
-          Langganan Rp 500rb/tahun →
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/dashboard/parent/subscription"
+            className="inline-flex items-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
+          >
+            Langganan Rp 500rb/tahun →
+          </Link>
+          <Link
+            href={`/dashboard/parent/children/${childId}/consultation?screeningRecordId=${screeningRecordId}`}
+            className="inline-flex items-center bg-transparent border border-white/40 text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all hover:bg-white/10"
+          >
+            Atau konsultasi psikolog anak →
+          </Link>
+        </div>
       </div>
     )
   }
@@ -255,14 +282,13 @@ function ResultCard({
       <p className="text-[12px] opacity-80">
         Jadwal skrining berikutnya: <strong>{nextDate.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</strong>
       </p>
-      {category === "PENYIMPANGAN" && (
-        <Link
-          href={`/dashboard/parent/children/${childId}/consultation?screeningRecordId=${screeningRecordId}`}
-          className="inline-flex items-center bg-white text-[#C75D5D] border border-[#F5AAAA] text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] mt-3 transition-all hover:bg-[#FAEAEA]"
-        >
-          Jadwalkan konsultasi psikolog →
-        </Link>
-      )}
+      <p className="text-[12px] mt-3 mb-1.5 opacity-80">{CONSULTATION_CTA_COPY[category]}</p>
+      <Link
+        href={`/dashboard/parent/children/${childId}/consultation?screeningRecordId=${screeningRecordId}`}
+        className={`inline-flex items-center bg-white border text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all ${CONSULTATION_CTA_STYLE[category]}`}
+      >
+        Jadwalkan konsultasi psikolog →
+      </Link>
       <p className="text-[11px] mt-3 opacity-70 leading-relaxed">
         Hasil ini adalah arahan awal, bukan diagnosis. Untuk penilaian klinis, konsultasikan ke dokter anak, Posyandu, atau psikolog.
       </p>

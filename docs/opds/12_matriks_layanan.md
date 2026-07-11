@@ -123,7 +123,7 @@ Langganan kini bercerita **dua pilar**: (1) cari & pantau nanny — sudah jalan;
 |---|---|---|
 | Kurva Pertumbuhan | Berat/tinggi anak diplot ke standar WHO + artinya | ⚠️ Tahap 1 selesai dikoding, menunggu tayang |
 | Jurnal & Galeri Momen | Linimasa kenangan per anak | ⚠️ Tahap 1 selesai dikoding, menunggu tayang |
-| Skrining Perkembangan | Checklist milestone (KPSP resmi) → arahan, bukan diagnosis. Hasil "sebaiknya konsultasi" kini langsung terhubung ke booking Konsultasi Psikolog Anak | ⚠️ Tahap 2 selesai dikoding, menunggu tayang |
+| Skrining Perkembangan | Checklist milestone (KPSP resmi) → arahan, bukan diagnosis. **Mengisi gratis untuk semua akun**, hasil lengkap khusus pelanggan. Tombol booking Konsultasi Psikolog Anak kini ditawarkan di semua tingkat hasil (bukan cuma yang bermasalah) sebagai soft-selling — 11 Juli 2026 | ⚠️ Tahap 2 selesai dikoding, menunggu tayang |
 | Konsultasi Psikolog Anak | Harga per level psikolog: Junior Rp 500rb · **Mid Rp 1jt (peluncuran, satu-satunya yang dijual sekarang)** · Senior Rp 2jt; **pelanggan: Rp 750rb** (diskon 25%). Orang tua pilih tanggal + jam (09:00/13:00/16:00), bayar otomatis lewat Mayar | ⚠️ Tahap 2 selesai dikoding, menunggu tayang |
 | Portal Psikolog | Ruang kerja psikolog: jadwal konsultasi (3 sesi/hari/psikolog, maks 5). Akun dibuat manual admin setelah screening (bukan pendaftaran sendiri). Review konten Edukasi Terkurasi menyusul Tahap 3 | ⚠️ Tahap 2 selesai dikoding, menunggu tayang |
 | Edukasi Terkurasi + Imunisasi | Artikel dua-mingguan disetujui psikolog + kalender imunisasi & pengingat | ❌ Tahap 3 |
