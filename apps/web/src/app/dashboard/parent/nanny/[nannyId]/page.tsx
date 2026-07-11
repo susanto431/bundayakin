@@ -121,6 +121,7 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
   })
   const hasGuarantee = guaranteeRow != null
   const connectionAddonFeeIDR = await getEffectiveValue("CONNECTION_ADDON_FEE_IDR")
+  const talentPoolContactFeeIDR = await getEffectiveValue("TALENT_POOL_CONTACT_FEE_IDR")
   // Komparasi Preferensi — dihitung deterministik dari SurveyResponse mentah, terpisah dari
   // skor AI di atas (bisa sesekali tidak sinkron dengan skorDomainA/B/C, lihat ADR-015).
   // Gratis, tidak dikunci Kuota Koneksi.
@@ -455,6 +456,7 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
           alreadyUnlocked={kontakTerbuka}
           hasGuarantee={hasGuarantee}
           connectionAddonFeeIDR={connectionAddonFeeIDR}
+          talentPoolContactFeeIDR={talentPoolContactFeeIDR}
         />
       </div>
 

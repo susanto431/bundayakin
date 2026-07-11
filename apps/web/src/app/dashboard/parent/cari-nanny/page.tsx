@@ -84,6 +84,7 @@ export default async function CariNannyPage() {
       talentPoolRemaining={talentPoolRemaining}
       hasGuarantee={guarantee != null}
       connectionAddonFeeIDR={defaultQuota.CONNECTION_ADDON_FEE_IDR}
+      talentPoolContactFeeIDR={defaultQuota.TALENT_POOL_CONTACT_FEE_IDR}
     />
   )
 }

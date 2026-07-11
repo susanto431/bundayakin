@@ -57,6 +57,7 @@
 | [ADR-012](ADR-012_pilih-psikolog-dan-jadwal-individual.md) | Orang tua bisa pilih psikolog spesifik & psikolog atur Jadwal Psikolog sendiri (revisi sebagian ADR-010/PRD §7b) | Accepted | Juli 2026 |
 | [ADR-014](ADR-014_undangan-psikotes.md) | Undangan Psikotes: jalur berbayar dari Orang Tua berdampingan dengan self-service Nanny, satu harga untuk lihat-hasil/kirim-undangan | Accepted | Juli 2026 |
 | [ADR-015](ADR-015_komparasi-preferensi-deterministik.md) | Komparasi Preferensi: perbandingan jawaban deterministik per aspek, terpisah dari skor AI | Accepted | Juli 2026 |
+| [ADR-016](ADR-016_talent-pool-kontak-selalu-berbayar.md) | AI Talent Pool: buka nomor WA nanny selalu berbayar (Rp250rb), kuota gratis dihapus (Referral tidak terpengaruh) | Accepted | Juli 2026 |
 
 ---
 

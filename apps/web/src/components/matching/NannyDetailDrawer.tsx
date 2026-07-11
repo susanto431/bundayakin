@@ -55,6 +55,7 @@ type Props = {
   remainingQuota?: number
   hasGuarantee?: boolean
   connectionAddonFeeIDR?: number
+  talentPoolContactFeeIDR?: number
   onContactUnlocked?: () => void
 }
 
@@ -97,6 +98,7 @@ export default function NannyDetailDrawer({
   onContactUnlocked,
   hasGuarantee = false,
   connectionAddonFeeIDR,
+  talentPoolContactFeeIDR,
 }: Props) {
   const [detail, setDetail] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -548,6 +550,7 @@ export default function NannyDetailDrawer({
                 alreadyUnlocked={false}
                 hasGuarantee={hasGuarantee}
                 connectionAddonFeeIDR={connectionAddonFeeIDR}
+                talentPoolContactFeeIDR={talentPoolContactFeeIDR}
                 onUnlocked={handleContactUnlocked}
               />
             ) : (

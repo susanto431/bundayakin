@@ -106,18 +106,13 @@ export async function POST(request: Request) {
         )
       }
       if (flowType === "TALENT_POOL") {
-        if (!isSubscriber) {
-          return NextResponse.json(
-            { success: false, error: "Fitur Talent Pool memerlukan langganan aktif", code: "SUBSCRIPTION_REQUIRED" },
-            { status: 403 }
-          )
-        }
-        if (quota.talentPoolUsed >= quota.talentPoolLimit) {
-          return NextResponse.json(
-            { success: false, error: "Kuota talent pool habis untuk periode ini", code: "QUOTA_EXHAUSTED" },
-            { status: 400 }
-          )
-        }
+        // Buka nomor WA dari AI Talent Pool SELALU berbayar per kontak (Rp 250rb,
+        // TALENT_POOL_CONTACT_FEE_IDR) — tidak pernah gratis lewat kuota, kecuali
+        // Jaminan Kecocokan (viaGuarantee, sudah dicek di atas). Lihat api/payment/connection-addon.
+        return NextResponse.json(
+          { success: false, error: "Buka kontak Talent Pool memerlukan pembayaran terpisah", code: "PAYMENT_REQUIRED" },
+          { status: 403 }
+        )
       }
     }
 

@@ -36,9 +36,10 @@ type Props = {
   talentPoolRemaining: number
   hasGuarantee?: boolean
   connectionAddonFeeIDR?: number
+  talentPoolContactFeeIDR?: number
 }
 
-export default function TalentPoolClient({ talentPoolRemaining, hasGuarantee = false, connectionAddonFeeIDR }: Props) {
+export default function TalentPoolClient({ talentPoolRemaining, hasGuarantee = false, connectionAddonFeeIDR, talentPoolContactFeeIDR }: Props) {
   const [nannies, setNannies] = useState<NannyDirectoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -214,6 +215,7 @@ export default function TalentPoolClient({ talentPoolRemaining, hasGuarantee = f
           onContactUnlocked={handleContactUnlocked}
           hasGuarantee={hasGuarantee}
           connectionAddonFeeIDR={connectionAddonFeeIDR}
+          talentPoolContactFeeIDR={talentPoolContactFeeIDR}
         />
       )}
     </div>

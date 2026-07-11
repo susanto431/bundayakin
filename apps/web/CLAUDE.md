@@ -43,7 +43,7 @@
 > - Terminologi user-facing: **"Tes Kecocokan"** (bukan "Survey Matching")
 > - **KTP tidak diminta** dari nanny — hapus dari semua form dan schema
 > - Payment gateway: **Mayar** — hapus semua referensi Midtrans
-> - Model unlock kontak: **Kuota Koneksi** (3 gratis/30 hari referral + 7 langganan), bukan pay-per-unlock
+> - Model unlock kontak: **Kuota Koneksi** untuk Referral saja (3 gratis/30 hari, lalu Rp100rb/koneksi via Connection Add-on setelah habis). **AI Talent Pool TIDAK lagi pakai kuota gratis** (revisi 11 Juli 2026, lihat [ADR-016](../../docs/opds/08_adr/ADR-016_talent-pool-kontak-selalu-berbayar.md)) — buka nomor WA nanny dari Talent Pool SELALU berbayar Rp250rb (`TALENT_POOL_CONTACT_FEE_IDR`) per kontak, kecuali pemegang Jaminan Kecocokan aktif (tetap gratis). `TALENT_POOL_QUOTA` (7/30 hari) masih ada di skema tapi tidak lagi menggratiskan unlock apa pun. **Belum selesai:** copy UI "Sisa N× koneksi" di Beranda/matching/page.tsx/TalentPoolClient masih menyiratkan kuota gratis Talent Pool — perlu diperbarui; halaman legacy `cari-nanny/direktori` masih hardcode Rp100.000 di jalur pembayarannya sendiri, belum ikut disamakan; migrasi skema (`prisma db push`) untuk key pricing baru belum dijalankan ke database.
 > - Score threshold: ≥80% teal · 60–79% orange · <60% red
 > - Foto upload: Cloudflare R2 via `src/lib/cloudflare.ts`
 > - Video upload: Cloudflare Stream via `src/lib/cloudflare.ts`

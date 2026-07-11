@@ -150,9 +150,10 @@ enum VerificationStatus {
 enum PricingConfigKey {
   SUBSCRIPTION_FEE_IDR      // Langganan tahunan
   PLACEMENT_FEE_IDR         // Biaya penempatan nanny
-  CONNECTION_ADDON_FEE_IDR  // Beli koneksi tambahan setelah kuota habis
+  CONNECTION_ADDON_FEE_IDR  // Beli koneksi tambahan setelah kuota habis (Flow A/Referral)
   REFERRAL_QUOTA            // Kuota undangan (Flow A) per 30 hari — berlaku semua akun
-  TALENT_POOL_QUOTA         // Kuota Talent Pool (Flow B) per 30 hari — khusus pelanggan
+  TALENT_POOL_QUOTA         // Kuota Talent Pool (Flow B) per 30 hari — khusus pelanggan (dipakai untuk akses direktori, BUKAN lagi unlock kontak gratis — lihat TALENT_POOL_CONTACT_FEE_IDR)
+  TALENT_POOL_CONTACT_FEE_IDR // Buka nomor WA nanny dari AI Talent Pool — SELALU berbayar per kontak, tidak pernah gratis lewat kuota (keputusan Kartika, Juli 2026)
 
   // Konsultasi Psikolog Anak (PRD 13 §7b, 8 Juli 2026) — 4 key disiapkan sekaligus
   // walau Junior & Senior belum dibuka untuk dibeli (keputusan Kartika eksplisit,

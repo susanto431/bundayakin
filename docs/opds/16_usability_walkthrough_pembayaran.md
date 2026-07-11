@@ -70,7 +70,7 @@ Ditelusuri di seluruh `subscription/page.tsx`, `MayarButton`, `PlacementClient`:
 **Status implementasi (Juli 2026):**
 - ✅ #1 — error email/HP kosong sekarang menautkan langsung ke halaman profil
 - ✅ #2 — banner pembayaran menampilkan tombol "Cek status pembayaran" + link CS setelah auto-refresh pertama, tidak lagi macet di "0 detik"
-- ✅ #3 (selesai penuh, Juli 2026) — **checkout Connection Add-on otomatis dibangun**, menggantikan CS manual sepenuhnya (keputusan Kartika): tombol "Bayar Rp 100rb — buka kontak ini" di kedua kondisi kuota habis (pelanggan Talent Pool maupun akun gratis Referral), invoice Mayar via `api/payment/connection-addon`, webhook handler baru (`handleConnectionAddonSuccess`), dan polling otomatis pasca-redirect (5× percobaan, konsisten dengan pola temuan #2) sebelum menawarkan "Cek status pembayaran" manual
+- ✅ #3 (selesai penuh, Juli 2026) — **checkout Connection Add-on otomatis dibangun**, menggantikan CS manual sepenuhnya (keputusan Kartika): tombol "Bayar — buka kontak ini" saat kuota habis (Referral, Rp100rb) atau selalu (Talent Pool, Rp250rb — lihat [ADR-016](08_adr/ADR-016_talent-pool-kontak-selalu-berbayar.md), 11 Juli 2026), invoice Mayar via `api/payment/connection-addon`, webhook handler baru (`handleConnectionAddonSuccess`), dan polling otomatis pasca-redirect (5× percobaan, konsisten dengan pola temuan #2) sebelum menawarkan "Cek status pembayaran" manual
 - ✅ #4 — idempotency placement mengarahkan ke dashboard (bukan menampilkan error merah)
 - ✅ #5 — halaman langganan menambahkan link "Hubungi CS" untuk kendala pembayaran
 

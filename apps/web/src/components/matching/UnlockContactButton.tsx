@@ -11,7 +11,8 @@ type Props = {
   remainingQuota: number
   alreadyUnlocked: boolean
   hasGuarantee?: boolean // Jaminan Kecocokan aktif → unlock gratis tanpa kuota
-  connectionAddonFeeIDR?: number // harga efektif hari ini (Pricing Config Panel); default 100rb kalau tidak dipass
+  connectionAddonFeeIDR?: number // Referral: harga add-on setelah kuota referral habis; default 100rb kalau tidak dipass
+  talentPoolContactFeeIDR?: number // Talent Pool: harga buka kontak, SELALU berlaku (tidak ada jalur gratis); default 250rb kalau tidak dipass
   onUnlocked?: () => void
 }
 
@@ -38,6 +39,7 @@ export default function UnlockContactButton({
   alreadyUnlocked,
   hasGuarantee = false,
   connectionAddonFeeIDR = 100_000,
+  talentPoolContactFeeIDR = 250_000,
   onUnlocked,
 }: Props) {
   const [viaGuarantee, setViaGuarantee] = useState(false)
@@ -142,23 +144,26 @@ export default function UnlockContactButton({
     }
   }
 
-// Kuota habis dan kontak belum terbuka — kecuali pemegang Jaminan Kecocokan (gratis)
-  if (!alreadyUnlocked && remainingQuota === 0 && !hasGuarantee && state.kind !== "buying") {
-    // TALENT_POOL hanya tersedia untuk pelanggan aktif — "upgrade langganan" jadi jalan
-    // buntu untuk yang sudah berlangganan. Untuk keduanya, checkout Connection Add-on
-    // (Rp 100rb, otomatis via Mayar) selalu tersedia (walkthrough #2 temuan #3).
-    const isSubscriberOutOfQuota = flowType === "TALENT_POOL"
+  // Talent Pool: nomor WA nanny SELALU berbayar per kontak, tidak ada jalur gratis
+  // lewat kuota (keputusan Kartika, Juli 2026) — jadi gate ini selalu tampil untuk
+  // TALENT_POOL. Referral: gate hanya tampil setelah kuota bulanannya habis.
+  // Keduanya lewati gate ini kalau pemegang Jaminan Kecocokan (unlock gratis).
+  const isTalentPool = flowType === "TALENT_POOL"
+  const feeIDR = isTalentPool ? talentPoolContactFeeIDR : connectionAddonFeeIDR
+  if (!alreadyUnlocked && !hasGuarantee && state.kind !== "buying" && (isTalentPool || remainingQuota === 0)) {
     return (
       <div className="bg-[#5A3A7A] rounded-[16px] p-4">
-        <p className="text-[13px] font-bold text-white mb-1">Kuota koneksi habis</p>
+        <p className="text-[13px] font-bold text-white mb-1">
+          {isTalentPool ? "Buka nomor WhatsApp nanny" : "Kuota koneksi habis"}
+        </p>
         <p className="text-[12px] text-white/70 mb-3 leading-relaxed">
-          {isSubscriberOutOfQuota
-            ? "Kuota Talent Pool bulan ini sudah terpakai semua. Kuota akan terisi ulang di periode berikutnya, atau buka kontak ini sekarang dengan biaya tambahan."
+          {isTalentPool
+            ? "Data kontak nanny di AI Talent Pool tidak dibagikan gratis — buka nomor WhatsApp-nya dengan sekali bayar per nanny."
             : "Semua kuota koneksi bulan ini sudah terpakai. Upgrade langganan untuk kuota lebih banyak, atau buka kontak ini saja dengan biaya tambahan."}
         </p>
         {buyError && <p className="text-[12px] text-red-300 mb-2" role="alert">{buyError}</p>}
         <div className="flex flex-col gap-2">
-          {!isSubscriberOutOfQuota && (
+          {!isTalentPool && (
             <Link
               href="/dashboard/parent/subscription"
               className="inline-flex items-center justify-center bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all"
@@ -170,12 +175,12 @@ export default function UnlockContactButton({
             type="button"
             onClick={handleBuyAddon}
             className={`inline-flex items-center justify-center text-[13px] font-semibold px-4 py-2 rounded-[10px] min-h-[40px] transition-all ${
-              isSubscriberOutOfQuota
+              isTalentPool
                 ? "bg-[#5BBFB0] hover:bg-[#2C5F5A] text-white"
                 : "bg-transparent border-[1.5px] border-white/40 text-white hover:bg-white/10"
             }`}
           >
-            Bayar Rp {connectionAddonFeeIDR.toLocaleString("id-ID")} — buka kontak ini →
+            Bayar Rp {feeIDR.toLocaleString("id-ID")} — buka kontak ini →
           </button>
         </div>
       </div>

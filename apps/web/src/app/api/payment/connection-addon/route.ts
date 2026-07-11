@@ -107,7 +107,12 @@ export async function POST(request: Request) {
     const orderId = `CONN-${parentProfile.id.slice(-8).toUpperCase()}-${Date.now()}`
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
     const returnPath = connectionAddonReturnPath(flowType, nannyProfileId, matchingRequestId)
-    const EXTRA_CONNECTION_FEE_IDR = await getEffectiveValue("CONNECTION_ADDON_FEE_IDR")
+    // Talent Pool: nomor WA nanny selalu berbayar per kontak, tidak ada jalur gratis
+    // lewat kuota (keputusan Kartika, Juli 2026). Referral: tetap harga add-on lama,
+    // hanya berlaku setelah kuota referral bulanan habis.
+    const EXTRA_CONNECTION_FEE_IDR = await getEffectiveValue(
+      flowType === "TALENT_POOL" ? "TALENT_POOL_CONTACT_FEE_IDR" : "CONNECTION_ADDON_FEE_IDR"
+    )
 
     const invoice = await createMayarInvoice({
       orderId,
@@ -116,7 +121,10 @@ export async function POST(request: Request) {
       customerEmail: user.email,
       customerPhone: normalizedPhone,
       itemName: `Buka Kontak Nanny — ${nannyFirstName}`,
-      description: "Koneksi tambahan setelah kuota bulanan habis.",
+      description:
+        flowType === "TALENT_POOL"
+          ? "Buka nomor WhatsApp nanny dari AI Talent Pool."
+          : "Koneksi tambahan setelah kuota bulanan habis.",
       redirectUrl: `${appUrl}${returnPath}`,
     })
 
