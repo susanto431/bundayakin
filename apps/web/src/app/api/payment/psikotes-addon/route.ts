@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Profil nanny tidak ditemukan" }, { status: 404 })
     }
     if (nanny.assessmentResults.length === 0) {
-      return NextResponse.json({ success: false, error: "Nanny ini belum mengisi Tes Sikap Kerja" }, { status: 400 })
+      return NextResponse.json({ success: false, error: "Nanny ini belum mengisi Psikotes Karakter Kerja Nanny" }, { status: 400 })
     }
 
     const matchResult = await prisma.matchResult.findUnique({
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
       customerEmail: user.email,
       customerPhone: normalizedPhone,
       itemName: `Psikotes AI — ${nannyFirstName}`,
-      description: "Buka hasil detail Tes Sikap Kerja nanny ini.",
+      description: "Buka hasil detail Psikotes Karakter Kerja Nanny ini.",
       redirectUrl: `${appUrl}/dashboard/parent/cari-nanny/direktori?psikotes=success&nannyProfileId=${nannyProfileId}`,
     })
 

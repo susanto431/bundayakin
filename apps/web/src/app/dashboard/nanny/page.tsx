@@ -310,7 +310,7 @@ export default async function NannyDashboardPage() {
       {profile?.surveyCompletedAt && !captureWorkStyleDone && (
         <>
           <p className="text-[9px] font-bold tracking-[1.5px] uppercase text-[#999AAA] mb-2">
-            Tes Sikap Kerja — belum diisi
+            Psikotes Karakter Kerja Nanny — belum diisi
           </p>
           <div className="bg-[#F3EEF8] border-[1.5px] border-[#E0D0F0] rounded-[14px] p-3.5 mb-3">
             <p className="text-[14px] font-bold text-[#5A3A7A] mb-1.5">Tunjukkan gaya kerja {honorific} lebih dalam</p>
@@ -322,7 +322,7 @@ export default async function NannyDashboardPage() {
               href="/dashboard/nanny/tes-sikap-kerja"
               className="inline-flex items-center bg-[#A97CC4] hover:bg-[#5A3A7A] text-white font-semibold text-[14px] px-4 py-2.5 rounded-[10px] min-h-[48px] transition-all"
             >
-              Isi Tes Sikap Kerja →
+              Isi Psikotes Karakter Kerja →
             </Link>
           </div>
         </>

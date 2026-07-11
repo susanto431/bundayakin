@@ -372,7 +372,7 @@ async function handlePsikotesAddonSuccess(
       userId: parentProfile.userId,
       type: "PAYMENT",
       title: "Hasil Psikotes AI terbuka",
-      body: "Pembayaran berhasil — hasil detail Tes Sikap Kerja nanny ini sudah bisa dilihat.",
+      body: "Pembayaran berhasil — hasil detail Psikotes Karakter Kerja Nanny ini sudah bisa dilihat.",
     },
   })
 

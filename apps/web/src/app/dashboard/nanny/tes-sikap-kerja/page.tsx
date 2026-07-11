@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import { CAPTURE_WORK_STYLE_ITEMS } from "@/lib/capture-work-style-instrument"
 import TesSikapKerjaClient from "./TesSikapKerjaClient"
 
-export const metadata = { title: "Tes Sikap Kerja — BundaYakin" }
+export const metadata = { title: "Psikotes Karakter Kerja Nanny — BundaYakin" }
 export const dynamic = "force-dynamic"
 
 export default async function TesSikapKerjaPage() {

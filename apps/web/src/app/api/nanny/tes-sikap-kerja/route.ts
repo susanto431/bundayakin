@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       select: { id: true },
     })
     if (existing) {
-      return NextResponse.json({ success: false, error: "Tes Sikap Kerja sudah pernah diisi" }, { status: 409 })
+      return NextResponse.json({ success: false, error: "Psikotes Karakter Kerja Nanny sudah pernah diisi" }, { status: 409 })
     }
 
     const body = (await request.json()) as { answers?: unknown }

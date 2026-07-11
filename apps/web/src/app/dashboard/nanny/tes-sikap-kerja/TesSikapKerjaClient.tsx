@@ -61,7 +61,7 @@ export default function TesSikapKerjaClient({ items, alreadyDoneAtISO }: Props) 
     return (
       <div className="max-w-[480px] mx-auto px-4 pt-5 pb-8">
         <div className="bg-white border border-[#E0D0F0] rounded-[16px] p-5 text-center">
-          <p className="text-[16px] font-bold text-[#5A3A7A] mb-1">Tes Sikap Kerja sudah selesai</p>
+          <p className="text-[16px] font-bold text-[#5A3A7A] mb-1">Psikotes Karakter Kerja Nanny sudah selesai</p>
           <p className="text-[13px] text-[#999AAA] leading-relaxed">
             {alreadyDoneAtISO && `Dikerjakan ${formatDate(alreadyDoneAtISO)}. `}
             Hasilnya sudah masuk ke profil Sus dan bisa dilihat keluarga yang tertarik.
@@ -74,7 +74,7 @@ export default function TesSikapKerjaClient({ items, alreadyDoneAtISO }: Props) 
   return (
     <div className="max-w-[480px] mx-auto px-4 pt-5 pb-8">
       <div className="border-b border-[#E0D0F0] pb-3 mb-4">
-        <h1 className="text-[16px] font-bold text-[#5A3A7A]">Tes Sikap Kerja</h1>
+        <h1 className="text-[16px] font-bold text-[#5A3A7A]">Psikotes Karakter Kerja Nanny</h1>
         <p className="text-[12px] text-[#999AAA] mt-0.5">Tidak dibatasi waktu — pilih jawaban yang pertama kali terlintas di pikiran Sus.</p>
       </div>
 
