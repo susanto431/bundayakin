@@ -15,9 +15,13 @@
 |---|---|---|
 | Buka app → tab **Cari Nanny** | Halaman matching: form undang nanny + kartu AI Talent Pool (terkunci) | ✔ Jalur A terlihat jelas |
 | Penasaran, tap **AI Talent Pool** → halaman langganan | Kartu ungu "Fitur Pelanggan" + tombol langganan + link "Kembali ke dashboard" | 🔴 **Temuan #1** |
+| (Pelanggan) tap kartu nanny di direktori → "Lihat profil lengkap" | Halaman profil penuh (`/dashboard/parent/nanny/[nannyId]`) — **tidak ada link/tombol kembali sama sekali** | 🔴 **Temuan #6** |
 
 **🔴 Temuan #1 — Paywall Talent Pool adalah jalan buntu.** Bunda datang ingin *nanny*, bukan ingin *langganan*. Halaman paywall (`cari-nanny/page.tsx`) hanya menawarkan dua pintu: bayar, atau kembali. Tidak ada satu kalimat pun: *"Belum siap langganan? Bunda tetap bisa mengundang nanny yang Bunda kenal — gratis 3×/bulan"* + tombol ke halaman undangan. Melanggar guideline `escape-routes` & `empty-nav-state`.
 **Fix:** tambah satu link sekunder di bawah tombol langganan → ke `/dashboard/parent/matching`.
+
+**🔴 Temuan #6 — Profil lengkap nanny adalah jalan buntu.** Dari kartu direktori, Bunda tap "Lihat profil lengkap" dan pindah ke halaman penuh (`nanny/[nannyId]/page.tsx`) — beda dari drawer di direktori yang tinggal ditutup. Halaman ini tidak punya link "← Kembali", padahal semua halaman detail lain (skrining, konsultasi, laporan penempatan) sudah pakai pola itu. Satu-satunya jalan keluar adalah bottom nav, yang juga tidak menyorot tab "Cari Nanny" saat di halaman ini — terasa seperti jalan buntu.
+**Fix:** tambah link "← Kembali ke Cari Nanny" di bagian atas halaman.
 
 ## Skenario 2 — "Bunda Sari mengundang nanny kenalannya, lalu menunggu hasilnya"
 
@@ -66,6 +70,7 @@ Halaman langganan & pricing sudah ada dan bisa dijangkau dari beberapa pintu (se
 | 4 | Pemantauan tersembunyi dari navigasi | 🟠 | ✅ Diperbaiki — link "Kelola penugasan →" permanen di Beranda |
 | 3 | Nanny pasca-survey tidak dituntun menyalakan "Siap Kerja" | 🟠 | ✅ Diperbaiki — kartu "Langkah terakhir" + tombol aktivasi langsung |
 | 5 | Pemakaian jaminan tidak diberi penanda saat unlock | 🟡 | ✅ Diperbaiki — label tombol & badge "Gratis — Jaminan Kecocokan" |
+| 6 | Halaman profil lengkap nanny tidak punya link kembali | 🔴 | ✅ **Diperbaiki Juli 2026** — link "← Kembali ke Cari Nanny" di `nanny/[nannyId]/page.tsx` |
 
 Bonus perbaikan: emoji 🔔 di beranda nanny diganti ikon SVG (konsistensi ikon, temuan UI/UX review).
 
