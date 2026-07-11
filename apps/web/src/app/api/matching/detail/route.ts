@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { getPsikotesInfo } from "@/lib/psikotes"
+import { getKomparasiPreferensi } from "@/lib/preference-comparison"
 
 export async function GET(req: NextRequest) {
   try {
@@ -54,9 +55,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Hasil matching tidak ditemukan" }, { status: 404 })
     }
 
-    const psikotes = await getPsikotesInfo(nannyProfileId, matchResult.psikotesUnlocked)
+    const [psikotes, komparasiPreferensi] = await Promise.all([
+      getPsikotesInfo(nannyProfileId, matchResult.psikotesUnlocked),
+      getKomparasiPreferensi(parentProfile.id, nannyProfileId),
+    ])
 
-    return NextResponse.json({ success: true, data: { ...matchResult, psikotes } })
+    // Nomor telepon hanya boleh sampai ke client kalau kontak sudah dibuka (kuota/pembayaran) —
+    // jangan bocorkan lewat payload walau UI menyembunyikannya di balik gate.
+    const { user, ...nannyRest } = matchResult.nannyProfile
+    const phone = matchResult.kontakTerbuka ? user?.phone ?? null : null
+
+    return NextResponse.json({
+      success: true,
+      data: { ...matchResult, nannyProfile: { ...nannyRest, phone }, psikotes, komparasiPreferensi },
+    })
   } catch (error) {
     console.error("[MATCHING_DETAIL]", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })

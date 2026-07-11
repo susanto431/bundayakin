@@ -2,9 +2,13 @@ import { cachedAuth } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
 import { cfStream } from "@/lib/cloudflare"
 import { getEffectiveValue } from "@/lib/pricing-config"
+import { scoreColor, scoreTextColor, verdictLabel } from "@/lib/score-display"
+import { getKomparasiPreferensi } from "@/lib/preference-comparison"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import UnlockContactButton from "@/components/matching/UnlockContactButton"
+import ScoreRing from "@/components/matching/ScoreRing"
+import KomparasiPreferensi from "@/components/matching/KomparasiPreferensi"
 import SkillVideoFeed from "./SkillVideoFeed"
 
 export const metadata = { title: "Profil Nanny — BundaYakin" }
@@ -22,20 +26,6 @@ function formatPeriod(
   if (isOngoing) return `${start} – Sekarang`
   if (endMonth && endYear) return `${start} – ${MONTHS[endMonth - 1]} ${endYear}`
   return start
-}
-
-function scoreColor(s: number) {
-  return s >= 80 ? "#5BBFB0" : s >= 60 ? "#E07B39" : "#C75D5D"
-}
-
-function scoreTextColor(s: number) {
-  return s >= 80 ? "text-[#2C5F5A]" : s >= 60 ? "text-[#E07B39]" : "text-[#C75D5D]"
-}
-
-function verdictLabel(s: number) {
-  if (s >= 80) return "Sangat Cocok"
-  if (s >= 60) return "Cocok"
-  return "Cukup Cocok"
 }
 
 function formatSalary(n: number) {
@@ -130,6 +120,10 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
   })
   const hasGuarantee = guaranteeRow != null
   const connectionAddonFeeIDR = await getEffectiveValue("CONNECTION_ADDON_FEE_IDR")
+  // Komparasi Preferensi — dihitung deterministik dari SurveyResponse mentah, terpisah dari
+  // skor AI di atas (bisa sesekali tidak sinkron dengan skorDomainA/B/C, lihat ADR-015).
+  // Gratis, tidak dikunci Kuota Koneksi.
+  const komparasiPreferensi = await getKomparasiPreferensi(parentProfile.id, params.nannyId)
 
   if (!nanny) notFound()
 
@@ -205,15 +199,23 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
 
       {/* Score card */}
       {score !== null && (
-        <div className="bg-white border border-[#E0D0F0] rounded-[16px] p-4 mb-4">
-          <div className="text-center mb-3">
-            <div
-              className="font-[var(--font-dm-serif)] leading-none"
-              style={{ fontSize: "48px", color: scoreColor(score) }}
-            >
-              {score}<span style={{ fontSize: "24px" }}>%</span>
+        <div
+          className="bg-white border border-[#E0D0F0] rounded-[16px] p-4 mb-4"
+          style={{ boxShadow: "0 4px 16px rgba(90,58,122,0.07)" }}
+        >
+          <div className="flex flex-col items-center mb-4">
+            <div className="relative" style={{ width: 132, height: 132 }}>
+              <ScoreRing score={score} color={scoreColor(score)} />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div
+                  className="font-[var(--font-dm-serif)] leading-none"
+                  style={{ fontSize: "40px", color: scoreColor(score) }}
+                >
+                  {score}<span style={{ fontSize: "20px" }}>%</span>
+                </div>
+              </div>
             </div>
-            <span className="inline-flex items-center text-[12px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-3 py-0.5 rounded-full mt-1.5">
+            <span className="inline-flex items-center text-[12px] font-semibold bg-[#E5F6F4] text-[#2C5F5A] border border-[#A8DDD8] px-3 py-0.5 rounded-full mt-2">
               {verdictLabel(score)}
             </span>
           </div>
@@ -239,6 +241,10 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
           </div>
         </div>
       )}
+
+      {/* Komparasi Preferensi — perbandingan deterministik jawaban Bunda vs Nanny,
+          terpisah & bisa sesekali tidak sinkron dengan skor AI di atas (lihat ADR-015). */}
+      <KomparasiPreferensi aspects={komparasiPreferensi} />
 
       {/* Video Perkenalan — portrait aspect ratio */}
       {introVideo ? (

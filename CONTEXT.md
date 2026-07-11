@@ -34,7 +34,7 @@ Output AI scoring dari satu Sesi Matching formal: skor per domain, highlight, ti
 _Avoid_: dirancukan dengan Skor Direktori
 
 **Skor Direktori (MatchResult)**:
-Cache skor kecocokan orang tua ↔ nanny untuk direktori, dihitung tanpa Sesi Matching formal.
+Cache skor kecocokan orang tua ↔ nanny untuk direktori, dihitung tanpa Sesi Matching formal. Ditampilkan bersama [[Komparasi Preferensi]] (terhitung terpisah, deterministik) di halaman profil nanny & drawer "Detail Nanny".
 _Avoid_: dirancukan dengan Hasil Matching
 
 **Domain (A/B/C)**:
@@ -51,6 +51,11 @@ Tingkat kedalaman assessment: Layer 1 survey kecocokan (gratis dalam langganan),
 **Capture Work Style**:
 Instrumen kepribadian milik HCC sendiri (revisi dari PAPI Kostick, item & kunci jawaban buatan HCC) — dasar skoring otomatis Layer 2 (Psikotes AI). Skoring deterministik (rumus tetap), dibangun built-in di `apps/web` sebagai deviasi terkontrol dari ADR-009 (lihat [ADR-011](docs/opds/08_adr/ADR-011_capture-work-style-built-in.md)).
 _Avoid_: PAPI Kostick (nama instrumen asli — bukan nama produk HCC yang dipakai user-facing)
+_Catatan (11 Juli 2026)_: Nanny bisa mengerjakan Capture Work Style lewat dua jalur yang berdampingan — mandiri gratis dari dashboard-nya sendiri, atau dipicu lewat [[Undangan Psikotes]] dari Orang Tua. Mandiri sengaja dipertahankan meski ada Undangan Psikotes: setiap Nanny yang mengisi menambah data ke seluruh pool platform, bukan cuma jadi milik satu Orang Tua yang membayar. Lihat [ADR-014](docs/opds/08_adr/ADR-014_undangan-psikotes.md).
+
+**Undangan Psikotes**:
+Aksi Orang Tua membayar (harga diatur admin lewat panel harga, default Rp 300rb — sama dengan harga buka hasil) untuk seorang Nanny tertentu: kalau Nanny itu belum pernah mengerjakan Capture Work Style, pembayaran ini memicu dia mengerjakannya (Orang Tua otomatis dapat akses hasil begitu selesai, tanpa bayar kedua); kalau Nanny itu sudah pernah mengerjakan (baik mandiri maupun lewat Undangan Orang Tua lain), pembayaran yang sama langsung membuka hasil detailnya. Satu harga, satu tombol di NannyDetailDrawer yang teksnya berubah sesuai status Nanny ("Kirim Undangan Psikotes" vs "Lihat Hasil Psikotes"). Tidak ada batas waktu maupun refund kalau Nanny tidak kunjung mengerjakan — sistem hanya mengirim reminder WA berkala ke Nanny sampai selesai.
+_Avoid_: Assignment Psikotes, Penugasan Psikotes — bentrok makna dengan Penugasan (NannyAssignment) yang berarti hubungan kerja aktif nanny-keluarga, bukan soal tes.
 
 **Tester HCC**:
 Admin HCC yang memandu sesi Zoom pengambilan tes grafis (DAP+BAUM) dengan nanny untuk Layer 3, lalu meng-upload hasil gambarnya ke sistem. Bukan peran/akun baru — memakai akun ADMIN yang sudah ada.
@@ -71,6 +76,13 @@ _Catatan (Juli 2026)_: tidak ada jalur "admin carikan nanny secara manual" — o
 
 **Open to Job**:
 Status nanny yang aktif mencari keluarga baru (gaya LinkedIn).
+
+**Komparasi Preferensi**:
+Tampilan di halaman [[Skor Direktori]] yang membandingkan jawaban Tes Kecocokan Bunda vs Nanny per aspek (9 baris: A1, A2, B1, B2, B3, C1–C4), status per aspek: Cocok / Beda Preferensi / Perlu Dibicarakan / Belum Ada Data. Dihitung **deterministik** langsung dari `SurveyResponse` mentah (bukan dari AI) — sumber kebenaran terpisah dari skor domain A/B/C yang dihasilkan Claude API, bisa sesekali tidak sinkron dengan skor itu karena keduanya mengukur hal berbeda (lihat [ADR-015](docs/opds/08_adr/ADR-015_komparasi-preferensi-deterministik.md)). Gratis, tidak dikunci di balik Kuota Koneksi.
+_Avoid_: skor per aspek (istilah ini bukan skor/angka, tapi status kecocokan jawaban)
+
+**Beda Preferensi**:
+Status di [[Komparasi Preferensi]] untuk aspek yang jawaban Bunda & Nanny berbeda TAPI tidak ada pihak yang menandainya wajib cocok — netral, bukan [[Dealbreaker]]. Dibedakan dari framing "Perlu Dibicarakan" yang khusus dipakai untuk Dealbreaker asli, supaya perbedaan preferensi kecil tidak terkesan seserius Dealbreaker.
 
 ### Monetisasi
 

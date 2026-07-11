@@ -55,6 +55,7 @@
 | [ADR-010](ADR-010_portal-psikolog-built-in.md) | Portal Psikolog & Konsultasi Psikolog Anak built-in di `apps/web` | Accepted | Juli 2026 |
 | [ADR-011](ADR-011_capture-work-style-built-in.md) | Capture Work Style (instrumen Layer 2) built-in di `apps/web`, deviasi terkontrol dari ADR-009 | Accepted | Juli 2026 |
 | [ADR-012](ADR-012_pilih-psikolog-dan-jadwal-individual.md) | Orang tua bisa pilih psikolog spesifik & psikolog atur Jadwal Psikolog sendiri (revisi sebagian ADR-010/PRD §7b) | Accepted | Juli 2026 |
+| [ADR-015](ADR-015_komparasi-preferensi-deterministik.md) | Komparasi Preferensi: perbandingan jawaban deterministik per aspek, terpisah dari skor AI | Accepted | Juli 2026 |
 
 ---
 

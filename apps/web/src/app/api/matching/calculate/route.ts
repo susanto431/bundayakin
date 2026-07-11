@@ -12,6 +12,7 @@ import { prisma } from "@/lib/prisma"
 import Anthropic from "@anthropic-ai/sdk"
 import { buildMatchingPrompt, type MatchingPromptResult } from "@/lib/prompts/matching"
 import { getPsikotesInfo } from "@/lib/psikotes"
+import { getKomparasiPreferensi } from "@/lib/preference-comparison"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -62,8 +63,16 @@ export async function POST(req: NextRequest) {
       },
     })
     if (existing) {
-      const psikotes = await getPsikotesInfo(nannyProfileId, existing.psikotesUnlocked)
-      return NextResponse.json({ success: true, data: { ...existing, psikotes } })
+      const [psikotes, komparasiPreferensi] = await Promise.all([
+        getPsikotesInfo(nannyProfileId, existing.psikotesUnlocked),
+        getKomparasiPreferensi(parentProfile.id, nannyProfileId),
+      ])
+      const { user, ...nannyRest } = existing.nannyProfile
+      const phone = existing.kontakTerbuka ? user?.phone ?? null : null
+      return NextResponse.json({
+        success: true,
+        data: { ...existing, nannyProfile: { ...nannyRest, phone }, psikotes, komparasiPreferensi },
+      })
     }
 
     // Ambil nannyProfile
@@ -206,8 +215,19 @@ export async function POST(req: NextRequest) {
     })
 
     console.info("[MATCHING_CALCULATE]", parentProfile.id, nannyProfileId, `skor=${result.skor_keseluruhan}`)
-    const psikotes = matchResult ? await getPsikotesInfo(nannyProfileId, matchResult.psikotesUnlocked) : null
-    return NextResponse.json({ success: true, data: matchResult ? { ...matchResult, psikotes } : matchResult })
+    if (!matchResult) {
+      return NextResponse.json({ success: true, data: matchResult })
+    }
+    const [psikotes, komparasiPreferensi] = await Promise.all([
+      getPsikotesInfo(nannyProfileId, matchResult.psikotesUnlocked),
+      getKomparasiPreferensi(parentProfile.id, nannyProfileId),
+    ])
+    const { user, ...nannyRest } = matchResult.nannyProfile
+    const phone = matchResult.kontakTerbuka ? user?.phone ?? null : null
+    return NextResponse.json({
+      success: true,
+      data: { ...matchResult, nannyProfile: { ...nannyRest, phone }, psikotes, komparasiPreferensi },
+    })
   } catch (error) {
     console.error("[MATCHING_CALCULATE]", error)
     const raw = error instanceof Error ? error.message : String(error)

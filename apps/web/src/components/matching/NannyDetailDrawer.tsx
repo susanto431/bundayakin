@@ -5,6 +5,10 @@ import Image from "next/image"
 import Link from "next/link"
 import PaymentModal from "./PaymentModal"
 import UnlockContactButton from "./UnlockContactButton"
+import ScoreRing from "./ScoreRing"
+import KomparasiPreferensi from "./KomparasiPreferensi"
+import { scoreColor, verdictLabel } from "@/lib/score-display"
+import type { AspectComparison } from "@/lib/preference-comparison"
 
 type MatchDetail = {
   id: string
@@ -27,6 +31,7 @@ type MatchDetail = {
     priceIDR: number | null
     categories: Array<{ id: string; label: string; narratives: string[] }> | null
   }
+  komparasiPreferensi: AspectComparison[]
   nannyProfile: {
     id: string
     fullName: string
@@ -289,16 +294,37 @@ export default function NannyDetailDrawer({
                   ))}
                 </div>
               ) : (
-                <div className="rounded-xl p-4" style={{ backgroundColor: "#E5F6F4" }}>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-semibold text-[#5A3A7A]">Kecocokan Keseluruhan</span>
-                    <span className="text-2xl font-bold text-[#5BBFB0]">{detail.skorKeseluruhan}%</span>
+                <div className="rounded-xl p-4 flex items-center gap-4" style={{ backgroundColor: "#E5F6F4" }}>
+                  <div className="relative flex-shrink-0" style={{ width: 88, height: 88 }}>
+                    <ScoreRing
+                      score={detail.skorKeseluruhan}
+                      size={88}
+                      strokeWidth={8}
+                      color={scoreColor(detail.skorKeseluruhan)}
+                      trackColor="#FFFFFF"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span
+                        className="text-lg font-bold leading-none"
+                        style={{ color: scoreColor(detail.skorKeseluruhan), fontFamily: "var(--font-dm-serif)" }}
+                      >
+                        {detail.skorKeseluruhan}%
+                      </span>
+                    </div>
                   </div>
-                  <DomainBar label="A — Kondisi Kerja" skor={detail.skorDomainA} />
-                  <DomainBar label="B — Nilai & Gaya Hidup" skor={detail.skorDomainB} />
-                  <DomainBar label="C — Pengalaman & Kemampuan" skor={detail.skorDomainC} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-[#5A3A7A] mb-0.5">Kecocokan Keseluruhan</p>
+                    <p className="text-xs text-[#666666] mb-2">{verdictLabel(detail.skorKeseluruhan)}</p>
+                    <DomainBar label="A — Kondisi Kerja" skor={detail.skorDomainA} />
+                    <DomainBar label="B — Nilai & Gaya Hidup" skor={detail.skorDomainB} />
+                    <DomainBar label="C — Pengalaman & Kemampuan" skor={detail.skorDomainC} />
+                  </div>
                 </div>
               )}
+
+              {/* Komparasi Preferensi — perbandingan deterministik jawaban Bunda vs Nanny,
+                  gratis & tidak dikunci Kuota Koneksi (lihat ADR-015). */}
+              <KomparasiPreferensi aspects={detail.komparasiPreferensi} />
 
               {/* Psikotes AI (Layer 2 — Capture Work Style) */}
               {detail.psikotes.available && (
