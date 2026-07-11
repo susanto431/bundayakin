@@ -5,6 +5,7 @@ import { getEffectiveValue } from "@/lib/pricing-config"
 import { scoreColor, scoreTextColor, verdictLabel } from "@/lib/score-display"
 import { getKomparasiPreferensi } from "@/lib/preference-comparison"
 import Image from "next/image"
+import Link from "next/link"
 import { notFound } from "next/navigation"
 import UnlockContactButton from "@/components/matching/UnlockContactButton"
 import ScoreRing from "@/components/matching/ScoreRing"
@@ -159,6 +160,14 @@ export default async function NannyProfilePage({ params }: { params: { nannyId: 
 
   return (
     <div className="max-w-[480px] mx-auto px-4 pt-5 pb-28">
+
+      {/* Back link */}
+      <Link
+        href="/dashboard/parent/cari-nanny"
+        className="text-[12px] text-[#A97CC4] font-semibold mb-3 inline-block"
+      >
+        ← Kembali ke Cari Nanny
+      </Link>
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-5">
