@@ -13,6 +13,10 @@ export type PsikotesCategoryResult = {
 export type PsikotesInfo = {
   available: boolean
   unlocked: boolean
+  /** Kapan Undangan Psikotes terakhir dikirim untuk nanny ini, kalau dia belum
+   * menyelesaikan testnya (ADR-014). Butuh model `PsikotesInvitation` — belum ada,
+   * jadi tetap null sampai bagian backend Undangan Psikotes dibangun. */
+  invitedAt: string | null
   priceIDR: number | null
   categories: PsikotesCategoryResult[] | null
 }
@@ -33,20 +37,22 @@ export async function getPsikotesInfo(nannyProfileId: string, psikotesUnlocked: 
     select: { rawScores: true },
   })
 
-  if (!result) {
-    return { available: false, unlocked: false, priceIDR: null, categories: null }
-  }
-
   const priceIDR = await getEffectiveValue("ADDON_PSIKOTES_FEE_IDR")
 
+  if (!result) {
+    // TODO(ADR-014): cek PsikotesInvitation aktif untuk nannyProfileId ini dan isi invitedAt
+    // begitu model & endpoint /api/payment/psikotes-invite dibangun.
+    return { available: false, unlocked: false, invitedAt: null, priceIDR, categories: null }
+  }
+
   if (!psikotesUnlocked) {
-    return { available: true, unlocked: false, priceIDR, categories: null }
+    return { available: true, unlocked: false, invitedAt: null, priceIDR, categories: null }
   }
 
   const raw = result.rawScores as { dimensionRaw?: Record<CaptureWorkStyleDimension, number> } | null
   const dimensionRaw = raw?.dimensionRaw
   if (!dimensionRaw) {
-    return { available: true, unlocked: true, priceIDR, categories: null }
+    return { available: true, unlocked: true, invitedAt: null, priceIDR, categories: null }
   }
 
   const categories: PsikotesCategoryResult[] = CAPTURE_WORK_STYLE_CATEGORIES.map(cat => ({
@@ -55,5 +61,5 @@ export async function getPsikotesInfo(nannyProfileId: string, psikotesUnlocked: 
     narratives: cat.dimensions.map(dim => getInterpretation(dim, dimensionRaw[dim] ?? 0)),
   }))
 
-  return { available: true, unlocked: true, priceIDR, categories }
+  return { available: true, unlocked: true, invitedAt: null, priceIDR, categories }
 }

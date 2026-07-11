@@ -6,6 +6,7 @@ import { d } from "@/lib/date"
 import Link from "next/link"
 import NannyInviteForm from "@/components/matching/NannyInviteForm"
 import DirectInviteCard from "@/components/matching/DirectInviteCard"
+import PsikotesInviteForm from "@/components/matching/PsikotesInviteForm"
 
 export const metadata = { title: "Cari Nanny — BundaYakin" }
 
@@ -157,6 +158,12 @@ export default async function ParentMatchingPage({
       </div>
 
       <NannyInviteForm inviteCode={inviteCode} />
+
+      {/* Undangan Psikotes (ADR-014) — sengaja bukan bagian dari Jalur A/B di atas:
+          tujuannya beda (assessment mandiri, bukan mencocokkan dengan Bunda ini). */}
+      <div className="mt-5 mb-4">
+        <PsikotesInviteForm priceIDR={defaultQuota.ADDON_PSIKOTES_FEE_IDR} />
+      </div>
 
       {/* Jalur B — AI Talent Pool */}
       <div className="mb-2 mt-2">

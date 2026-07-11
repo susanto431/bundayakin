@@ -28,6 +28,7 @@ type MatchDetail = {
   psikotes: {
     available: boolean
     unlocked: boolean
+    invitedAt: string | null
     priceIDR: number | null
     categories: Array<{ id: string; label: string; narratives: string[] }> | null
   }
@@ -104,6 +105,7 @@ export default function NannyDetailDrawer({
   const [calculating, setCalculating] = useState(false)
   const [unlockingPsikotes, setUnlockingPsikotes] = useState(false)
   const [psikotesError, setPsikotesError] = useState("")
+  const [invitingPsikotes, setInvitingPsikotes] = useState(false)
 
   const fetchDetail = useCallback(async () => {
     setLoading(true)
@@ -194,6 +196,27 @@ export default function NannyDetailDrawer({
     } catch (e) {
       setPsikotesError(e instanceof Error ? e.message : "Gagal membuat pembayaran")
       setUnlockingPsikotes(false)
+    }
+  }
+
+  // Undangan Psikotes (ADR-014): satu harga, satu endpoint — kalau nanny belum pernah
+  // mengerjakan Capture Work Style, pembayaran ini memicu dia mengerjakan; begitu selesai
+  // Bunda otomatis dapat akses (lihat handleUnlockPsikotes), tanpa bayar kedua kali.
+  async function handleInvitePsikotes() {
+    setInvitingPsikotes(true)
+    setPsikotesError("")
+    try {
+      const res = await fetch("/api/payment/psikotes-invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nannyProfileId }),
+      })
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error)
+      window.location.href = json.data.paymentUrl
+    } catch (e) {
+      setPsikotesError(e instanceof Error ? e.message : "Gagal membuat pembayaran")
+      setInvitingPsikotes(false)
     }
   }
 
@@ -326,48 +349,101 @@ export default function NannyDetailDrawer({
                   gratis & tidak dikunci Kuota Koneksi (lihat ADR-015). */}
               <KomparasiPreferensi aspects={detail.komparasiPreferensi} />
 
-              {/* Psikotes AI (Layer 2 — Capture Work Style) */}
-              {detail.psikotes.available && (
-                <div className="rounded-xl p-4 border" style={{ backgroundColor: "#F3EEF8", borderColor: "#E0D0F0" }}>
-                  <p className="font-semibold text-[#5A3A7A] mb-2">🧠 Psikotes AI — Sikap Kerja</p>
-                  {detail.psikotes.unlocked ? (
-                    // Narasi bahasa awam per kategori — TIDAK menampilkan kode dimensi/istilah
-                    // Inggris/angka mentah ke orang tua (aturan larangan CLAUDE.md §5).
-                    <div className="space-y-2">
-                      {detail.psikotes.categories?.map(cat => (
-                        <details key={cat.id} className="group rounded-lg" style={{ backgroundColor: "#FFFFFF" }}>
-                          <summary className="cursor-pointer list-none px-3 py-2.5 flex items-center justify-between text-sm font-semibold text-[#5A3A7A]">
-                            {cat.label}
-                            <span className="text-[#A97CC4] text-xs group-open:rotate-180 transition-transform">▾</span>
-                          </summary>
-                          <div className="px-3 pb-3 space-y-2">
-                            {cat.narratives.map((text, i) => (
-                              <p key={i} className="text-sm text-[#666666] leading-relaxed">{text}</p>
-                            ))}
-                          </div>
-                        </details>
-                      ))}
+              {/* Psikotes AI (Layer 2 — Capture Work Style) — 4 kondisi (ADR-014):
+                  1. Belum ada undangan  2. Menunggu nanny mengerjakan
+                  3. Sudah selesai, belum dibuka  4. Sudah dibuka */}
+              <div className="rounded-xl p-4 border" style={{ backgroundColor: "#F3EEF8", borderColor: "#E0D0F0" }}>
+                <p className="font-semibold text-[#5A3A7A] mb-2">🧠 Psikotes Sikap Kerja</p>
+
+                {detail.psikotes.unlocked ? (
+                  // Kondisi 4 — narasi bahasa awam per kategori, TIDAK menampilkan kode dimensi/
+                  // istilah Inggris/angka mentah ke orang tua (aturan larangan CLAUDE.md §5).
+                  <div className="space-y-2">
+                    {detail.psikotes.categories?.map(cat => (
+                      <details key={cat.id} className="group rounded-lg" style={{ backgroundColor: "#FFFFFF" }}>
+                        <summary className="cursor-pointer list-none px-3 py-2.5 flex items-center justify-between text-sm font-semibold text-[#5A3A7A]">
+                          {cat.label}
+                          <span className="text-[#A97CC4] text-xs group-open:rotate-180 transition-transform">▾</span>
+                        </summary>
+                        <div className="px-3 pb-3 space-y-2">
+                          {cat.narratives.map((text, i) => (
+                            <p key={i} className="text-sm text-[#666666] leading-relaxed">{text}</p>
+                          ))}
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                ) : detail.psikotes.available ? (
+                  // Kondisi 3 — nanny sudah selesai (mandiri atau lewat undangan Bunda lain),
+                  // Bunda ini belum bayar untuk buka hasilnya. Instan begitu bayar.
+                  <>
+                    <p className="text-sm text-[#666666] mb-3">
+                      ✅ Nanny ini sudah menyelesaikan Tes Sikap Kerja. Buka hasilnya untuk lihat gambaran gaya kerja & kepribadiannya.
+                    </p>
+                    {psikotesError && <p className="text-sm text-[#C75D5D] mb-2">{psikotesError}</p>}
+                    <button
+                      onClick={handleUnlockPsikotes}
+                      disabled={unlockingPsikotes}
+                      className="w-full py-2.5 rounded-lg font-semibold text-white text-sm disabled:opacity-50 transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: "#A97CC4" }}
+                    >
+                      {unlockingPsikotes
+                        ? "Memproses..."
+                        : `Lihat Hasil Psikotes — Rp ${(detail.psikotes.priceIDR ?? 0).toLocaleString("id-ID")}`}
+                    </button>
+                  </>
+                ) : detail.psikotes.invitedAt ? (
+                  // Kondisi 2 — undangan sudah dibayar, menunggu nanny mengerjakan. Tidak ada
+                  // jaminan waktu (ADR-014) — copy harus jujur & tidak terkesan macet/error.
+                  <>
+                    <div className="inline-flex items-center gap-1.5 mb-2 px-2.5 py-1 rounded-full text-xs font-semibold"
+                      style={{ backgroundColor: "#FDF0DC", color: "#9A6B1E" }}>
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: "#D9A441" }} />
+                      Menunggu Nanny Mengerjakan
                     </div>
-                  ) : (
-                    <>
-                      <p className="text-sm text-[#666666] mb-3">
-                        Nanny ini sudah mengisi Tes Sikap Kerja. Buka hasilnya untuk lihat gambaran gaya kerja & kepribadiannya.
-                      </p>
-                      {psikotesError && <p className="text-sm text-[#C75D5D] mb-2">{psikotesError}</p>}
-                      <button
-                        onClick={handleUnlockPsikotes}
-                        disabled={unlockingPsikotes}
-                        className="w-full py-2.5 rounded-lg font-semibold text-white text-sm disabled:opacity-50 transition-opacity hover:opacity-90"
-                        style={{ backgroundColor: "#A97CC4" }}
+                    <p className="text-sm text-[#666666] mb-1 leading-relaxed">
+                      Undangan sudah terkirim. Nanny mengerjakan 90 pertanyaan ini sendiri di waktu luangnya — kami kirim pengingat WhatsApp otomatis ke nanny sampai selesai.
+                    </p>
+                    <p className="text-xs text-[#999AAA] mb-3 leading-relaxed">
+                      Waktu pengerjaan tidak bisa dipastikan platform. Begitu nanny submit jawabannya, hasil langsung muncul di sini dan Bunda akan dapat notifikasi.
+                    </p>
+                    {detail.kontakTerbuka && nanny?.phone && (
+                      <a
+                        href={`https://api.whatsapp.com/send?phone=${nanny.phone.replace(/\D/g, "").replace(/^0/, "62")}&text=${encodeURIComponent(
+                          `Halo ${nanny.fullName}, saya sudah kirim undangan Tes Sikap Kerja di BundaYakin. Boleh dibantu dikerjakan kalau ada waktu ya, terima kasih!`
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center text-sm font-semibold text-[#5BBFB0] hover:underline"
                       >
-                        {unlockingPsikotes
-                          ? "Memproses..."
-                          : `Buka Hasil — Rp ${(detail.psikotes.priceIDR ?? 0).toLocaleString("id-ID")}`}
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
+                        Ingatkan sendiri via WhatsApp →
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  // Kondisi 1 — belum ada undangan sama sekali. Nanny juga tetap bisa mengisi
+                  // mandiri gratis dari dashboard-nya sendiri (lihat CONTEXT.md § Capture Work Style).
+                  <>
+                    <p className="text-sm text-[#666666] mb-1 leading-relaxed">
+                      Nanny ini belum mengerjakan Tes Sikap Kerja (90 pertanyaan tentang gaya kerjanya).
+                    </p>
+                    <p className="text-xs text-[#999AAA] mb-3 leading-relaxed">
+                      Kirim undangan — begitu nanny selesai mengerjakan, Bunda otomatis bisa lihat hasilnya tanpa bayar dua kali. Nanny mengerjakan sendiri, waktunya tidak bisa dipastikan.
+                    </p>
+                    {psikotesError && <p className="text-sm text-[#C75D5D] mb-2">{psikotesError}</p>}
+                    <button
+                      onClick={handleInvitePsikotes}
+                      disabled={invitingPsikotes}
+                      className="w-full py-2.5 rounded-lg font-semibold text-white text-sm disabled:opacity-50 transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: "#A97CC4" }}
+                    >
+                      {invitingPsikotes
+                        ? "Memproses..."
+                        : `Kirim Undangan Psikotes — Rp ${(detail.psikotes.priceIDR ?? 0).toLocaleString("id-ID")}`}
+                    </button>
+                  </>
+                )}
+              </div>
 
               {/* Kekuatan */}
               {detail.kekuatan.length > 0 && (
