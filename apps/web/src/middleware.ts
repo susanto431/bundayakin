@@ -19,7 +19,14 @@ export default auth(function middleware(req) {
   // Redirect logged-in users away from auth pages
   if (isAuthPage && session) {
     if (role === "PARENT") return NextResponse.redirect(new URL("/dashboard/parent", req.url))
-    if (role === "NANNY") return NextResponse.redirect(new URL("/dashboard/nanny", req.url))
+    if (role === "NANNY") {
+      // Akun shell dari Undangan Psikotes (ADR-017) — skip dashboard/onboarding penuh,
+      // langsung ke tes. Flag dibersihkan begitu dia submit tesnya (lihat api/nanny/tes-sikap-kerja).
+      const psikotesOnlyOnboarding = session.user?.psikotesOnlyOnboarding as boolean | undefined
+      return NextResponse.redirect(
+        new URL(psikotesOnlyOnboarding ? "/dashboard/nanny/tes-sikap-kerja" : "/dashboard/nanny", req.url)
+      )
+    }
     if (role === "PSIKOLOG") return NextResponse.redirect(new URL("/dashboard/psikolog", req.url))
     if (role === "ADMIN" || canSwitchRoles) return NextResponse.redirect(new URL("/dashboard/admin", req.url))
   }

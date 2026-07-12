@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     }
 
     const [psikotes, komparasiPreferensi] = await Promise.all([
-      getPsikotesInfo(nannyProfileId, matchResult.psikotesUnlocked),
+      getPsikotesInfo(nannyProfileId, parentProfile.id, matchResult.psikotesUnlocked),
       getKomparasiPreferensi(parentProfile.id, nannyProfileId),
     ])
 

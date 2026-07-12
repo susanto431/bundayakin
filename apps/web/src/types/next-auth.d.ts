@@ -7,12 +7,14 @@ declare module "next-auth" {
       role: string
       originalRole: string
       canSwitchRoles: boolean
+      psikotesOnlyOnboarding: boolean
     } & DefaultSession["user"]
   }
 
   interface User {
     role: string
     canSwitchRoles?: boolean
+    psikotesOnlyOnboarding?: boolean
   }
 }
 
@@ -22,5 +24,6 @@ declare module "next-auth/jwt" {
     role: string
     originalRole: string
     canSwitchRoles: boolean
+    psikotesOnlyOnboarding: boolean
   }
 }

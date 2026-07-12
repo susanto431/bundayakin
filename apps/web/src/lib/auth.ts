@@ -39,12 +39,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const canSwitchRoles = (user.phone != null && normalizePhone(user.phone) === "6287888180363") || user.role === "ADMIN"
 
+        let psikotesOnlyOnboarding = false
+        if (user.role === "NANNY") {
+          const nannyProfile = await prisma.nannyProfile.findUnique({
+            where: { userId: user.id },
+            select: { psikotesOnlyOnboarding: true },
+          })
+          psikotesOnlyOnboarding = nannyProfile?.psikotesOnlyOnboarding ?? false
+        }
+
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
           canSwitchRoles,
+          psikotesOnlyOnboarding,
         }
       },
     }),

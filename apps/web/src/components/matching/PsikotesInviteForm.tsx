@@ -6,10 +6,7 @@ type Props = {
   priceIDR: number
 }
 
-// Backend Undangan Psikotes (/api/payment/psikotes-invite, ADR-014) belum dibangun —
-// nonaktifkan form-nya di production supaya tidak ada yang submit lalu kena error nyata.
-// Nyalakan lagi begitu endpoint-nya sudah ada.
-const PSIKOTES_INVITE_ENABLED = false
+const PSIKOTES_INVITE_ENABLED = true
 
 function toInternationalPhone(phone: string): string {
   const digits = phone.replace(/\D/g, "")

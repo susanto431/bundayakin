@@ -8,7 +8,11 @@ export default async function LandingPage() {
   const role = session?.user?.role
   const canSwitchRoles = session?.user?.canSwitchRoles
   if (role === "PARENT") redirect("/dashboard/parent")
-  if (role === "NANNY") redirect("/dashboard/nanny")
+  if (role === "NANNY") {
+    // Akun shell dari Undangan Psikotes (ADR-017) — skip dashboard/onboarding penuh,
+    // langsung ke tes. Flag dibersihkan begitu dia submit tesnya.
+    redirect(session?.user?.psikotesOnlyOnboarding ? "/dashboard/nanny/tes-sikap-kerja" : "/dashboard/nanny")
+  }
   if (role === "PSIKOLOG") redirect("/dashboard/psikolog")
   if (role === "ADMIN" || canSwitchRoles) redirect("/dashboard/admin")
 

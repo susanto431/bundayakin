@@ -58,6 +58,7 @@
 | [ADR-014](ADR-014_undangan-psikotes.md) | Undangan Psikotes: jalur berbayar dari Orang Tua berdampingan dengan self-service Nanny, satu harga untuk lihat-hasil/kirim-undangan | Accepted | Juli 2026 |
 | [ADR-015](ADR-015_komparasi-preferensi-deterministik.md) | Komparasi Preferensi: perbandingan jawaban deterministik per aspek, terpisah dari skor AI | Accepted | Juli 2026 |
 | [ADR-016](ADR-016_talent-pool-kontak-selalu-berbayar.md) | AI Talent Pool: buka nomor WA nanny selalu berbayar (Rp250rb), kuota gratis dihapus (Referral tidak terpengaruh) | Accepted | Juli 2026 |
+| [ADR-017](ADR-017_undangan-psikotes-nanny-belum-terdaftar.md) | Undangan Psikotes untuk Nanny belum terdaftar: akun mandiri saat pembayaran, bukan menumpang Flow A (revisi sebagian ADR-014) | Accepted | Juli 2026 |
 
 ---
 

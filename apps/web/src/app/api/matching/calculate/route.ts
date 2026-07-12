@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     })
     if (existing && !isMatchResultStale(existing.generatedAt)) {
       const [psikotes, komparasiPreferensi] = await Promise.all([
-        getPsikotesInfo(nannyProfileId, existing.psikotesUnlocked),
+        getPsikotesInfo(nannyProfileId, parentProfile.id, existing.psikotesUnlocked),
         getKomparasiPreferensi(parentProfile.id, nannyProfileId),
       ])
       const { user, ...nannyRest } = existing.nannyProfile
@@ -221,7 +221,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, data: matchResult })
     }
     const [psikotes, komparasiPreferensi] = await Promise.all([
-      getPsikotesInfo(nannyProfileId, matchResult.psikotesUnlocked),
+      getPsikotesInfo(nannyProfileId, parentProfile.id, matchResult.psikotesUnlocked),
       getKomparasiPreferensi(parentProfile.id, nannyProfileId),
     ])
     const { user, ...nannyRest } = matchResult.nannyProfile

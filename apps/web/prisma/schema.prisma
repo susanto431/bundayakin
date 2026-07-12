@@ -100,6 +100,7 @@ enum TransactionType {
   CONNECTION_ADDON      // Rp 100rb — buka koneksi setelah kuota habis (via Mayar)
   PLACEMENT_FEE         // fee penyaluran nanny
   CONSULTATION_PSIKOLOG_ANAK // Konsultasi Psikolog Anak (Tumbuh Kembang Tahap 2) — harga per level, lihat PRD 13 §4/§7b
+  PSIKOTES_INVITE       // Undangan Psikotes (ADR-014) — sama harga dengan ADDON_PSIKOTES, beda pemicu
 }
 
 enum NannyMediaType {
@@ -643,6 +644,13 @@ model NannyProfile {
 
   // Availability
   isAvailable         Boolean            @default(true)
+
+  // Akun "shell" dibuat langsung oleh Undangan Psikotes untuk nanny yang belum terdaftar
+  // sama sekali (ADR-017) — belum ada password/profil lengkap saat dibuat. Begitu true,
+  // login pertama diarahkan langsung ke tes-sikap-kerja (skip onboarding), lalu dibersihkan
+  // ke false begitu dia submit tesnya.
+  psikotesOnlyOnboarding Boolean         @default(false)
+
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 
@@ -1433,6 +1441,42 @@ model MatchResult {
   @@unique([parentProfileId, nannyProfileId])
   @@index([parentProfileId])
   @@index([nannyProfileId])
+}
+
+// ============================================================
+// PSIKOTES INVITATION — Undangan Psikotes (ADR-014, jalur nanny belum terdaftar direvisi ADR-017)
+// Parent bayar untuk memicu SATU nanny mengerjakan Capture Work Style (Layer 2).
+// nannyProfileId selalu terisi begitu pembayaran sukses (baik nanny yang sudah match/terdaftar
+// maupun nanny off-platform — untuk off-platform, webhook langsung buat akun+profil shell,
+// TIDAK menunggu dia mendaftar sendiri lewat Flow A, lihat ADR-017). Nullable tetap dipertahankan
+// untuk jaga-jaga kegagalan parsial, bukan karena ada alur yang sengaja menunda pengisiannya.
+// Tidak pakai relasi Prisma eksplisit ke ParentProfile/NannyProfile/Transaction —
+// mengikuti pola Transaction.parentProfileId/nannyProfileId yang sudah ada (foreign key polos, join manual).
+// ============================================================
+
+model PsikotesInvitation {
+  id              String    @id @default(cuid())
+  parentProfileId String
+  transactionId   String    @unique
+  nannyProfileId  String?
+  nannyName       String
+  nannyPhone      String    // format internasional 62xxxxxxxxxx
+
+  // "WAITING_COMPLETION" (menunggu nanny isi tes — termasuk yang belum atur kata sandi
+  // akun shell-nya) | "COMPLETED" (tes selesai, hasil sudah dikirim)
+  status          String    @default("WAITING_COMPLETION")
+  invitedAt       DateTime
+  completedAt     DateTime?
+  lastReminderAt  DateTime?
+  reminderCount   Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentProfileId])
+  @@index([nannyProfileId])
+  @@index([nannyPhone])
+  @@index([status])
 }
 
 // ============================================================

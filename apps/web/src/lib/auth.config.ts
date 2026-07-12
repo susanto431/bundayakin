@@ -15,6 +15,7 @@ export const authConfig: NextAuthConfig = {
         token.role = (user as { role?: string }).role ?? ""
         token.originalRole = (user as { role?: string }).role ?? ""
         token.canSwitchRoles = (user as { canSwitchRoles?: boolean }).canSwitchRoles ?? false
+        token.psikotesOnlyOnboarding = (user as { psikotesOnlyOnboarding?: boolean }).psikotesOnlyOnboarding ?? false
       }
       if (trigger === "update") {
         const incoming = session as { switchToRole?: string; email?: string } | undefined
@@ -35,6 +36,7 @@ export const authConfig: NextAuthConfig = {
         session.user.role = (token.role as string) ?? ""
         session.user.originalRole = (token.originalRole as string) ?? token.role as string ?? ""
         session.user.canSwitchRoles = (token.canSwitchRoles as boolean) ?? false
+        session.user.psikotesOnlyOnboarding = (token.psikotesOnlyOnboarding as boolean) ?? false
         // Pastikan email selalu tersinkron dari token ke session
         if (token.email) session.user.email = token.email
       }

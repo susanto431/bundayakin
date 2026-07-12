@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { CAPTURE_WORK_STYLE_ITEMS } from "@/lib/capture-work-style-instrument"
 import { scoreCaptureWorkStyle, type CaptureWorkStyleAnswer } from "@/lib/capture-work-style-scoring"
+import { resolvePsikotesInvitationsOnCompletion } from "@/lib/psikotes-invitation"
 import { NextResponse } from "next/server"
 
 // POST /api/nanny/tes-sikap-kerja
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
 
     const nannyProfile = await prisma.nannyProfile.findUnique({
       where: { userId: session.user.id },
-      select: { id: true },
+      select: { id: true, psikotesOnlyOnboarding: true },
     })
     if (!nannyProfile) {
       return NextResponse.json({ success: false, error: "Profil nanny tidak ditemukan" }, { status: 404 })
@@ -63,6 +64,23 @@ export async function POST(request: Request) {
         interpretedBy: "AI",
       },
     })
+
+    // Akun shell dari Undangan Psikotes (ADR-017) — begitu tes selesai, lepas status "khusus
+    // psikotes" supaya login berikutnya kembali ke dashboard nanny biasa, bukan ke halaman tes lagi.
+    if (nannyProfile.psikotesOnlyOnboarding) {
+      await prisma.nannyProfile.update({
+        where: { id: nannyProfile.id },
+        data: { psikotesOnlyOnboarding: false },
+      })
+    }
+
+    // Selesaikan Undangan Psikotes (ADR-014/017) yang menunggu nanny ini, kalau ada — non-fatal,
+    // tidak boleh menggagalkan submit tes nanny.
+    try {
+      await resolvePsikotesInvitationsOnCompletion(nannyProfile.id)
+    } catch (e) {
+      console.error("[NANNY_TES_SIKAP_KERJA_POST] resolvePsikotesInvitationsOnCompletion gagal", e)
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
