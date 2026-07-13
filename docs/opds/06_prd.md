@@ -1,11 +1,12 @@
 # Product Requirements Document (PRD)
 ## BundaYakin — Human Care Consulting
 
-> Versi 1.3 · Diperbarui 11 Juli 2026 (nama tampilan Layer 2 diganti) · Dokumen Internal OPDS
+> Versi 1.4 · Diperbarui 13 Juli 2026 (bug fix Pricing Config Panel) · Dokumen Internal OPDS
 > Scope: Fasa 1 — Platform Kecocokan & Pemantauan
 > Changelog v1.1: status Mayar diperbarui (production aktif), direktori nanny internal masuk scope shipped, auto-login pasca registrasi, profil anak dibuka untuk akun free
 > Changelog v1.2: **Layer 2 (Psikotes AI) selesai dikoding** — lihat §5 & §8; Layer 3 (psikolog) SOP-nya sudah final walau belum dikoding
 > Changelog v1.3 (11 Juli 2026): nama tampilan Layer 2 diganti dari "Tes Sikap Kerja" menjadi **"Psikotes Karakter Kerja Nanny"** — lihat §5
+> Changelog v1.4 (13 Juli 2026): **fix bug Pricing Config Panel** — kalau admin mengubah harga/kuota lebih dari sekali di tanggal yang sama, sistem sempat bisa menampilkan perubahan yang bukan yang terakhir dibuat sebagai harga berlaku. Sekarang selalu perubahan TERAKHIR yang menang. Detail teknis di [ADR-008](08_adr/ADR-008_pricing-config-panel.md).
 > **Juli 2026:** langganan kini dua pilar ([ADR-007](08_adr/ADR-007_langganan-dua-pilar.md)) — pilar kedua "Tumbuh Kembang" punya PRD sendiri: [13_prd_tumbuh_kembang.md](13_prd_tumbuh_kembang.md)
 
 ---

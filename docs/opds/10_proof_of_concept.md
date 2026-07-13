@@ -69,7 +69,7 @@ Kode kunci: `src/lib/claude.ts` (prompt & parsing), `src/constants/matching-weig
 ### 3.2 Monetisasi (H2)
 
 - Langganan Rp 500rb/tahun: halaman subscription → invoice Mayar → redirect checkout → webhook `api/payment/webhook` (lookup via `productId` + `lookupId`) → status ACTIVE + kuota talent pool terbuka.
-- Placement fee Rp 1,2jt (satu tarif flat) via `api/payment/placement`; harga & kuota kini bisa diatur admin lewat Pricing Config Panel ([ADR-008](08_adr/ADR-008_pricing-config-panel.md)).
+- Placement fee Rp 1,2jt (satu tarif flat) via `api/payment/placement`; harga & kuota kini bisa diatur admin lewat Pricing Config Panel ([ADR-008](08_adr/ADR-008_pricing-config-panel.md)) — **bug fix 13 Juli 2026**: perubahan ganda di tanggal yang sama sempat bisa salah pilih harga lama sebagai yang berlaku, sekarang selalu perubahan terakhir yang menang.
 - Kuota Koneksi rolling 30 hari: 3 referral gratis/30 hari (lalu Rp100rb/koneksi via Connection Add-on) — logika di `src/lib/queries/parent.ts`. **AI Talent Pool tidak lagi punya kuota gratis** (revisi 11 Juli 2026, [ADR-016](08_adr/ADR-016_talent-pool-kontak-selalu-berbayar.md)): buka nomor WA nanny dari Talent Pool selalu Rp250rb/kontak, kecuali pemegang Jaminan Kecocokan.
 
 ### 3.3 Profil digital nanny (H3)

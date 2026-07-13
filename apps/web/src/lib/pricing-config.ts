@@ -44,7 +44,11 @@ async function fetchEffectiveValues(atISO: string): Promise<Record<PricingConfig
   const at = new Date(atISO)
   const entries = await prisma.pricingConfigEntry.findMany({
     where: { cancelled: false, effectiveFrom: { lte: at } },
-    orderBy: { effectiveFrom: "desc" },
+    // Urutan kedua (createdAt desc) wajib ada: kalau beberapa perubahan
+    // dijadwalkan untuk tanggal yang sama (mis. via date picker tanpa jam),
+    // effectiveFrom-nya identik dan urutan "desc" saja tidak deterministik —
+    // bisa mengembalikan entry lama, bukan yang terakhir dibuat admin.
+    orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }],
     select: { key: true, value: true },
   })
 
@@ -163,7 +167,7 @@ export async function cancelScheduledChange(entryId: string, cancelledByUserId: 
 export async function listScheduleForKey(key: PricingConfigKey) {
   return prisma.pricingConfigEntry.findMany({
     where: { key },
-    orderBy: { effectiveFrom: "desc" },
+    orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }],
     select: {
       id: true,
       value: true,
